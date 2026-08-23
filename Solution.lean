@@ -1,4 +1,4 @@
-import PalomarTemplate
+import TuzaRankFour
 
 /-!
 # Proved solution
@@ -8,6 +8,13 @@ declaration below has exactly the same statement as its counterpart in
 `Challenge.lean` and uses only the permitted axioms.
 -/
 
-theorem PalomarTemplate.main_result (n : ℕ) : n + n = 2 * n := by
-  exact add_self_eq_two_mul n
+namespace SimpleGraph
+
+theorem tuza_rank_four {V : Type*} [Fintype V]
+    (G : SimpleGraph V)
+    (hν : G.trianglePackingNumber ≤ 4) :
+    G.triangleTransversalNumber ≤ 2 * G.trianglePackingNumber := by
+  exact tuza_rank_four_proof G hν
+
+end SimpleGraph
 

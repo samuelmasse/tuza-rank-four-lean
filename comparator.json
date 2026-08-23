@@ -1,8 +1,15 @@
 {
   "challenge_module": "Challenge",
   "solution_module": "Solution",
-  "theorem_names": ["PalomarTemplate.main_result"],
-  "definition_names": [],
+  "theorem_names": ["SimpleGraph.tuza_rank_four"],
+  "definition_names": [
+    "SimpleGraph.triangles",
+    "SimpleGraph.edges",
+    "SimpleGraph.IsTrianglePacking",
+    "SimpleGraph.IsTriangleTransversal",
+    "SimpleGraph.trianglePackingNumber",
+    "SimpleGraph.triangleTransversalNumber"
+  ],
   "permitted_axioms": ["propext", "Quot.sound", "Classical.choice"],
   "enable_nanoda": true
 }

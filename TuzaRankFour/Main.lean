@@ -1,4 +1,5 @@
 import TuzaRankFour.Parker
+import TuzaRankFour.Reduction
 
 /-!
 # Tuza's conjecture for packing number at most four

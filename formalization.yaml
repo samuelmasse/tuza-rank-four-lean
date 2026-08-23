@@ -64,10 +64,11 @@ related_formalizations: []
 status:
   scope: >-
     The audited definitions and exact rank-four theorem statement are present.
-    Foundational extremal lemmas and the rank-zero case are proved. The Parker
-    rank-at-most-three input, the twelve-vertex analytic reduction, the 66-case
-    finite bridge, and the final theorem are still being formalized. The
-    stronger K4-free nu=4, tau<=7 statement is intentionally outside scope.
+    The foundational extremal theory and Parker's theorem through packing rank
+    three are proved in Lean. The twelve-vertex analytic reduction, the
+    graph-to-certificate translation for the 66 finite cases, and the final
+    rank-four theorem are still being formalized. The stronger K4-free nu=4,
+    tau<=7 statement is intentionally outside scope.
   sorry_count: 1
   sorry_in_definitions: 0
   axioms: ["sorryAx"]

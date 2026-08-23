@@ -25,8 +25,9 @@ arbitrary `SimpleGraph` on it.
 The planned finite endpoint converts the 66 independently checked DRAT
 refutations to LRAT. Mathlib's LRAT importer has been smoke-tested on the
 frozen certificates and produces ordinary Lean theorems using only Palomar's
-permitted axioms. The analytic reduction and the graph-to-certificate bridge
-remain ordinary Lean proof obligations.
+permitted axioms. Parker's theorem through packing rank three is now proved in
+Lean. The rank-four analytic reduction and graph-to-certificate bridge remain
+ordinary Lean proof obligations.
 
 ## Build
 

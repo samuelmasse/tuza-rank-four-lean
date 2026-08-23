@@ -14,6 +14,15 @@ namespace SimpleGraph
 variable {V : Type*} [Fintype V] [DecidableEq V]
 variable (G : SimpleGraph V)
 
+omit [Fintype V] in
+private theorem pair_subset_of_mem {u v : V} {s : Finset V}
+    (hu : u ∈ s) (hv : v ∈ s) : ({u, v} : Finset V) ⊆ s := by
+  intro w hw
+  simp only [Finset.mem_insert, Finset.mem_singleton] at hw
+  rcases hw with hwu | hwv
+  · exact hwu ▸ hu
+  · exact hwv ▸ hv
+
 /-- `C` covers the triangle subfamily `F` by graph edges. -/
 def IsTriangleFamilyTransversal
     (F C : Finset (Finset V)) : Prop :=
@@ -502,6 +511,13 @@ noncomputable def privateTriangles
   classical
   exact G.triangles.filter fun q ↦
     2 ≤ (q ∩ e).card ∧ (q ∩ f).card ≤ 1
+
+/-- Triangles close to `t` and to neither of two other packing members. -/
+noncomputable def exclusiveTriangles
+    (t e f : Finset V) : Finset (Finset V) := by
+  classical
+  exact G.triangles.filter fun q ↦
+    2 ≤ (q ∩ t).card ∧ (q ∩ e).card ≤ 1 ∧ (q ∩ f).card ≤ 1
 
 /-- Maximality of a two-packing: every triangle shares an edge with one of
 its two members. -/
@@ -1084,6 +1100,32 @@ theorem trianglePackingNumber_deleteEdgesWithin_le_two
   rw [Finset.card_insert_of_notMem htNot] at hbound
   omega
 
+/-- Deleting the internal edges of a triangle lowers the packing number by
+at least one. -/
+theorem trianglePackingNumber_deleteEdgesWithin_add_one_le
+    {t : Finset V} (ht : t ∈ G.triangles) :
+    (G.deleteEdgesWithin t).trianglePackingNumber + 1 ≤
+      G.trianglePackingNumber := by
+  classical
+  obtain ⟨P, hP, hPcard⟩ :=
+    (G.deleteEdgesWithin t).exists_max_trianglePacking
+  have hPsubG : P ⊆ G.triangles := by
+    intro q hq
+    exact (G.mem_triangles_deleteEdgesWithin_iff.mp (hP.1 hq)).1
+  have hPG : G.IsTrianglePacking P := ⟨hPsubG, hP.2⟩
+  have hcompat : ∀ ⦃q⦄, q ∈ P → (q ∩ t).card ≤ 1 := by
+    intro q hq
+    exact (G.mem_triangles_deleteEdgesWithin_iff.mp (hP.1 hq)).2
+  have htNot : t ∉ P := by
+    intro htP
+    have hsmall := hcompat htP
+    have htCard := G.card_eq_three_of_mem_triangles ht
+    simp [htCard] at hsmall
+  have hinsert := G.isTrianglePacking_insert hPG ht hcompat
+  have hbound := G.card_le_trianglePackingNumber hinsert
+  rw [Finset.card_insert_of_notMem htNot, hPcard] at hbound
+  exact hbound
+
 /-- Parker's deletion step: a two-edge cover of all triangles near one
 triangle in a maximum three-packing extends to a six-edge transversal. -/
 theorem exists_six_transversal_of_two_cover_near_triangle
@@ -1117,5 +1159,1372 @@ theorem exists_six_transversal_of_two_cover_near_triangle
         obtain ⟨e, he, heq⟩ := hC₁.2 hq'
         exact ⟨e, Finset.mem_union_right C₀ he, heq⟩
   · exact (Finset.card_union_le C₀ C₁).trans (by omega)
+
+/-- Specialized form of Parker's Lemma 15 for a type-1a maximum packing.
+If the triangles exclusive to `f` have a common pair and `f` is disjoint
+from `g`, deleting the internal edges of `f` and `e` leaves a rank-one
+graph. -/
+theorem exists_six_transversal_of_common_exclusive_pair
+    (hν : G.trianglePackingNumber ≤ 3)
+    {e f g d : Finset V}
+    (he : e ∈ G.triangles) (hf : f ∈ G.triangles)
+    (_hg : g ∈ G.triangles)
+    (hef : (e ∩ f).card ≤ 1) (hfg : Disjoint f g)
+    (hd : d ∈ f.powersetCard 2)
+    (hdcommon : ∀ ⦃q⦄, q ∈ G.exclusiveTriangles f e g → d ⊆ q) :
+    ∃ C : Finset (Finset V), G.IsTriangleTransversal C ∧ C.card ≤ 6 := by
+  classical
+  let S := G.exclusiveTriangles f e g
+  have hCS : G.IsTriangleFamilyTransversal S {d} := by
+    constructor
+    · intro a ha
+      simp only [Finset.mem_singleton] at ha
+      subst a
+      have hddata := Finset.mem_powersetCard.mp hd
+      exact G.mem_edges_of_subset_triangle hf hddata.1 hddata.2
+    · intro q hq
+      exact ⟨d, by simp, hdcommon hq⟩
+  let G₁ := G.deleteEdgesWithin f
+  have he₁ : e ∈ G₁.triangles := by
+    rw [G.mem_triangles_deleteEdgesWithin_iff]
+    exact ⟨he, by simpa [Finset.inter_comm] using hef⟩
+  have hν₁ : G₁.trianglePackingNumber ≤ 2 := by
+    have hdrop := G.trianglePackingNumber_deleteEdgesWithin_add_one_le hf
+    have : (G.deleteEdgesWithin f).trianglePackingNumber ≤ 2 := by omega
+    simpa [G₁] using this
+  let G₂ := G₁.deleteEdgesWithin e
+  have hν₂ : G₂.trianglePackingNumber ≤ 1 := by
+    have hdrop := G₁.trianglePackingNumber_deleteEdgesWithin_add_one_le he₁
+    have : (G₁.deleteEdgesWithin e).trianglePackingNumber ≤ 1 := by omega
+    simpa [G₂] using this
+  have htuza₂ := G₂.tuza_of_trianglePackingNumber_le_one hν₂
+  obtain ⟨C₂, hC₂, hC₂eq⟩ := G₂.exists_min_triangleTransversal
+  have hC₂card : C₂.card ≤ 2 := by
+    rw [hC₂eq]
+    exact htuza₂.trans (by omega)
+  have hCE := G.powersetCard_two_is_family_transversal
+    (F := G.nearTriangles e) he (by
+      intro q hq
+      exact (Finset.mem_filter.mp hq).2)
+  let C : Finset (Finset V) := {d} ∪ e.powersetCard 2 ∪ C₂
+  refine ⟨C, ?_, ?_⟩
+  · constructor
+    · intro a ha
+      simp only [C, Finset.mem_union] at ha
+      rcases ha with (ha | ha) | ha
+      · exact hCS.1 ha
+      · exact hCE.1 ha
+      · have haG₂ : a ∈ G₂.edges := hC₂.1 ha
+        have haG₁ : a ∈ G₁.edges :=
+          (G₁.edges_deleteEdgesWithin_subset (t := e)) haG₂
+        exact (G.edges_deleteEdgesWithin_subset (t := f)) haG₁
+    · intro q hq
+      by_cases hqe : 2 ≤ (q ∩ e).card
+      · obtain ⟨a, ha, haq⟩ := hCE.2
+          (Finset.mem_filter.mpr ⟨hq, hqe⟩)
+        exact ⟨a, by simp [C, ha], haq⟩
+      · by_cases hqf : 2 ≤ (q ∩ f).card
+        · have hqg : (q ∩ g).card ≤ 1 :=
+            card_inter_le_one_of_disjoint_of_large_inter
+              (G.card_eq_three_of_mem_triangles hq) hfg hqf
+          have hqS : q ∈ S := Finset.mem_filter.mpr
+            ⟨hq, hqf, by omega, hqg⟩
+          obtain ⟨a, ha, haq⟩ := hCS.2 hqS
+          have had : a = d := by simpa using ha
+          exact ⟨a, by simp [C, had], haq⟩
+        · have hqG₁ : q ∈ G₁.triangles := by
+            rw [G.mem_triangles_deleteEdgesWithin_iff]
+            exact ⟨hq, by omega⟩
+          have hqG₂ : q ∈ G₂.triangles := by
+            rw [G₁.mem_triangles_deleteEdgesWithin_iff]
+            exact ⟨hqG₁, by omega⟩
+          obtain ⟨a, ha, haq⟩ := hC₂.2 hqG₂
+          exact ⟨a, by simp [C, ha], haq⟩
+  · have hEcard := G.card_powersetCard_two_of_triangle he
+    have hsingle : ({d} : Finset (Finset V)).card = 1 := by simp
+    have hunion₁ := Finset.card_union_le ({d} : Finset (Finset V))
+      (e.powersetCard 2)
+    have hunion₂ := Finset.card_union_le
+      (({d} : Finset (Finset V)) ∪ e.powersetCard 2) C₂
+    change (({d} : Finset (Finset V)) ∪ e.powersetCard 2 ∪ C₂).card ≤ 6
+    omega
+
+/-- A maximum three-packing with one member vertex-disjoint from the other
+two has a six-edge transversal. -/
+theorem exists_six_transversal_of_isolated_packing_member
+    (hν : G.trianglePackingNumber ≤ 3)
+    {t e f : Finset V}
+    (ht : t ∈ G.triangles) (he : e ∈ G.triangles)
+    (hf : f ∈ G.triangles)
+    (hte : Disjoint t e) (htf : Disjoint t f)
+    (hef : (e ∩ f).card ≤ 1) :
+    ∃ C : Finset (Finset V), G.IsTriangleTransversal C ∧ C.card ≤ 6 := by
+  classical
+  let T := G.nearTriangles t
+  have hTsub : T ⊆ G.triangles := by
+    intro q hq
+    exact (Finset.mem_filter.mp hq).1
+  have htT : t ∈ T := by
+    simp [T, nearTriangles, ht, G.card_eq_three_of_mem_triangles ht]
+  have hTpair : ∀ ⦃q⦄, q ∈ T → ∀ ⦃r⦄, r ∈ T →
+      2 ≤ (q ∩ r).card := by
+    intro q hqT r hrT
+    have hq := hTsub hqT
+    have hr := hTsub hrT
+    have hqt := (Finset.mem_filter.mp hqT).2
+    have hrt := (Finset.mem_filter.mp hrT).2
+    have hqe := card_inter_le_one_of_disjoint_of_large_inter
+      (G.card_eq_three_of_mem_triangles hq) hte hqt
+    have hqf := card_inter_le_one_of_disjoint_of_large_inter
+      (G.card_eq_three_of_mem_triangles hq) htf hqt
+    have hre := card_inter_le_one_of_disjoint_of_large_inter
+      (G.card_eq_three_of_mem_triangles hr) hte hrt
+    have hrf := card_inter_le_one_of_disjoint_of_large_inter
+      (G.card_eq_three_of_mem_triangles hr) htf hrt
+    by_contra hqr
+    have hqr' : (q ∩ r).card ≤ 1 := by omega
+    have hpack₃ := G.isTrianglePacking_triple hq hr he hqr' hqe hre
+    have hpack₄ : G.IsTrianglePacking (insert f {q, r, e}) := by
+      apply G.isTrianglePacking_insert hpack₃ hf
+      intro a ha
+      simp only [Finset.mem_insert, Finset.mem_singleton] at ha
+      rcases ha with rfl | rfl | rfl
+      · exact hqf
+      · exact hrf
+      · exact hef
+    have hbound := G.card_le_trianglePackingNumber hpack₄
+    have hqrNe : q ≠ r := by
+      intro h
+      subst r
+      have hqCard := G.card_eq_three_of_mem_triangles hq
+      simp [hqCard] at hqr'
+    have hqeNe : q ≠ e := by
+      intro h
+      subst q
+      have heCard := G.card_eq_three_of_mem_triangles he
+      simp [heCard] at hqe
+    have hreNe : r ≠ e := by
+      intro h
+      subst r
+      have heCard := G.card_eq_three_of_mem_triangles he
+      simp [heCard] at hre
+    have hfqNe : f ≠ q := by
+      intro h
+      subst q
+      have hfCard := G.card_eq_three_of_mem_triangles hf
+      simp [hfCard] at hqf
+    have hfrNe : f ≠ r := by
+      intro h
+      subst r
+      have hfCard := G.card_eq_three_of_mem_triangles hf
+      simp [hfCard] at hrf
+    have hfeNe : f ≠ e := by
+      intro h
+      subst f
+      have heCard := G.card_eq_three_of_mem_triangles he
+      simp [heCard] at hef
+    have hcard₃ : ({q, r, e} : Finset (Finset V)).card = 3 := by
+      simp [hqrNe, hqeNe, hreNe]
+    have hfNot : f ∉ ({q, r, e} : Finset (Finset V)) := by
+      simp [hfqNe, hfrNe, hfeNe]
+    rw [Finset.card_insert_of_notMem hfNot, hcard₃] at hbound
+    omega
+  obtain ⟨C₀, hC₀, hC₀card⟩ :=
+    G.exists_two_family_transversal_of_pairwise_two_intersecting
+      hTsub ⟨t, htT⟩ hTpair
+  exact G.exists_six_transversal_of_two_cover_near_triangle
+    hν ht hC₀ hC₀card
+
+/-- Maximality of a three-packing: every graph triangle shares an edge with
+at least one packing member. -/
+theorem near_one_of_packing_triple
+    (hν : G.trianglePackingNumber ≤ 3)
+    {e f g q : Finset V}
+    (he : e ∈ G.triangles) (hf : f ∈ G.triangles)
+    (hg : g ∈ G.triangles) (hq : q ∈ G.triangles)
+    (hef : (e ∩ f).card ≤ 1) (heg : (e ∩ g).card ≤ 1)
+    (hfg : (f ∩ g).card ≤ 1) :
+    2 ≤ (q ∩ e).card ∨ 2 ≤ (q ∩ f).card ∨ 2 ≤ (q ∩ g).card := by
+  classical
+  by_contra h
+  push Not at h
+  have hqe : (q ∩ e).card ≤ 1 := by omega
+  have hqf : (q ∩ f).card ≤ 1 := by omega
+  have hqg : (q ∩ g).card ≤ 1 := by omega
+  have hpack₃ := G.isTrianglePacking_triple he hf hg hef heg hfg
+  have hpack₄ : G.IsTrianglePacking (insert q {e, f, g}) := by
+    apply G.isTrianglePacking_insert hpack₃ hq
+    intro a ha
+    simp only [Finset.mem_insert, Finset.mem_singleton] at ha
+    rcases ha with rfl | rfl | rfl
+    · simpa [Finset.inter_comm] using hqe
+    · simpa [Finset.inter_comm] using hqf
+    · simpa [Finset.inter_comm] using hqg
+  have hbound := G.card_le_trianglePackingNumber hpack₄
+  have hefNe : e ≠ f := by
+    intro h
+    subst f
+    have heCard := G.card_eq_three_of_mem_triangles he
+    simp [heCard] at hef
+  have hegNe : e ≠ g := by
+    intro h
+    subst g
+    have heCard := G.card_eq_three_of_mem_triangles he
+    simp [heCard] at heg
+  have hfgNe : f ≠ g := by
+    intro h
+    subst g
+    have hfCard := G.card_eq_three_of_mem_triangles hf
+    simp [hfCard] at hfg
+  have hqeNe : q ≠ e := by
+    intro h
+    subst q
+    have heCard := G.card_eq_three_of_mem_triangles he
+    simp [heCard] at hqe
+  have hqfNe : q ≠ f := by
+    intro h
+    subst q
+    have hfCard := G.card_eq_three_of_mem_triangles hf
+    simp [hfCard] at hqf
+  have hqgNe : q ≠ g := by
+    intro h
+    subst q
+    have hgCard := G.card_eq_three_of_mem_triangles hg
+    simp [hgCard] at hqg
+  have hcard₃ : ({e, f, g} : Finset (Finset V)).card = 3 := by
+    simp [hefNe, hegNe, hfgNe]
+  have hqNot : q ∉ ({e, f, g} : Finset (Finset V)) := by
+    simp [hqeNe, hqfNe, hqgNe]
+  rw [Finset.card_insert_of_notMem hqNot, hcard₃] at hbound
+  omega
+
+/-- An exclusive family associated with one member of a maximum
+three-packing is pairwise two-intersecting. -/
+theorem exclusiveTriangles_pairwise_two_intersecting
+    (hν : G.trianglePackingNumber ≤ 3)
+    {t e f : Finset V} (he : e ∈ G.triangles) (hf : f ∈ G.triangles)
+    (hef : (e ∩ f).card ≤ 1) :
+    ∀ ⦃q⦄, q ∈ G.exclusiveTriangles t e f →
+      ∀ ⦃r⦄, r ∈ G.exclusiveTriangles t e f → 2 ≤ (q ∩ r).card := by
+  classical
+  intro q hqS r hrS
+  have hqData := Finset.mem_filter.mp hqS
+  have hrData := Finset.mem_filter.mp hrS
+  by_contra hqr
+  have hqr' : (q ∩ r).card ≤ 1 := by omega
+  have hpack₃ := G.isTrianglePacking_triple
+    hqData.1 hrData.1 he hqr' hqData.2.2.1 hrData.2.2.1
+  have hpack₄ : G.IsTrianglePacking (insert f {q, r, e}) := by
+    apply G.isTrianglePacking_insert hpack₃ hf
+    intro a ha
+    simp only [Finset.mem_insert, Finset.mem_singleton] at ha
+    rcases ha with rfl | rfl | rfl
+    · exact hqData.2.2.2
+    · exact hrData.2.2.2
+    · exact hef
+  have hbound := G.card_le_trianglePackingNumber hpack₄
+  have hqrNe : q ≠ r := by
+    intro h
+    subst r
+    have hqCard := G.card_eq_three_of_mem_triangles hqData.1
+    simp [hqCard] at hqr'
+  have hqeNe : q ≠ e := by
+    intro h
+    subst q
+    have heCard := G.card_eq_three_of_mem_triangles he
+    simp [heCard] at hqData
+  have hreNe : r ≠ e := by
+    intro h
+    subst r
+    have heCard := G.card_eq_three_of_mem_triangles he
+    simp [heCard] at hrData
+  have hfqNe : f ≠ q := by
+    intro h
+    subst q
+    have hfCard := G.card_eq_three_of_mem_triangles hf
+    simp [hfCard] at hqData
+  have hfrNe : f ≠ r := by
+    intro h
+    subst r
+    have hfCard := G.card_eq_three_of_mem_triangles hf
+    simp [hfCard] at hrData
+  have hfeNe : f ≠ e := by
+    intro h
+    subst f
+    have heCard := G.card_eq_three_of_mem_triangles he
+    simp [heCard] at hef
+  have hcard₃ : ({q, r, e} : Finset (Finset V)).card = 3 := by
+    simp [hqrNe, hqeNe, hreNe]
+  have hfNot : f ∉ ({q, r, e} : Finset (Finset V)) := by
+    simp [hfqNe, hfrNe, hfeNe]
+  rw [Finset.card_insert_of_notMem hfNot, hcard₃] at hbound
+  omega
+
+omit [Fintype V] in
+theorem exists_eq_insert_of_subset_card_two_card_three
+    {A q : Finset V} (hA : A.card = 2) (hq : q.card = 3)
+    (hsub : A ⊆ q) :
+    ∃ u ∉ A, q = insert u A := by
+  classical
+  have hdiffCard : (q \ A).card = 1 := by
+    rw [Finset.card_sdiff]
+    have hinter : A ∩ q = A := Finset.inter_eq_left.mpr hsub
+    rw [hinter, hq, hA]
+  obtain ⟨u, hu⟩ := Finset.card_eq_one.mp hdiffCard
+  have huDiff : u ∈ q \ A := by simp [hu]
+  refine ⟨u, (Finset.mem_sdiff.mp huDiff).2, ?_⟩
+  ext z
+  constructor
+  · intro hzq
+    by_cases hzA : z ∈ A
+    · exact Finset.mem_insert_of_mem hzA
+    · have : z ∈ q \ A := Finset.mem_sdiff.mpr ⟨hzq, hzA⟩
+      have hzu : z = u := by simpa [hu] using this
+      exact hzu ▸ Finset.mem_insert_self u A
+  · intro hz
+    simp only [Finset.mem_insert] at hz
+    rcases hz with rfl | hz
+    · exact (Finset.mem_sdiff.mp huDiff).1
+    · exact hsub hz
+
+omit [Fintype V] in
+theorem sdiff_erase_eq_singleton {t : Finset V} {x : V} (hx : x ∈ t) :
+    t \ t.erase x = {x} := by
+  classical
+  ext z
+  simp only [Finset.mem_sdiff, Finset.mem_erase, Finset.mem_singleton]
+  constructor
+  · rintro ⟨hzt, hnot⟩
+    by_contra hzx
+    exact hnot ⟨hzx, hzt⟩
+  · rintro rfl
+    exact ⟨hx, by simp⟩
+
+omit [Fintype V] in
+theorem card_inter_insert_le_one_of_disjoint
+    {A t : Finset V} {u : V} (hdisj : Disjoint A t) :
+    (insert u A ∩ t).card ≤ 1 := by
+  classical
+  have hsub : insert u A ∩ t ⊆ {u} := by
+    intro z hz
+    have hzInsert := (Finset.mem_inter.mp hz).1
+    simp only [Finset.mem_insert] at hzInsert
+    rcases hzInsert with rfl | hzA
+    · simp
+    · exact (Finset.disjoint_left.mp hdisj hzA
+        (Finset.mem_inter.mp hz).2).elim
+  exact (Finset.card_le_card hsub).trans (by simp)
+
+omit [Fintype V] in
+theorem eq_of_inter_eq_and_sdiff_eq
+    {q r t : Finset V} (hi : q ∩ t = r ∩ t)
+    (hd : q \ t = r \ t) : q = r := by
+  classical
+  ext z
+  by_cases hzt : z ∈ t
+  · have hqi : z ∈ q ↔ z ∈ q ∩ t := by simp [hzt]
+    have hri : z ∈ r ↔ z ∈ r ∩ t := by simp [hzt]
+    exact hqi.trans ((Finset.ext_iff.mp hi z).trans hri.symm)
+  · have hqd : z ∈ q ↔ z ∈ q \ t := by simp [hzt]
+    have hrd : z ∈ r ↔ z ∈ r \ t := by simp [hzt]
+    exact hqd.trans ((Finset.ext_iff.mp hd z).trans hrd.symm)
+
+/-- If the pair of vertices of `t` opposite `x` has no extension other than
+`t`, the two pairs of `t` through `x` cover every triangle near `t`. -/
+theorem exists_six_transversal_of_no_opposite_pair_extension
+    (hν : G.trianglePackingNumber ≤ 3)
+    {t : Finset V} {x : V} (ht : t ∈ G.triangles) (hx : x ∈ t)
+    (hunique : ∀ ⦃q⦄, q ∈ G.triangles → t.erase x ⊆ q → q = t) :
+    ∃ C : Finset (Finset V), G.IsTriangleTransversal C ∧ C.card ≤ 6 := by
+  classical
+  let T := G.nearTriangles t
+  have hTnear : ∀ ⦃q⦄, q ∈ T → 2 ≤ (q ∩ t).card := by
+    intro q hq
+    exact (Finset.mem_filter.mp hq).2
+  have hxall : ∀ ⦃q⦄, q ∈ T → x ∈ q := by
+    intro q hqT
+    have hq := (Finset.mem_filter.mp hqT).1
+    have htEraseCard : (t.erase x).card = 2 := by
+      rw [Finset.card_erase_of_mem hx,
+        G.card_eq_three_of_mem_triangles ht]
+    rcases subset_or_mem_of_large_trace htEraseCard
+        (sdiff_erase_eq_singleton hx) (hTnear hqT) with hsub | hxq
+    · rw [hunique hq hsub]
+      exact hx
+    · exact hxq
+  have hCT := G.pairsThrough_is_family_transversal ht hx hTnear hxall
+  have hcard := card_pairsThrough_le_two
+    (G.card_eq_three_of_mem_triangles ht) hx
+  exact G.exists_six_transversal_of_two_cover_near_triangle
+    hν ht hCT hcard
+
+/-- Parker's type-1a case: the middle member meets two vertex-disjoint
+packing members in distinct vertices. -/
+theorem exists_six_transversal_of_type_one_a
+    (hν : G.trianglePackingNumber ≤ 3)
+    {e f g : Finset V} {x y : V}
+    (he : e ∈ G.triangles) (hf : f ∈ G.triangles)
+    (hg : g ∈ G.triangles)
+    (hefSet : e ∩ f = {x}) (hegSet : e ∩ g = {y})
+    (hfg : Disjoint f g) :
+    ∃ C : Finset (Finset V), G.IsTriangleTransversal C ∧ C.card ≤ 6 := by
+  classical
+  have hefCard : (e ∩ f).card = 1 := by simp [hefSet]
+  have hegCard : (e ∩ g).card = 1 := by simp [hegSet]
+  have hfgCard : (f ∩ g).card = 0 := by
+    rw [Finset.card_eq_zero, Finset.disjoint_iff_inter_eq_empty.mp hfg]
+  have hxe : x ∈ e := by
+    have : x ∈ e ∩ f := by simp [hefSet]
+    exact (Finset.mem_inter.mp this).1
+  have hxf : x ∈ f := by
+    have : x ∈ e ∩ f := by simp [hefSet]
+    exact (Finset.mem_inter.mp this).2
+  have hye : y ∈ e := by
+    have : y ∈ e ∩ g := by simp [hegSet]
+    exact (Finset.mem_inter.mp this).1
+  have hyg : y ∈ g := by
+    have : y ∈ e ∩ g := by simp [hegSet]
+    exact (Finset.mem_inter.mp this).2
+  have hxy : x ≠ y := by
+    intro hxy
+    subst y
+    exact (Finset.disjoint_left.mp hfg) hxf hyg
+  let A := f.erase x
+  let B := g.erase y
+  have hAcard : A.card = 2 := by
+    change (f.erase x).card = 2
+    rw [Finset.card_erase_of_mem hxf,
+      G.card_eq_three_of_mem_triangles hf]
+  have hBcard : B.card = 2 := by
+    change (g.erase y).card = 2
+    rw [Finset.card_erase_of_mem hyg,
+      G.card_eq_three_of_mem_triangles hg]
+  have hfForm : f = insert x A := by
+    simpa [A] using (Finset.insert_erase hxf).symm
+  have hgForm : g = insert y B := by
+    simpa [B] using (Finset.insert_erase hyg).symm
+  have hAf : A ⊆ f := by exact Finset.erase_subset _ _
+  have hBg : B ⊆ g := by exact Finset.erase_subset _ _
+  have hAdisjE : Disjoint A e := by
+    rw [Finset.disjoint_left]
+    intro z hzA hze
+    have hzef : z ∈ e ∩ f := Finset.mem_inter.mpr ⟨hze, hAf hzA⟩
+    have hzx : z = x := by simpa [hefSet] using hzef
+    exact (Finset.mem_erase.mp hzA).1 hzx
+  have hAdisjG : Disjoint A g := by
+    rw [Finset.disjoint_left]
+    intro z hzA hzg
+    exact (Finset.disjoint_left.mp hfg) (hAf hzA) hzg
+  have hBdisjE : Disjoint B e := by
+    rw [Finset.disjoint_left]
+    intro z hzB hze
+    have hzeg : z ∈ e ∩ g := Finset.mem_inter.mpr ⟨hze, hBg hzB⟩
+    have hzy : z = y := by simpa [hegSet] using hzeg
+    exact (Finset.mem_erase.mp hzB).1 hzy
+  have hBdisjF : Disjoint B f := by
+    rw [Finset.disjoint_left]
+    intro z hzB hzf
+    exact (Finset.disjoint_left.mp hfg) hzf (hBg hzB)
+  by_cases hExtF : ∃ q ∈ G.triangles, A ⊆ q ∧ q ≠ f
+  · obtain ⟨f₁, hf₁, hAf₁, hf₁f⟩ := hExtF
+    obtain ⟨u, huA, hf₁Form⟩ :=
+      exists_eq_insert_of_subset_card_two_card_three hAcard
+        (G.card_eq_three_of_mem_triangles hf₁) hAf₁
+    have hux : u ≠ x := by
+      intro hux
+      subst u
+      apply hf₁f
+      rw [hf₁Form]
+      exact hfForm.symm
+    have huf : u ∉ f := by
+      rw [hfForm]
+      simp [huA, hux]
+    by_cases hExtG : ∃ q ∈ G.triangles, B ⊆ q ∧ q ≠ g
+    · obtain ⟨g₁, hg₁, hBg₁, hg₁g⟩ := hExtG
+      obtain ⟨v, hvB, hg₁Form⟩ :=
+        exists_eq_insert_of_subset_card_two_card_three hBcard
+          (G.card_eq_three_of_mem_triangles hg₁) hBg₁
+      have hvy : v ≠ y := by
+        intro hvy
+        subst v
+        apply hg₁g
+        rw [hg₁Form]
+        exact hgForm.symm
+      have hvg : v ∉ g := by
+        rw [hgForm]
+        simp [hvB, hvy]
+      by_cases huLoc : u ∈ (e ∪ g) \ {x}
+      · by_cases hvLoc : v ∈ (e ∪ f) \ {y}
+        · let SF := G.exclusiveTriangles f e g
+          let SG := G.exclusiveTriangles g e f
+          have hfSF : f ∈ SF := by
+            simp [SF, exclusiveTriangles, hf,
+              G.card_eq_three_of_mem_triangles hf,
+              Finset.inter_comm, hefCard, hfgCard]
+          have hgSG : g ∈ SG := by
+            simp [SG, exclusiveTriangles, hg,
+              G.card_eq_three_of_mem_triangles hg,
+              Finset.inter_comm, hegCard, hfgCard]
+          have hf₁SF : f₁ ∈ SF := by
+            have hf₁e : (f₁ ∩ e).card ≤ 1 := by
+              rw [hf₁Form]
+              exact card_inter_insert_le_one_of_disjoint hAdisjE
+            have hf₁g : (f₁ ∩ g).card ≤ 1 := by
+              rw [hf₁Form]
+              exact card_inter_insert_le_one_of_disjoint hAdisjG
+            have hnear : 2 ≤ (f₁ ∩ f).card := by
+              have hsub : A ⊆ f₁ ∩ f := fun z hz ↦
+                Finset.mem_inter.mpr ⟨hAf₁ hz, hAf hz⟩
+              have := Finset.card_le_card hsub
+              omega
+            exact Finset.mem_filter.mpr ⟨hf₁, hnear, hf₁e, hf₁g⟩
+          have hg₁SG : g₁ ∈ SG := by
+            have hg₁e : (g₁ ∩ e).card ≤ 1 := by
+              rw [hg₁Form]
+              exact card_inter_insert_le_one_of_disjoint hBdisjE
+            have hg₁f : (g₁ ∩ f).card ≤ 1 := by
+              rw [hg₁Form]
+              exact card_inter_insert_le_one_of_disjoint hBdisjF
+            have hnear : 2 ≤ (g₁ ∩ g).card := by
+              have hsub : B ⊆ g₁ ∩ g := fun z hz ↦
+                Finset.mem_inter.mpr ⟨hBg₁ hz, hBg hz⟩
+              have := Finset.card_le_card hsub
+              omega
+            exact Finset.mem_filter.mpr ⟨hg₁, hnear, hg₁e, hg₁f⟩
+          have hSFsub : SF ⊆ G.triangles := by
+            intro q hq
+            exact (Finset.mem_filter.mp hq).1
+          have hSGsub : SG ⊆ G.triangles := by
+            intro q hq
+            exact (Finset.mem_filter.mp hq).1
+          have hSFpair : ∀ ⦃q⦄, q ∈ SF → ∀ ⦃r⦄, r ∈ SF →
+              2 ≤ (q ∩ r).card := by
+            simpa [SF] using
+              (G.exclusiveTriangles_pairwise_two_intersecting hν he hg
+                (by omega) (t := f))
+          have hSGpair : ∀ ⦃q⦄, q ∈ SG → ∀ ⦃r⦄, r ∈ SG →
+              2 ≤ (q ∩ r).card := by
+            simpa [SG] using
+              (G.exclusiveTriangles_pairwise_two_intersecting hν he hf
+                (by omega) (t := g))
+          by_cases hcommonF :
+              ∃ d ∈ f.powersetCard 2, ∀ ⦃q⦄, q ∈ SF → d ⊆ q
+          · obtain ⟨d, hd, hdcommon⟩ := hcommonF
+            exact G.exists_six_transversal_of_common_exclusive_pair
+              hν he hf hg (by omega) hfg hd (by simpa [SF] using hdcommon)
+          · by_cases hcommonG :
+                ∃ d ∈ g.powersetCard 2, ∀ ⦃q⦄, q ∈ SG → d ⊆ q
+            · obtain ⟨d, hd, hdcommon⟩ := hcommonG
+              exact G.exists_six_transversal_of_common_exclusive_pair
+                hν he hg hf (by omega) hfg.symm hd
+                (by simpa [SG] using hdcommon)
+            · have hSFstructure :=
+                G.family_common_pair_or_common_outside_vertex
+                  hSFsub hSFpair hfSF
+              obtain ⟨w, hwf, htipF₀⟩ :=
+                Or.resolve_left hSFstructure hcommonF
+              have hf₁Diff : f₁ \ f = {u} := by
+                ext z
+                constructor
+                · intro hz
+                  have hzf₁ := (Finset.mem_sdiff.mp hz).1
+                  rw [hf₁Form] at hzf₁
+                  simp only [Finset.mem_insert] at hzf₁
+                  rcases hzf₁ with rfl | hzA
+                  · simp
+                  · exact ((Finset.mem_sdiff.mp hz).2 (hAf hzA)).elim
+                · intro hz
+                  have hzu : z = u := by simpa using hz
+                  subst z
+                  exact Finset.mem_sdiff.mpr ⟨by simp [hf₁Form], huf⟩
+              have hwu : w = u := by
+                have hw := htipF₀ hf₁SF hf₁f
+                rw [hf₁Diff] at hw
+                exact Finset.singleton_inj.mp hw.symm
+              subst w
+              have hSGstructure :=
+                G.family_common_pair_or_common_outside_vertex
+                  hSGsub hSGpair hgSG
+              obtain ⟨w, hwg, htipG₀⟩ :=
+                Or.resolve_left hSGstructure hcommonG
+              have hg₁Diff : g₁ \ g = {v} := by
+                ext z
+                constructor
+                · intro hz
+                  have hzg₁ := (Finset.mem_sdiff.mp hz).1
+                  rw [hg₁Form] at hzg₁
+                  simp only [Finset.mem_insert] at hzg₁
+                  rcases hzg₁ with rfl | hzB
+                  · simp
+                  · exact ((Finset.mem_sdiff.mp hz).2 (hBg hzB)).elim
+                · intro hz
+                  have hzv : z = v := by simpa using hz
+                  subst z
+                  exact Finset.mem_sdiff.mpr ⟨by simp [hg₁Form], hvg⟩
+              have hwv : w = v := by
+                have hw := htipG₀ hg₁SG hg₁g
+                rw [hg₁Diff] at hw
+                exact Finset.singleton_inj.mp hw.symm
+              subst w
+              have hf₂Exists : ∃ q ∈ SF, q ≠ f ∧ q ≠ f₁ := by
+                by_contra h
+                apply hcommonF
+                refine ⟨A, Finset.mem_powersetCard.mpr ⟨hAf, hAcard⟩, ?_⟩
+                intro q hq
+                by_cases hqf : q = f
+                · subst q
+                  exact hAf
+                · by_cases hqf₁ : q = f₁
+                  · subst q
+                    exact hAf₁
+                  · exact (h ⟨q, hq, hqf, hqf₁⟩).elim
+              obtain ⟨f₂, hf₂SF, hf₂f, hf₂f₁⟩ := hf₂Exists
+              have hg₂Exists : ∃ q ∈ SG, q ≠ g ∧ q ≠ g₁ := by
+                by_contra h
+                apply hcommonG
+                refine ⟨B, Finset.mem_powersetCard.mpr ⟨hBg, hBcard⟩, ?_⟩
+                intro q hq
+                by_cases hqg : q = g
+                · subst q
+                  exact hBg
+                · by_cases hqg₁ : q = g₁
+                  · subst q
+                    exact hBg₁
+                  · exact (h ⟨q, hq, hqg, hqg₁⟩).elim
+              obtain ⟨g₂, hg₂SG, hg₂g, hg₂g₁⟩ := hg₂Exists
+              have htipF : ∀ ⦃q⦄, q ∈ SF → q ≠ f → q \ f = {u} := htipF₀
+              have htipG : ∀ ⦃q⦄, q ∈ SG → q ≠ g → q \ g = {v} := htipG₀
+              have hf₁Inter : f₁ ∩ f = A := by
+                ext z
+                rw [hf₁Form]
+                simp only [Finset.mem_inter, Finset.mem_insert]
+                constructor
+                · rintro ⟨rfl | hzA, hzf⟩
+                  · exact (huf hzf).elim
+                  · exact hzA
+                · intro hzA
+                  exact ⟨Or.inr hzA, hAf hzA⟩
+              have hg₁Inter : g₁ ∩ g = B := by
+                ext z
+                rw [hg₁Form]
+                simp only [Finset.mem_inter, Finset.mem_insert]
+                constructor
+                · rintro ⟨rfl | hzB, hzg⟩
+                  · exact (hvg hzg).elim
+                  · exact hzB
+                · intro hzB
+                  exact ⟨Or.inr hzB, hBg hzB⟩
+              have hf₂Data := Finset.mem_filter.mp hf₂SF
+              have hg₂Data := Finset.mem_filter.mp hg₂SG
+              have hf₂TraceCard := card_inter_eq_two_of_card_eq_three
+                (G.card_eq_three_of_mem_triangles hf₂Data.1)
+                (G.card_eq_three_of_mem_triangles hf) hf₂f hf₂Data.2.1
+              have hg₂TraceCard := card_inter_eq_two_of_card_eq_three
+                (G.card_eq_three_of_mem_triangles hg₂Data.1)
+                (G.card_eq_three_of_mem_triangles hg) hg₂g hg₂Data.2.1
+              have hf₂TraceNe : f₂ ∩ f ≠ A := by
+                intro htrace
+                apply hf₂f₁
+                exact eq_of_inter_eq_and_sdiff_eq
+                  (htrace.trans hf₁Inter.symm)
+                  ((htipF hf₂SF hf₂f).trans hf₁Diff.symm)
+              have hg₂TraceNe : g₂ ∩ g ≠ B := by
+                intro htrace
+                apply hg₂g₁
+                exact eq_of_inter_eq_and_sdiff_eq
+                  (htrace.trans hg₁Inter.symm)
+                  ((htipG hg₂SG hg₂g).trans hg₁Diff.symm)
+              have hxf₂ : x ∈ f₂ := by
+                rcases subset_or_mem_of_large_trace hAcard
+                    (sdiff_erase_eq_singleton hxf) hf₂Data.2.1 with hsub | hxmem
+                · have hsub' : A ⊆ f₂ ∩ f := fun z hz ↦
+                    Finset.mem_inter.mpr ⟨hsub hz, hAf hz⟩
+                  have heq : A = f₂ ∩ f :=
+                    Finset.eq_of_subset_of_card_le hsub' (by omega)
+                  exact (hf₂TraceNe heq.symm).elim
+                · exact hxmem
+              have hyg₂ : y ∈ g₂ := by
+                rcases subset_or_mem_of_large_trace hBcard
+                    (sdiff_erase_eq_singleton hyg) hg₂Data.2.1 with hsub | hymem
+                · have hsub' : B ⊆ g₂ ∩ g := fun z hz ↦
+                    Finset.mem_inter.mpr ⟨hsub hz, hBg hz⟩
+                  have heq : B = g₂ ∩ g :=
+                    Finset.eq_of_subset_of_card_le hsub' (by omega)
+                  exact (hg₂TraceNe heq.symm).elim
+                · exact hymem
+              have huf₂ : u ∈ f₂ := by
+                have : u ∈ f₂ \ f := by rw [htipF hf₂SF hf₂f]; simp
+                exact (Finset.mem_sdiff.mp this).1
+              have hvg₂ : v ∈ g₂ := by
+                have : v ∈ g₂ \ g := by rw [htipG hg₂SG hg₂g]; simp
+                exact (Finset.mem_sdiff.mp this).1
+              have hue : u ∉ e := by
+                intro hue
+                have hxu : x ≠ u := by
+                  intro h
+                  exact huf (h ▸ hxf)
+                have hpSub : ({x, u} : Finset V) ⊆ f₂ ∩ e := by
+                  intro z hz
+                  simp only [Finset.mem_insert, Finset.mem_singleton] at hz
+                  rcases hz with rfl | rfl
+                  · exact Finset.mem_inter.mpr ⟨hxf₂, hxe⟩
+                  · exact Finset.mem_inter.mpr ⟨huf₂, hue⟩
+                have hpCard : ({x, u} : Finset V).card = 2 := by simp [hxu]
+                have := Finset.card_le_card hpSub
+                omega
+              have hve : v ∉ e := by
+                intro hve
+                have hyv : y ≠ v := by
+                  intro h
+                  exact hvg (h ▸ hyg)
+                have hpSub : ({y, v} : Finset V) ⊆ g₂ ∩ e := by
+                  intro z hz
+                  simp only [Finset.mem_insert, Finset.mem_singleton] at hz
+                  rcases hz with rfl | rfl
+                  · exact Finset.mem_inter.mpr ⟨hyg₂, hye⟩
+                  · exact Finset.mem_inter.mpr ⟨hvg₂, hve⟩
+                have hpCard : ({y, v} : Finset V).card = 2 := by simp [hyv]
+                have := Finset.card_le_card hpSub
+                omega
+              have hug : u ∈ g := by
+                have huUnion := (Finset.mem_sdiff.mp huLoc).1
+                rcases Finset.mem_union.mp huUnion with hue' | hug
+                · exact (hue hue').elim
+                · exact hug
+              have hvf : v ∈ f := by
+                have hvUnion := (Finset.mem_sdiff.mp hvLoc).1
+                rcases Finset.mem_union.mp hvUnion with hve' | hvf
+                · exact (hve hve').elim
+                · exact hvf
+              have huv : u ≠ v := by
+                intro huv
+                subst v
+                exact (Finset.disjoint_left.mp hfg) hvf hug
+              let R : Finset (Finset V) :=
+                e.powersetCard 2 ∪ {{u, v}, f.erase v, g.erase u}
+              let C : Finset (Finset V) := R ∩ G.edges
+              have hRcard : R.card ≤ 6 := by
+                have hEcard := G.card_powersetCard_two_of_triangle he
+                have hthree : ({{u, v}, f.erase v, g.erase u} :
+                    Finset (Finset V)).card ≤ 3 := Finset.card_le_three
+                change (e.powersetCard 2 ∪
+                  ({{u, v}, f.erase v, g.erase u} :
+                    Finset (Finset V))).card ≤ 6
+                calc
+                  _ ≤ (e.powersetCard 2).card +
+                      ({{u, v}, f.erase v, g.erase u} :
+                        Finset (Finset V)).card := Finset.card_union_le _ _
+                  _ ≤ 3 + 3 := Nat.add_le_add hEcard.le hthree
+                  _ = 6 := rfl
+              refine ⟨C, ?_, ?_⟩
+              · constructor
+                · exact Finset.inter_subset_right
+                · intro q hq
+                  have hnear := G.near_one_of_packing_triple hν he hf hg hq
+                    (by omega) (by omega) (by omega)
+                  rcases hnear with hqe | hqf | hqg
+                  · obtain ⟨p, hp, hpCard⟩ :=
+                      Finset.exists_subset_card_eq (s := q ∩ e) (n := 2) hqe
+                    have hpE : p ∈ e.powersetCard 2 :=
+                      Finset.mem_powersetCard.mpr
+                        ⟨hp.trans Finset.inter_subset_right, hpCard⟩
+                    have hpq : p ⊆ q := hp.trans Finset.inter_subset_left
+                    have hpEdge := G.mem_edges_of_subset_triangle hq hpq hpCard
+                    exact ⟨p, Finset.mem_inter.mpr
+                      ⟨Finset.mem_union_left _ hpE, hpEdge⟩, hpq⟩
+                  · by_cases hqe' : 2 ≤ (q ∩ e).card
+                    · obtain ⟨p, hp, hpCard⟩ :=
+                        Finset.exists_subset_card_eq (s := q ∩ e) (n := 2) hqe'
+                      have hpE : p ∈ e.powersetCard 2 :=
+                        Finset.mem_powersetCard.mpr
+                          ⟨hp.trans Finset.inter_subset_right, hpCard⟩
+                      have hpq : p ⊆ q := hp.trans Finset.inter_subset_left
+                      have hpEdge := G.mem_edges_of_subset_triangle hq hpq hpCard
+                      exact ⟨p, Finset.mem_inter.mpr
+                        ⟨Finset.mem_union_left _ hpE, hpEdge⟩, hpq⟩
+                    · have hqg' : (q ∩ g).card ≤ 1 :=
+                        card_inter_le_one_of_disjoint_of_large_inter
+                          (G.card_eq_three_of_mem_triangles hq) hfg hqf
+                      have hqSF : q ∈ SF := Finset.mem_filter.mpr
+                        ⟨hq, hqf, by omega, hqg'⟩
+                      by_cases hqRoot : q = f
+                      · subst q
+                        have hpCard : (f.erase v).card = 2 := by
+                          rw [Finset.card_erase_of_mem hvf,
+                            G.card_eq_three_of_mem_triangles hf]
+                        have hpEdge := G.mem_edges_of_subset_triangle hf
+                          (Finset.erase_subset _ _) hpCard
+                        exact ⟨f.erase v, Finset.mem_inter.mpr
+                          ⟨by simp [R], hpEdge⟩, Finset.erase_subset _ _⟩
+                      · have huq : u ∈ q := by
+                          have : u ∈ q \ f := by rw [htipF hqSF hqRoot]; simp
+                          exact (Finset.mem_sdiff.mp this).1
+                        have hEraseCard : (f.erase v).card = 2 := by
+                          rw [Finset.card_erase_of_mem hvf,
+                            G.card_eq_three_of_mem_triangles hf]
+                        rcases subset_or_mem_of_large_trace hEraseCard
+                            (sdiff_erase_eq_singleton hvf) hqf with hsub | hvq
+                        · have hpEdge := G.mem_edges_of_subset_triangle hq hsub hEraseCard
+                          exact ⟨f.erase v, Finset.mem_inter.mpr
+                            ⟨by simp [R], hpEdge⟩, hsub⟩
+                        · have hpSub : {u, v} ⊆ q := by
+                            intro z hz
+                            simp only [Finset.mem_insert, Finset.mem_singleton] at hz
+                            exact hz.elim (fun h ↦ h ▸ huq) (fun h ↦ h ▸ hvq)
+                          have hpCard : ({u, v} : Finset V).card = 2 := by simp [huv]
+                          have hpEdge := G.mem_edges_of_subset_triangle hq hpSub hpCard
+                          exact ⟨{u, v}, Finset.mem_inter.mpr
+                            ⟨by simp [R], hpEdge⟩, hpSub⟩
+                  · by_cases hqe' : 2 ≤ (q ∩ e).card
+                    · obtain ⟨p, hp, hpCard⟩ :=
+                        Finset.exists_subset_card_eq (s := q ∩ e) (n := 2) hqe'
+                      have hpE : p ∈ e.powersetCard 2 :=
+                        Finset.mem_powersetCard.mpr
+                          ⟨hp.trans Finset.inter_subset_right, hpCard⟩
+                      have hpq : p ⊆ q := hp.trans Finset.inter_subset_left
+                      have hpEdge := G.mem_edges_of_subset_triangle hq hpq hpCard
+                      exact ⟨p, Finset.mem_inter.mpr
+                        ⟨Finset.mem_union_left _ hpE, hpEdge⟩, hpq⟩
+                    · have hqf' : (q ∩ f).card ≤ 1 :=
+                        card_inter_le_one_of_disjoint_of_large_inter
+                          (G.card_eq_three_of_mem_triangles hq) hfg.symm hqg
+                      have hqSG : q ∈ SG := Finset.mem_filter.mpr
+                        ⟨hq, hqg, by omega, hqf'⟩
+                      by_cases hqRoot : q = g
+                      · subst q
+                        have hpCard : (g.erase u).card = 2 := by
+                          rw [Finset.card_erase_of_mem hug,
+                            G.card_eq_three_of_mem_triangles hg]
+                        have hpEdge := G.mem_edges_of_subset_triangle hg
+                          (Finset.erase_subset _ _) hpCard
+                        exact ⟨g.erase u, Finset.mem_inter.mpr
+                          ⟨by simp [R], hpEdge⟩, Finset.erase_subset _ _⟩
+                      · have hvq : v ∈ q := by
+                          have : v ∈ q \ g := by rw [htipG hqSG hqRoot]; simp
+                          exact (Finset.mem_sdiff.mp this).1
+                        have hEraseCard : (g.erase u).card = 2 := by
+                          rw [Finset.card_erase_of_mem hug,
+                            G.card_eq_three_of_mem_triangles hg]
+                        rcases subset_or_mem_of_large_trace hEraseCard
+                            (sdiff_erase_eq_singleton hug) hqg with hsub | huq
+                        · have hpEdge := G.mem_edges_of_subset_triangle hq hsub hEraseCard
+                          exact ⟨g.erase u, Finset.mem_inter.mpr
+                            ⟨by simp [R], hpEdge⟩, hsub⟩
+                        · have hpSub : {u, v} ⊆ q := by
+                            intro z hz
+                            simp only [Finset.mem_insert, Finset.mem_singleton] at hz
+                            exact hz.elim (fun h ↦ h ▸ huq) (fun h ↦ h ▸ hvq)
+                          have hpCard : ({u, v} : Finset V).card = 2 := by simp [huv]
+                          have hpEdge := G.mem_edges_of_subset_triangle hq hpSub hpCard
+                          exact ⟨{u, v}, Finset.mem_inter.mpr
+                            ⟨by simp [R], hpEdge⟩, hpSub⟩
+              · change (R ∩ G.edges).card ≤ 6
+                exact (Finset.card_le_card Finset.inter_subset_left).trans hRcard
+        · have hvUnion : v ∉ e ∪ f := by
+            intro hvUnion
+            apply hvLoc
+            exact Finset.mem_sdiff.mpr ⟨hvUnion, by simp [hvy]⟩
+          have hg₁e : Disjoint g₁ e := by
+            rw [hg₁Form, Finset.disjoint_left]
+            intro z hz hze
+            simp only [Finset.mem_insert] at hz
+            rcases hz with rfl | hzB
+            · exact hvUnion (Finset.mem_union_left _ hze)
+            · exact (Finset.disjoint_left.mp hBdisjE) hzB hze
+          have hg₁f : Disjoint g₁ f := by
+            rw [hg₁Form, Finset.disjoint_left]
+            intro z hz hzf
+            simp only [Finset.mem_insert] at hz
+            rcases hz with rfl | hzB
+            · exact hvUnion (Finset.mem_union_right _ hzf)
+            · exact (Finset.disjoint_left.mp hBdisjF) hzB hzf
+          exact G.exists_six_transversal_of_isolated_packing_member
+            hν hg₁ he hf hg₁e hg₁f (by omega)
+      · have huUnion : u ∉ e ∪ g := by
+          intro huUnion
+          apply huLoc
+          exact Finset.mem_sdiff.mpr ⟨huUnion, by simp [hux]⟩
+        have hf₁e : Disjoint f₁ e := by
+          rw [hf₁Form, Finset.disjoint_left]
+          intro z hz hze
+          simp only [Finset.mem_insert] at hz
+          rcases hz with rfl | hzA
+          · exact huUnion (Finset.mem_union_left _ hze)
+          · exact (Finset.disjoint_left.mp hAdisjE) hzA hze
+        have hf₁g : Disjoint f₁ g := by
+          rw [hf₁Form, Finset.disjoint_left]
+          intro z hz hzg
+          simp only [Finset.mem_insert] at hz
+          rcases hz with rfl | hzA
+          · exact huUnion (Finset.mem_union_right _ hzg)
+          · exact (Finset.disjoint_left.mp hAdisjG) hzA hzg
+        exact G.exists_six_transversal_of_isolated_packing_member
+          hν hf₁ he hg hf₁e hf₁g (by omega)
+    · exact G.exists_six_transversal_of_no_opposite_pair_extension
+        hν hg hyg (by
+          intro q hq hBq
+          by_contra hqg
+          exact hExtG ⟨q, hq, hBq, hqg⟩)
+  · exact G.exists_six_transversal_of_no_opposite_pair_extension
+      hν hf hxf (by
+        intro q hq hAq
+        by_contra hqf
+        exact hExtF ⟨q, hq, hAq, hqf⟩)
+
+/-- Two vertex-disjoint graph triangles either supply the six-edge cover
+directly or extend to an isolated/type-1a maximum three-packing. -/
+theorem exists_six_transversal_of_disjoint_triangle_pair
+    (hν : G.trianglePackingNumber ≤ 3)
+    {a b : Finset V} (ha : a ∈ G.triangles) (hb : b ∈ G.triangles)
+    (hab : Disjoint a b) :
+    ∃ C : Finset (Finset V), G.IsTriangleTransversal C ∧ C.card ≤ 6 := by
+  classical
+  let C₀ := a.powersetCard 2 ∪ b.powersetCard 2
+  by_cases hcover : ∀ ⦃q⦄, q ∈ G.triangles →
+      ∃ p ∈ C₀, p ⊆ q
+  · refine ⟨C₀, ?_, ?_⟩
+    · constructor
+      · intro p hp
+        rcases Finset.mem_union.mp hp with hp | hp
+        · have hpData := Finset.mem_powersetCard.mp hp
+          exact G.mem_edges_of_subset_triangle ha hpData.1 hpData.2
+        · have hpData := Finset.mem_powersetCard.mp hp
+          exact G.mem_edges_of_subset_triangle hb hpData.1 hpData.2
+      · exact hcover
+    · have haCard := G.card_powersetCard_two_of_triangle ha
+      have hbCard := G.card_powersetCard_two_of_triangle hb
+      exact (Finset.card_union_le _ _).trans (by omega)
+  · have hmiss : ∃ q ∈ G.triangles, ∀ p ∈ C₀, ¬p ⊆ q := by
+      by_contra h
+      apply hcover
+      intro q hq
+      by_contra hqCover
+      exact h ⟨q, hq, by
+        intro p hp hpq
+        exact hqCover ⟨p, hp, hpq⟩⟩
+    obtain ⟨q, hq, hqMiss⟩ := hmiss
+    have hqa : (q ∩ a).card ≤ 1 := by
+      by_contra h
+      obtain ⟨p, hp, hpCard⟩ :=
+        Finset.exists_subset_card_eq (s := q ∩ a) (n := 2) (by omega)
+      have hpA : p ∈ a.powersetCard 2 :=
+        Finset.mem_powersetCard.mpr
+          ⟨hp.trans Finset.inter_subset_right, hpCard⟩
+      exact hqMiss p (Finset.mem_union_left _ hpA)
+        (hp.trans Finset.inter_subset_left)
+    have hqb : (q ∩ b).card ≤ 1 := by
+      by_contra h
+      obtain ⟨p, hp, hpCard⟩ :=
+        Finset.exists_subset_card_eq (s := q ∩ b) (n := 2) (by omega)
+      have hpB : p ∈ b.powersetCard 2 :=
+        Finset.mem_powersetCard.mpr
+          ⟨hp.trans Finset.inter_subset_right, hpCard⟩
+      exact hqMiss p (Finset.mem_union_right _ hpB)
+        (hp.trans Finset.inter_subset_left)
+    rcases Nat.le_one_iff_eq_zero_or_eq_one.mp hqa with hqa0 | hqa1
+    · rcases Nat.le_one_iff_eq_zero_or_eq_one.mp hqb with hqb0 | hqb1
+      · have hqaDisj : Disjoint q a :=
+          Finset.disjoint_iff_inter_eq_empty.mpr (Finset.card_eq_zero.mp hqa0)
+        have hqbDisj : Disjoint q b :=
+          Finset.disjoint_iff_inter_eq_empty.mpr (Finset.card_eq_zero.mp hqb0)
+        exact G.exists_six_transversal_of_isolated_packing_member
+          hν hq ha hb hqaDisj hqbDisj (by
+            have hzero : (a ∩ b).card = 0 := by
+              rw [Finset.card_eq_zero]
+              exact Finset.disjoint_iff_inter_eq_empty.mp hab
+            omega)
+      · have haqDisj : Disjoint a q := by
+          exact (Finset.disjoint_iff_inter_eq_empty.mpr
+            (Finset.card_eq_zero.mp hqa0)).symm
+        exact G.exists_six_transversal_of_isolated_packing_member
+          hν ha hq hb haqDisj hab (by
+            simpa [Finset.inter_comm] using hqb1.le)
+    · rcases Nat.le_one_iff_eq_zero_or_eq_one.mp hqb with hqb0 | hqb1
+      · have hqbDisj : Disjoint q b :=
+          Finset.disjoint_iff_inter_eq_empty.mpr (Finset.card_eq_zero.mp hqb0)
+        exact G.exists_six_transversal_of_isolated_packing_member
+          hν hb hq ha hqbDisj.symm hab.symm hqa1.le
+      · obtain ⟨x, hqaSet⟩ := Finset.card_eq_one.mp hqa1
+        obtain ⟨y, hqbSet⟩ := Finset.card_eq_one.mp hqb1
+        exact G.exists_six_transversal_of_type_one_a hν hq ha hb
+          (by simpa [Finset.inter_comm] using hqaSet)
+          (by simpa [Finset.inter_comm] using hqbSet) hab
+
+/-- Parker's type-1b case: three packing triangles have one common vertex. -/
+theorem exists_six_transversal_of_type_one_b
+    (hν : G.trianglePackingNumber ≤ 3)
+    {e f g : Finset V} {x : V}
+    (he : e ∈ G.triangles) (hf : f ∈ G.triangles)
+    (hg : g ∈ G.triangles)
+    (hef : e ∩ f = {x}) (heg : e ∩ g = {x})
+    (hfg : f ∩ g = {x}) :
+    ∃ C : Finset (Finset V), G.IsTriangleTransversal C ∧ C.card ≤ 6 := by
+  classical
+  have hxe : x ∈ e := by
+    have : x ∈ e ∩ f := by simp [hef]
+    exact (Finset.mem_inter.mp this).1
+  have hxf : x ∈ f := by
+    have : x ∈ e ∩ f := by simp [hef]
+    exact (Finset.mem_inter.mp this).2
+  have hxg : x ∈ g := by
+    have : x ∈ e ∩ g := by simp [heg]
+    exact (Finset.mem_inter.mp this).2
+  let B := g.erase x
+  have hBcard : B.card = 2 := by
+    change (g.erase x).card = 2
+    rw [Finset.card_erase_of_mem hxg,
+      G.card_eq_three_of_mem_triangles hg]
+  have hBg : B ⊆ g := Finset.erase_subset _ _
+  have hBdisjE : Disjoint B e := by
+    rw [Finset.disjoint_left]
+    intro z hzB hze
+    have hz : z ∈ e ∩ g := Finset.mem_inter.mpr ⟨hze, hBg hzB⟩
+    have hzx : z = x := by simpa [heg] using hz
+    exact (Finset.mem_erase.mp hzB).1 hzx
+  have hBdisjF : Disjoint B f := by
+    rw [Finset.disjoint_left]
+    intro z hzB hzf
+    have hz : z ∈ f ∩ g := Finset.mem_inter.mpr ⟨hzf, hBg hzB⟩
+    have hzx : z = x := by simpa [hfg] using hz
+    exact (Finset.mem_erase.mp hzB).1 hzx
+  by_cases hExt : ∃ q ∈ G.triangles, B ⊆ q ∧ q ≠ g
+  · obtain ⟨q, hq, hBq, hqg⟩ := hExt
+    obtain ⟨u, huB, hqForm⟩ :=
+      exists_eq_insert_of_subset_card_two_card_three hBcard
+        (G.card_eq_three_of_mem_triangles hq) hBq
+    have hux : u ≠ x := by
+      intro hux
+      subst u
+      apply hqg
+      rw [hqForm]
+      simpa [B] using Finset.insert_erase hxg
+    by_cases hue : u ∈ e
+    · have huf : u ∉ f := by
+        intro huf
+        have hmem : u ∈ e ∩ f := Finset.mem_inter.mpr ⟨hue, huf⟩
+        have : u = x := by simpa [hef] using hmem
+        exact hux this
+      have hqf : Disjoint q f := by
+        rw [hqForm, Finset.disjoint_left]
+        intro z hz hzf
+        simp only [Finset.mem_insert] at hz
+        rcases hz with rfl | hzB
+        · exact huf hzf
+        · exact (Finset.disjoint_left.mp hBdisjF) hzB hzf
+      exact G.exists_six_transversal_of_disjoint_triangle_pair hν hq hf hqf
+    · have hqe : Disjoint q e := by
+        rw [hqForm, Finset.disjoint_left]
+        intro z hz hze
+        simp only [Finset.mem_insert] at hz
+        rcases hz with rfl | hzB
+        · exact hue hze
+        · exact (Finset.disjoint_left.mp hBdisjE) hzB hze
+      exact G.exists_six_transversal_of_disjoint_triangle_pair hν hq he hqe
+  · exact G.exists_six_transversal_of_no_opposite_pair_extension
+      hν hg hxg (by
+        intro q hq hBq
+        by_contra hqg
+        exact hExt ⟨q, hq, hBq, hqg⟩)
+
+/-- Parker's type-1c case: the three pairwise intersections of the packing
+members are distinct. -/
+theorem exists_six_transversal_of_type_one_c
+    (hν : G.trianglePackingNumber ≤ 3)
+    {e f g : Finset V} {x y z : V}
+    (he : e ∈ G.triangles) (hf : f ∈ G.triangles)
+    (hg : g ∈ G.triangles)
+    (hef : e ∩ f = {x}) (hfg : f ∩ g = {y})
+    (heg : e ∩ g = {z})
+    (hxy : x ≠ y) (hxz : x ≠ z) (hyz : y ≠ z) :
+    ∃ C : Finset (Finset V), G.IsTriangleTransversal C ∧ C.card ≤ 6 := by
+  classical
+  by_cases hdisj : ∃ a ∈ G.triangles, ∃ b ∈ G.triangles, Disjoint a b
+  · obtain ⟨a, ha, b, hb, hab⟩ := hdisj
+    exact G.exists_six_transversal_of_disjoint_triangle_pair hν ha hb hab
+  · have hNoDisj : ∀ ⦃a⦄, a ∈ G.triangles →
+        ∀ ⦃b⦄, b ∈ G.triangles → ¬Disjoint a b := by
+      intro a ha b hb hab
+      exact hdisj ⟨a, ha, b, hb, hab⟩
+    have hxe : x ∈ e := by
+      have : x ∈ e ∩ f := by simp [hef]
+      exact (Finset.mem_inter.mp this).1
+    have hxf : x ∈ f := by
+      have : x ∈ e ∩ f := by simp [hef]
+      exact (Finset.mem_inter.mp this).2
+    have hyf : y ∈ f := by
+      have : y ∈ f ∩ g := by simp [hfg]
+      exact (Finset.mem_inter.mp this).1
+    have hyg : y ∈ g := by
+      have : y ∈ f ∩ g := by simp [hfg]
+      exact (Finset.mem_inter.mp this).2
+    have hze : z ∈ e := by
+      have : z ∈ e ∩ g := by simp [heg]
+      exact (Finset.mem_inter.mp this).1
+    have hzg : z ∈ g := by
+      have : z ∈ e ∩ g := by simp [heg]
+      exact (Finset.mem_inter.mp this).2
+    have hExzCard : ({x, z} : Finset V).card = 2 := by simp [hxz]
+    have hFxyCard : ({x, y} : Finset V).card = 2 := by simp [hxy]
+    have hGyzCard : ({y, z} : Finset V).card = 2 := by simp [hyz]
+    have hExz : ({x, z} : Finset V) ⊆ e := pair_subset_of_mem hxe hze
+    have hFxy : ({x, y} : Finset V) ⊆ f := pair_subset_of_mem hxf hyf
+    have hGyz : ({y, z} : Finset V) ⊆ g := pair_subset_of_mem hyg hzg
+    obtain ⟨b, hbPair, heForm⟩ :=
+      exists_eq_insert_of_subset_card_two_card_three hExzCard
+        (G.card_eq_three_of_mem_triangles he) hExz
+    obtain ⟨a, haPair, hfForm⟩ :=
+      exists_eq_insert_of_subset_card_two_card_three hFxyCard
+        (G.card_eq_three_of_mem_triangles hf) hFxy
+    obtain ⟨c, hcPair, hgForm⟩ :=
+      exists_eq_insert_of_subset_card_two_card_three hGyzCard
+        (G.card_eq_three_of_mem_triangles hg) hGyz
+    have hxc : x ≠ c := by
+      intro hxc
+      subst c
+      have hxg : x ∈ g := by simp [hgForm]
+      have hxeg : x ∈ e ∩ g := Finset.mem_inter.mpr ⟨hxe, hxg⟩
+      have hxz' : x = z := by simpa [heg] using hxeg
+      exact hxz hxz'
+    have hyb : y ≠ b := by
+      intro hyb
+      subst b
+      have hye : y ∈ e := by simp [heForm]
+      have hyef : y ∈ e ∩ f := Finset.mem_inter.mpr ⟨hye, hyf⟩
+      have hyx : y = x := by simpa [hef] using hyef
+      exact hxy hyx.symm
+    have hza : z ≠ a := by
+      intro hza
+      subst a
+      have hzf : z ∈ f := by simp [hfForm]
+      have hzfg : z ∈ f ∩ g := Finset.mem_inter.mpr ⟨hzf, hzg⟩
+      have hzy : z = y := by simpa [hfg] using hzfg
+      exact hyz hzy.symm
+    let R : Finset (Finset V) :=
+      {{x, y}, {x, z}, {y, z}, {x, c}, {y, b}, {z, a}}
+    let C : Finset (Finset V) := R ∩ G.edges
+    have hRcard : R.card ≤ 6 := by
+      change ({{x, y}, {x, z}, {y, z}, {x, c}, {y, b}, {z, a}} :
+        Finset (Finset V)).card ≤ 6
+      exact Finset.card_le_six
+    have hRtwo : ∀ ⦃p⦄, p ∈ R → p.card = 2 := by
+      intro p hp
+      simp only [R, Finset.mem_insert, Finset.mem_singleton] at hp
+      rcases hp with hp | hp | hp | hp | hp | hp
+      · rw [hp]; simp [hxy]
+      · rw [hp]; simp [hxz]
+      · rw [hp]; simp [hyz]
+      · rw [hp]; simp [hxc]
+      · rw [hp]; simp [hyb]
+      · rw [hp]; simp [hza]
+    refine ⟨C, ?_, ?_⟩
+    · constructor
+      · exact Finset.inter_subset_right
+      · intro q hq
+        have hnear := G.near_one_of_packing_triple hν he hf hg hq
+          (by simp [hef]) (by simp [heg]) (by simp [hfg])
+        have hraw : ∃ p ∈ R, p ⊆ q := by
+          rcases hnear with hqe | hqf | hqg
+          · by_cases hxq : x ∈ q <;> by_cases hzq : z ∈ q <;>
+              by_cases hbq : b ∈ q
+            · exact ⟨{x, z}, by simp [R], pair_subset_of_mem hxq hzq⟩
+            · exact ⟨{x, z}, by simp [R], pair_subset_of_mem hxq hzq⟩
+            · obtain ⟨w, hwq, hwg⟩ := Finset.not_disjoint_iff.mp
+                (hNoDisj hq hg)
+              simp only [hgForm, Finset.mem_insert,
+                Finset.mem_singleton] at hwg
+              rcases hwg with hwc | hwy | hwz
+              · have hcq : c ∈ q := by simpa [hwc] using hwq
+                exact ⟨{x, c}, by simp [R], pair_subset_of_mem hxq hcq⟩
+              · have hyq : y ∈ q := by simpa [hwy] using hwq
+                exact ⟨{y, b}, by simp [R], pair_subset_of_mem hyq hbq⟩
+              · have hzq : z ∈ q := by simpa [hwz] using hwq
+                exact ⟨{x, z}, by simp [R], pair_subset_of_mem hxq hzq⟩
+            · simp [heForm, hxq, hzq, hbq] at hqe
+            · obtain ⟨w, hwq, hwf⟩ := Finset.not_disjoint_iff.mp
+                (hNoDisj hq hf)
+              simp only [hfForm, Finset.mem_insert,
+                Finset.mem_singleton] at hwf
+              rcases hwf with hwa | hwx | hwy
+              · have haq : a ∈ q := by simpa [hwa] using hwq
+                exact ⟨{z, a}, by simp [R], pair_subset_of_mem hzq haq⟩
+              · have hxq' : x ∈ q := by simpa [hwx] using hwq
+                exact (hxq hxq').elim
+              · have hyq : y ∈ q := by simpa [hwy] using hwq
+                exact ⟨{y, b}, by simp [R], pair_subset_of_mem hyq hbq⟩
+            · simp [heForm, hxq, hzq, hbq] at hqe
+            · simp [heForm, hxq, hzq, hbq] at hqe
+            · simp [heForm, hxq, hzq, hbq] at hqe
+          · by_cases hxq : x ∈ q <;> by_cases hyq : y ∈ q <;>
+              by_cases haq : a ∈ q
+            · exact ⟨{x, y}, by simp [R], pair_subset_of_mem hxq hyq⟩
+            · exact ⟨{x, y}, by simp [R], pair_subset_of_mem hxq hyq⟩
+            · obtain ⟨w, hwq, hwg⟩ := Finset.not_disjoint_iff.mp
+                (hNoDisj hq hg)
+              simp only [hgForm, Finset.mem_insert,
+                Finset.mem_singleton] at hwg
+              rcases hwg with hwc | hwy | hwz
+              · have hcq : c ∈ q := by simpa [hwc] using hwq
+                exact ⟨{x, c}, by simp [R], pair_subset_of_mem hxq hcq⟩
+              · have hyq' : y ∈ q := by simpa [hwy] using hwq
+                exact ⟨{x, y}, by simp [R], pair_subset_of_mem hxq hyq'⟩
+              · have hzq : z ∈ q := by simpa [hwz] using hwq
+                exact ⟨{z, a}, by simp [R], pair_subset_of_mem hzq haq⟩
+            · simp [hfForm, hxq, hyq, haq] at hqf
+            · obtain ⟨w, hwq, hwe⟩ := Finset.not_disjoint_iff.mp
+                (hNoDisj hq he)
+              simp only [heForm, Finset.mem_insert,
+                Finset.mem_singleton] at hwe
+              rcases hwe with hwb | hwx | hwz
+              · have hbq : b ∈ q := by simpa [hwb] using hwq
+                exact ⟨{y, b}, by simp [R], pair_subset_of_mem hyq hbq⟩
+              · have hxq' : x ∈ q := by simpa [hwx] using hwq
+                exact ⟨{x, y}, by simp [R], pair_subset_of_mem hxq' hyq⟩
+              · have hzq : z ∈ q := by simpa [hwz] using hwq
+                exact ⟨{z, a}, by simp [R], pair_subset_of_mem hzq haq⟩
+            · simp [hfForm, hxq, hyq, haq] at hqf
+            · simp [hfForm, hxq, hyq, haq] at hqf
+            · simp [hfForm, hxq, hyq, haq] at hqf
+          · by_cases hyq : y ∈ q <;> by_cases hzq : z ∈ q <;>
+              by_cases hcq : c ∈ q
+            · exact ⟨{y, z}, by simp [R], pair_subset_of_mem hyq hzq⟩
+            · exact ⟨{y, z}, by simp [R], pair_subset_of_mem hyq hzq⟩
+            · obtain ⟨w, hwq, hwe⟩ := Finset.not_disjoint_iff.mp
+                (hNoDisj hq he)
+              simp only [heForm, Finset.mem_insert,
+                Finset.mem_singleton] at hwe
+              rcases hwe with hwb | hwx | hwz
+              · have hbq : b ∈ q := by simpa [hwb] using hwq
+                exact ⟨{y, b}, by simp [R], pair_subset_of_mem hyq hbq⟩
+              · have hxq : x ∈ q := by simpa [hwx] using hwq
+                exact ⟨{x, c}, by simp [R], pair_subset_of_mem hxq hcq⟩
+              · have hzq' : z ∈ q := by simpa [hwz] using hwq
+                exact ⟨{y, z}, by simp [R], pair_subset_of_mem hyq hzq'⟩
+            · simp [hgForm, hyq, hzq, hcq] at hqg
+            · obtain ⟨w, hwq, hwf⟩ := Finset.not_disjoint_iff.mp
+                (hNoDisj hq hf)
+              simp only [hfForm, Finset.mem_insert,
+                Finset.mem_singleton] at hwf
+              rcases hwf with hwa | hwx | hwy
+              · have haq : a ∈ q := by simpa [hwa] using hwq
+                exact ⟨{z, a}, by simp [R], pair_subset_of_mem hzq haq⟩
+              · have hxq : x ∈ q := by simpa [hwx] using hwq
+                exact ⟨{x, c}, by simp [R], pair_subset_of_mem hxq hcq⟩
+              · have hyq : y ∈ q := by simpa [hwy] using hwq
+                exact ⟨{y, z}, by simp [R], pair_subset_of_mem hyq hzq⟩
+            · simp [hgForm, hyq, hzq, hcq] at hqg
+            · simp [hgForm, hyq, hzq, hcq] at hqg
+            · simp [hgForm, hyq, hzq, hcq] at hqg
+        obtain ⟨p, hpR, hpq⟩ := hraw
+        have hpCard := hRtwo hpR
+        have hpEdge := G.mem_edges_of_subset_triangle hq hpq hpCard
+        exact ⟨p, Finset.mem_inter.mpr ⟨hpR, hpEdge⟩, hpq⟩
+    · change (R ∩ G.edges).card ≤ 6
+      exact (Finset.card_le_card Finset.inter_subset_left).trans hRcard
+
+/-- Every packing triple has a six-edge transversal.  The proof first removes
+the cases containing a vertex-disjoint pair, then distinguishes whether the
+three singleton pairwise intersections agree. -/
+theorem exists_six_transversal_of_packing_triple
+    (hν : G.trianglePackingNumber ≤ 3)
+    {e f g : Finset V}
+    (he : e ∈ G.triangles) (hf : f ∈ G.triangles)
+    (hg : g ∈ G.triangles)
+    (hef : (e ∩ f).card ≤ 1) (heg : (e ∩ g).card ≤ 1)
+    (hfg : (f ∩ g).card ≤ 1) :
+    ∃ C : Finset (Finset V), G.IsTriangleTransversal C ∧ C.card ≤ 6 := by
+  classical
+  by_cases hefDisj : Disjoint e f
+  · exact G.exists_six_transversal_of_disjoint_triangle_pair hν he hf hefDisj
+  by_cases hegDisj : Disjoint e g
+  · exact G.exists_six_transversal_of_disjoint_triangle_pair hν he hg hegDisj
+  by_cases hfgDisj : Disjoint f g
+  · exact G.exists_six_transversal_of_disjoint_triangle_pair hν hf hg hfgDisj
+  have hefNeZero : (e ∩ f).card ≠ 0 := by
+    intro hzero
+    apply hefDisj
+    exact Finset.disjoint_iff_inter_eq_empty.mpr (Finset.card_eq_zero.mp hzero)
+  have hegNeZero : (e ∩ g).card ≠ 0 := by
+    intro hzero
+    apply hegDisj
+    exact Finset.disjoint_iff_inter_eq_empty.mpr (Finset.card_eq_zero.mp hzero)
+  have hfgNeZero : (f ∩ g).card ≠ 0 := by
+    intro hzero
+    apply hfgDisj
+    exact Finset.disjoint_iff_inter_eq_empty.mpr (Finset.card_eq_zero.mp hzero)
+  have hefOne : (e ∩ f).card = 1 := by omega
+  have hegOne : (e ∩ g).card = 1 := by omega
+  have hfgOne : (f ∩ g).card = 1 := by omega
+  obtain ⟨x, hefSet⟩ := Finset.card_eq_one.mp hefOne
+  obtain ⟨z, hegSet⟩ := Finset.card_eq_one.mp hegOne
+  obtain ⟨y, hfgSet⟩ := Finset.card_eq_one.mp hfgOne
+  by_cases hxy : x = y
+  · have hxe : x ∈ e := by
+      have : x ∈ e ∩ f := by simp [hefSet]
+      exact (Finset.mem_inter.mp this).1
+    have hxg : x ∈ g := by
+      have : y ∈ f ∩ g := by simp [hfgSet]
+      exact hxy ▸ (Finset.mem_inter.mp this).2
+    have hxz : x = z := by
+      have : x ∈ e ∩ g := Finset.mem_inter.mpr ⟨hxe, hxg⟩
+      simpa [hegSet] using this
+    apply G.exists_six_transversal_of_type_one_b hν he hf hg hefSet
+    · simpa [← hxz] using hegSet
+    · simpa [← hxy] using hfgSet
+  by_cases hxz : x = z
+  · have hxf : x ∈ f := by
+      have : x ∈ e ∩ f := by simp [hefSet]
+      exact (Finset.mem_inter.mp this).2
+    have hxg : x ∈ g := by
+      have : z ∈ e ∩ g := by simp [hegSet]
+      exact hxz ▸ (Finset.mem_inter.mp this).2
+    have hxy' : x = y := by
+      have : x ∈ f ∩ g := Finset.mem_inter.mpr ⟨hxf, hxg⟩
+      simpa [hfgSet] using this
+    apply G.exists_six_transversal_of_type_one_b hν he hf hg hefSet
+    · simpa [← hxz] using hegSet
+    · simpa [← hxy'] using hfgSet
+  by_cases hyz : y = z
+  · have hyf : y ∈ f := by
+      have : y ∈ f ∩ g := by simp [hfgSet]
+      exact (Finset.mem_inter.mp this).1
+    have hye : y ∈ e := by
+      have : z ∈ e ∩ g := by simp [hegSet]
+      exact hyz ▸ (Finset.mem_inter.mp this).1
+    have hyx : y = x := by
+      have : y ∈ e ∩ f := Finset.mem_inter.mpr ⟨hye, hyf⟩
+      simpa [hefSet] using this
+    apply G.exists_six_transversal_of_type_one_b hν he hf hg
+    · simpa [← hyx] using hefSet
+    · simpa [← hyz] using hegSet
+    · exact hfgSet
+  exact G.exists_six_transversal_of_type_one_c hν he hf hg
+    hefSet hfgSet hegSet hxy hxz hyz
+
+/-- Parker's theorem at packing rank three, stated in the graph language used
+by the main rank-four theorem. -/
+theorem tuza_of_trianglePackingNumber_le_three
+    (hν : G.trianglePackingNumber ≤ 3) :
+    G.triangleTransversalNumber ≤ 2 * G.trianglePackingNumber := by
+  classical
+  by_cases hνtwo : G.trianglePackingNumber ≤ 2
+  · exact G.tuza_of_trianglePackingNumber_le_two hνtwo
+  have hνeq : G.trianglePackingNumber = 3 := by omega
+  obtain ⟨P, hP, hPcard⟩ := G.exists_max_trianglePacking
+  have hPcardThree : P.card = 3 := hPcard.trans hνeq
+  obtain ⟨e, f, g, hefNe, hegNe, hfgNe, rfl⟩ :=
+    Finset.card_eq_three.mp hPcardThree
+  have he : e ∈ G.triangles := hP.1 (by simp)
+  have hf : f ∈ G.triangles := hP.1 (by simp)
+  have hg : g ∈ G.triangles := hP.1 (by simp)
+  have hef : (e ∩ f).card ≤ 1 := hP.2 (by simp) (by simp) hefNe
+  have heg : (e ∩ g).card ≤ 1 := hP.2 (by simp) (by simp) hegNe
+  have hfg : (f ∩ g).card ≤ 1 := hP.2 (by simp) (by simp) hfgNe
+  obtain ⟨C, hC, hCcard⟩ :=
+    G.exists_six_transversal_of_packing_triple hν he hf hg hef heg hfg
+  calc
+    G.triangleTransversalNumber ≤ C.card :=
+      G.triangleTransversalNumber_le_card hC
+    _ ≤ 6 := hCcard
+    _ = 2 * G.trianglePackingNumber := by omega
 
 end SimpleGraph

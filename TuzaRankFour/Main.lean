@@ -1,4 +1,4 @@
-import TuzaRankFour.Definitions
+import TuzaRankFour.Parker
 
 /-!
 # Tuza's conjecture for packing number at most four
@@ -10,7 +10,7 @@ finite endpoint.
 namespace SimpleGraph
 
 /-- Proof-development counterpart of the advertised theorem. -/
-theorem tuza_rank_four_proof {V : Type*} [Fintype V]
+theorem tuza_rank_four_proof {V : Type*} [Fintype V] [DecidableEq V]
     (G : SimpleGraph V)
     (hν : G.trianglePackingNumber ≤ 4) :
     G.triangleTransversalNumber ≤ 2 * G.trianglePackingNumber := by

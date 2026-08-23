@@ -9,7 +9,7 @@ usual extremal characterization and discharge the rank-zero case.
 
 namespace SimpleGraph
 
-variable {V : Type*} [Fintype V]
+variable {V : Type*} [Fintype V] [DecidableEq V]
 variable (G : SimpleGraph V)
 
 @[simp]

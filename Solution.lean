@@ -10,7 +10,7 @@ declaration below has exactly the same statement as its counterpart in
 
 namespace SimpleGraph
 
-theorem tuza_rank_four {V : Type*} [Fintype V]
+theorem tuza_rank_four {V : Type*} [Fintype V] [DecidableEq V]
     (G : SimpleGraph V)
     (hν : G.trianglePackingNumber ≤ 4) :
     G.triangleTransversalNumber ≤ 2 * G.trianglePackingNumber := by

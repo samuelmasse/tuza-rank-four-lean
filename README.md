@@ -65,7 +65,8 @@ axiom.
 ## Verification
 
 The project pins Lean 4.32.0 and Mathlib 4.32.0. A clean build is deliberately
-substantial because it replays every proof certificate.
+substantial because it replays every proof certificate; the resulting local
+Lake directory occupies about 36 GiB.
 
     lake update
     lake exe cache get

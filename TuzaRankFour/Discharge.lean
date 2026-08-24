@@ -369,4 +369,368 @@ theorem exists_common_unique_spanner_of_distinct_labelled_edges
       simp [hxz]
     · simp [hy]
 
+omit [Fintype V] in
+/-- Two distinct edges of a three-set cover that three-set. -/
+theorem union_eq_of_mem_powersetCard_two_of_card_three
+    {t e f : Finset V} (htCard : t.card = 3)
+    (he : e ∈ t.powersetCard 2) (hf : f ∈ t.powersetCard 2)
+    (hef : e ≠ f) : e ∪ f = t := by
+  have heData := Finset.mem_powersetCard.mp he
+  have hfData := Finset.mem_powersetCard.mp hf
+  have hsub : e ∪ f ⊆ t := Finset.union_subset heData.1 hfData.1
+  apply Finset.eq_of_subset_of_card_le hsub
+  by_contra hsmall
+  have hUnionLe : (e ∪ f).card ≤ 2 := by omega
+  have heEq : e = e ∪ f :=
+    Finset.eq_of_subset_of_card_le Finset.subset_union_left (by omega)
+  have hfEq : f = e ∪ f :=
+    Finset.eq_of_subset_of_card_le Finset.subset_union_right (by omega)
+  exact hef (heEq.trans hfEq.symm)
+
+/-- If one outside vertex spans two distinct edges of a packed triangle, that
+vertex together with the triangle induces a `K₄`. -/
+theorem isNClique_four_insert_of_spans_distinct_edges
+    (G : SimpleGraph V) {t e f : Finset V}
+    (ht : t ∈ G.triangles)
+    (he : e ∈ t.powersetCard 2) (hf : f ∈ t.powersetCard 2)
+    (hef : e ≠ f) {x : V} (hxOutside : x ∉ t)
+    (heTriangle : insert x e ∈ G.triangles)
+    (hfTriangle : insert x f ∈ G.triangles) :
+    G.IsNClique 4 (insert x t) := by
+  classical
+  have htClique : G.IsNClique 3 t := by
+    simpa [triangles] using ht
+  have heClique : G.IsNClique 3 (insert x e) := by
+    simpa [triangles] using heTriangle
+  have hfClique : G.IsNClique 3 (insert x f) := by
+    simpa [triangles] using hfTriangle
+  have hunion : e ∪ f = t :=
+    union_eq_of_mem_powersetCard_two_of_card_three htClique.card_eq he hf hef
+  have hclique : G.IsClique ((insert x t : Finset V) : Set V) := by
+    intro u hu v hv huv
+    simp only [Finset.coe_insert, Set.mem_insert_iff] at hu hv
+    rcases hu with rfl | hut
+    · rcases hv with hvx | hvt
+      · exact (huv hvx.symm).elim
+      have hvUnion : v ∈ e ∪ f := by simpa [hunion] using hvt
+      rcases Finset.mem_union.mp hvUnion with hve | hvf
+      · exact heClique.isClique (by simp) (by simp [hve]) huv
+      · exact hfClique.isClique (by simp) (by simp [hvf]) huv
+    · rcases hv with rfl | hvt
+      · have huUnion : u ∈ e ∪ f := by simpa [hunion] using hut
+        rcases Finset.mem_union.mp huUnion with hue | huf
+        · exact heClique.isClique (by simp [hue]) (by simp) huv
+        · exact hfClique.isClique (by simp [huf]) (by simp) huv
+      · exact htClique.isClique hut hvt huv
+  have hcard : (insert x t).card = 4 := by
+    rw [Finset.card_insert_of_notMem hxOutside, htClique.card_eq]
+  exact ⟨hclique, hcard⟩
+
+/-- Every face through an outside vertex is compatible with all packing
+members retained after deleting the packed face. -/
+theorem card_inter_k4_face_le_one_of_retained
+    (G : SimpleGraph V) {S : Finset (Finset V)}
+    (hS : G.IsTrianglePacking S) {t : Finset V} (htS : t ∈ S)
+    {x : V} (hxOutside : x ∉ triangleFamilyVertexSupport S)
+    {q : Finset V} (hq : q ∈ S.erase t) (u : V) :
+    (q ∩ (insert x t).erase u).card ≤ 1 := by
+  classical
+  have hqS : q ∈ S := Finset.mem_of_mem_erase hq
+  have hqt : q ≠ t := Finset.ne_of_mem_erase hq
+  have hxq : x ∉ q := by
+    intro hxq
+    exact hxOutside (Finset.mem_biUnion.mpr ⟨q, hqS, hxq⟩)
+  have hsub : q ∩ (insert x t).erase u ⊆ q ∩ t := by
+    intro z hz
+    simp only [Finset.mem_inter] at hz ⊢
+    refine ⟨hz.1, ?_⟩
+    have hzInsert := (Finset.mem_erase.mp hz.2).2
+    rcases Finset.mem_insert.mp hzInsert with rfl | hzt
+    · exact (hxq hz.1).elim
+    · exact hzt
+  exact (Finset.card_le_card hsub).trans (hS.2 hqS htS hqt)
+
+/-- If a retained packing member contains the vertex omitted from a `K₄`
+face through an outside vertex, replacing the packed face by that `K₄` face
+strictly increases packing support. -/
+theorem packingImproves_k4_face_of_retained_contains
+    (G : SimpleGraph V) {S : Finset (Finset V)}
+    (hS : G.IsSupportMaximalPacking S)
+    {t : Finset V} (htS : t ∈ S) {x u : V}
+    (hxOutside : x ∉ triangleFamilyVertexSupport S)
+    (hut : u ∈ t) {p : Finset V} (hp : p ∈ S.erase t) (hup : u ∈ p)
+    (hQ : G.IsNClique 4 (insert x t)) : False := by
+  classical
+  let R := S.erase t
+  let face := (insert x t).erase u
+  let P := insert face R
+  have hfaceTriangle : face ∈ G.triangles := by
+    exact G.erase_mem_triangles_of_isNClique_four hQ (by simp [hut])
+  have hRpacking : G.IsTrianglePacking R :=
+    hS.1.mono_family G (Finset.erase_subset _ _)
+  have hcompat : ∀ ⦃q⦄, q ∈ R → (q ∩ face).card ≤ 1 := by
+    intro q hq
+    exact G.card_inter_k4_face_le_one_of_retained hS.1 htS hxOutside hq u
+  have hPpacking : G.IsTrianglePacking P :=
+    G.isTrianglePacking_insert hRpacking hfaceTriangle hcompat
+  have hxt : x ∉ t := by
+    intro hxt
+    exact hxOutside (Finset.mem_biUnion.mpr ⟨t, htS, hxt⟩)
+  have hxu : x ≠ u := fun hxu ↦ hxt (hxu ▸ hut)
+  have hxFace : x ∈ face := by simp [face, hxu]
+  have hfaceNotR : face ∉ R := by
+    intro hfaceR
+    have hfaceS : face ∈ S := Finset.mem_of_mem_erase hfaceR
+    exact hxOutside (Finset.mem_biUnion.mpr ⟨face, hfaceS, hxFace⟩)
+  have hcardP : P.card = S.card := by
+    change (insert face R).card = S.card
+    rw [Finset.card_insert_of_notMem hfaceNotR]
+    change (S.erase t).card + 1 = S.card
+    rw [Finset.card_erase_of_mem htS]
+    have hSpos : 0 < S.card := Finset.card_pos.mpr ⟨t, htS⟩
+    omega
+  have hsupportSubset : triangleFamilyVertexSupport S ⊆
+      triangleFamilyVertexSupport P := by
+    intro v hv
+    obtain ⟨q, hqS, hvq⟩ := Finset.mem_biUnion.mp hv
+    by_cases hqt : q = t
+    · subst q
+      by_cases hvu : v = u
+      · subst v
+        exact Finset.mem_biUnion.mpr
+          ⟨p, by simp [P, R, hp], hup⟩
+      · have hvFace : v ∈ face := by
+          exact Finset.mem_erase.mpr
+            ⟨hvu, Finset.mem_insert_of_mem hvq⟩
+        exact Finset.mem_biUnion.mpr
+          ⟨face, by simp [P], hvFace⟩
+    · have hqR : q ∈ R := by simp [R, hqS, hqt]
+      exact Finset.mem_biUnion.mpr
+        ⟨q, by simp [P, hqR], hvq⟩
+  have hxSupportP : x ∈ triangleFamilyVertexSupport P :=
+    Finset.mem_biUnion.mpr ⟨face, by simp [P], hxFace⟩
+  have hsupportNe : triangleFamilyVertexSupport S ≠
+      triangleFamilyVertexSupport P := by
+    intro hEq
+    exact hxOutside (hEq ▸ hxSupportP)
+  have hsupportLt : (triangleFamilyVertexSupport S).card <
+      (triangleFamilyVertexSupport P).card :=
+    Finset.card_lt_card
+      (Finset.ssubset_iff_subset_ne.mpr ⟨hsupportSubset, hsupportNe⟩)
+  have hmax := hS.2.2 hPpacking (hcardP.trans hS.2.1)
+  omega
+
+/-- An external triangle meeting the displayed `K₄` in an edge cannot also
+meet a retained packing member in an edge.  Such a retained member preserves
+an omitted packed vertex, enabling the support-increasing `K₄`-face exchange. -/
+theorem not_two_le_inter_retained_of_external_k4_triangle
+    (G : SimpleGraph V) {S : Finset (Finset V)}
+    (hS : G.IsSupportMaximalPacking S)
+    {t : Finset V} (htS : t ∈ S) {x : V}
+    (hxOutside : x ∉ triangleFamilyVertexSupport S)
+    (hQ : G.IsNClique 4 (insert x t))
+    {r : Finset V} (hr : r ∈ G.triangles)
+    (hrQ : 2 ≤ (r ∩ insert x t).card)
+    (hrNotSub : ¬r ⊆ insert x t)
+    {q : Finset V} (hq : q ∈ S.erase t) :
+    ¬2 ≤ (q ∩ r).card := by
+  classical
+  intro hqr
+  have hrCard : r.card = 3 := G.card_eq_three_of_mem_triangles hr
+  obtain ⟨z, hzr, hzQ⟩ := Set.not_subset.mp hrNotSub
+  have hInterQSub : r ∩ insert x t ⊆ r.erase z := by
+    intro y hy
+    simp only [Finset.mem_inter] at hy
+    exact Finset.mem_erase.mpr ⟨fun hyz ↦ hzQ (hyz ▸ hy.2), hy.1⟩
+  have hEraseCard : (r.erase z).card = 2 := by
+    rw [Finset.card_erase_of_mem hzr, hrCard]
+  have hInterQUpper := Finset.card_le_card hInterQSub
+  have hInterQCard : (r ∩ insert x t).card = 2 := by omega
+  have hUnionSub : (r ∩ insert x t) ∪ (r ∩ q) ⊆ r := by
+    intro y hy
+    rcases Finset.mem_union.mp hy with hy | hy
+    · exact (Finset.mem_inter.mp hy).1
+    · exact (Finset.mem_inter.mp hy).1
+  have hUnionCard : ((r ∩ insert x t) ∪ (r ∩ q)).card ≤ 3 := by
+    have := Finset.card_le_card hUnionSub
+    omega
+  have hInclusion := Finset.card_union_add_card_inter
+    (r ∩ insert x t) (r ∩ q)
+  have hrq : 2 ≤ (r ∩ q).card := by
+    simpa [Finset.inter_comm] using hqr
+  have hCommonPos : 0 < ((r ∩ insert x t) ∩ (r ∩ q)).card := by
+    omega
+  obtain ⟨u, hu⟩ := Finset.card_pos.mp hCommonPos
+  simp only [Finset.mem_inter] at hu
+  have huQ : u ∈ insert x t := hu.1.2
+  have huq : u ∈ q := hu.2.2
+  have hut : u ∈ t := by
+    rcases Finset.mem_insert.mp huQ with hux | hut
+    · subst u
+      have hqS : q ∈ S := Finset.mem_of_mem_erase hq
+      exact (hxOutside (Finset.mem_biUnion.mpr ⟨q, hqS, huq⟩)).elim
+    · exact hut
+  exact G.packingImproves_k4_face_of_retained_contains hS htS hxOutside
+    hut hq huq hQ
+
+omit [Fintype V] in
+/-- A three-set that meets another finite set in at least two elements but is
+not contained in it meets it in exactly two elements. -/
+theorem card_inter_eq_two_of_card_three_of_not_subset
+    {r Q : Finset V} (hrCard : r.card = 3)
+    (hrQ : 2 ≤ (r ∩ Q).card) (hrNotSub : ¬r ⊆ Q) :
+    (r ∩ Q).card = 2 := by
+  obtain ⟨z, hzr, hzQ⟩ := Set.not_subset.mp hrNotSub
+  have hSub : r ∩ Q ⊆ r.erase z := by
+    intro y hy
+    simp only [Finset.mem_inter] at hy
+    exact Finset.mem_erase.mpr ⟨fun hyz ↦ hzQ (hyz ▸ hy.2), hy.1⟩
+  have hEraseCard : (r.erase z).card = 2 := by
+    rw [Finset.card_erase_of_mem hzr, hrCard]
+  have hUpper := Finset.card_le_card hSub
+  omega
+
+/-- The `K₄` created by one outside vertex spanning two edges of a
+support-maximal packed triangle is triangle-isolated. -/
+theorem isTriangleIsolatedK4_of_spans_two_edges
+    (G : SimpleGraph V) {S : Finset (Finset V)}
+    (hS : G.IsSupportMaximalPacking S)
+    {t e f : Finset V} (htS : t ∈ S)
+    (he : e ∈ t.powersetCard 2) (hf : f ∈ t.powersetCard 2)
+    (hef : e ≠ f) {x : V}
+    (hxOutside : x ∉ triangleFamilyVertexSupport S)
+    (heTriangle : insert x e ∈ G.triangles)
+    (hfTriangle : insert x f ∈ G.triangles) :
+    G.IsTriangleIsolatedK4 (insert x t) := by
+  classical
+  have ht := hS.1.1 htS
+  have hxt : x ∉ t := by
+    intro hxt
+    exact hxOutside (Finset.mem_biUnion.mpr ⟨t, htS, hxt⟩)
+  have hQ : G.IsNClique 4 (insert x t) :=
+    G.isNClique_four_insert_of_spans_distinct_edges ht he hf hef hxt
+      heTriangle hfTriangle
+  refine ⟨hQ, ?_⟩
+  intro r hr hrQ
+  by_contra hrNotSub
+  have hrCard : r.card = 3 := G.card_eq_three_of_mem_triangles hr
+  have hRetained : ∀ ⦃q⦄, q ∈ S.erase t → (q ∩ r).card ≤ 1 := by
+    intro q hq
+    have hnot := G.not_two_le_inter_retained_of_external_k4_triangle
+      hS htS hxOutside hQ hr hrQ hrNotSub hq
+    omega
+  by_cases htr : 2 ≤ (t ∩ r).card
+  · obtain ⟨u, hu⟩ : (t ∩ r).Nonempty := by
+      rw [← Finset.card_pos]
+      omega
+    have hut : u ∈ t := (Finset.mem_inter.mp hu).1
+    have hur : u ∈ r := (Finset.mem_inter.mp hu).2
+    let Q := insert x t
+    let face := Q.erase u
+    let R := S.erase t
+    have hfaceTriangle : face ∈ G.triangles := by
+      exact G.erase_mem_triangles_of_isNClique_four hQ (by simp [Q, hut])
+    have hRpacking : G.IsTrianglePacking R :=
+      hS.1.mono_family G (Finset.erase_subset _ _)
+    have hfaceCompat : ∀ ⦃q⦄, q ∈ R → (q ∩ face).card ≤ 1 := by
+      intro q hq
+      exact G.card_inter_k4_face_le_one_of_retained hS.1 htS hxOutside hq u
+    have hfacePacking : G.IsTrianglePacking (insert face R) :=
+      G.isTrianglePacking_insert hRpacking hfaceTriangle hfaceCompat
+    have hQrCard : (r ∩ Q).card = 2 :=
+      card_inter_eq_two_of_card_three_of_not_subset hrCard hrQ hrNotSub
+    have hfaceInterSub : face ∩ r ⊆ (r ∩ Q).erase u := by
+      intro z hz
+      simp only [Finset.mem_inter] at hz
+      have hzFace := Finset.mem_erase.mp hz.1
+      apply Finset.mem_erase.mpr
+      refine ⟨hzFace.1, ?_⟩
+      simp only [Finset.mem_inter]
+      exact ⟨hz.2, hzFace.2⟩
+    have huQr : u ∈ r ∩ Q := by
+      simp only [Finset.mem_inter]
+      exact ⟨hur, by simp [Q, hut]⟩
+    have hEraseCard : ((r ∩ Q).erase u).card = 1 := by
+      rw [Finset.card_erase_of_mem huQr, hQrCard]
+    have hfaceR : (face ∩ r).card ≤ 1 := by
+      exact (Finset.card_le_card hfaceInterSub).trans_eq hEraseCard
+    have hrCompat : ∀ ⦃q⦄, q ∈ insert face R → (q ∩ r).card ≤ 1 := by
+      intro q hq
+      rcases Finset.mem_insert.mp hq with rfl | hqR
+      · exact hfaceR
+      · exact hRetained hqR
+    have hPpacking : G.IsTrianglePacking (insert r (insert face R)) :=
+      G.isTrianglePacking_insert hfacePacking hr hrCompat
+    have hxu : x ≠ u := fun hxu ↦ hxt (hxu ▸ hut)
+    have hxFace : x ∈ face := by simp [face, Q, hxu]
+    have hfaceNotR : face ∉ R := by
+      intro hfaceRmem
+      have hfaceS := Finset.mem_of_mem_erase hfaceRmem
+      exact hxOutside (Finset.mem_biUnion.mpr ⟨face, hfaceS, hxFace⟩)
+    have hrNeFace : r ≠ face := by
+      intro hEq
+      have hfaceCard := G.card_eq_three_of_mem_triangles hfaceTriangle
+      rw [hEq, Finset.inter_self, hfaceCard] at hfaceR
+      omega
+    have hrNotR : r ∉ R := by
+      intro hrR
+      have hsmall := hRetained hrR
+      rw [Finset.inter_self, hrCard] at hsmall
+      omega
+    have hrNot : r ∉ insert face R := by
+      simpa [Finset.mem_insert, hrNeFace, hrNotR]
+    have hcard : (insert r (insert face R)).card = S.card + 1 := by
+      rw [Finset.card_insert_of_notMem hrNot,
+        Finset.card_insert_of_notMem hfaceNotR]
+      change (S.erase t).card + 1 + 1 = S.card + 1
+      rw [Finset.card_erase_of_mem htS]
+      have hSpos : 0 < S.card := Finset.card_pos.mpr ⟨t, htS⟩
+      omega
+    have hbound := G.card_le_trianglePackingNumber hPpacking
+    rw [hcard, ← hS.2.1] at hbound
+    omega
+  · have htrSmall : (t ∩ r).card ≤ 1 := by omega
+    have hcompat : ∀ ⦃q⦄, q ∈ S → (q ∩ r).card ≤ 1 := by
+      intro q hq
+      by_cases hqt : q = t
+      · simpa [hqt] using htrSmall
+      · exact hRetained (Finset.mem_erase.mpr ⟨hqt, hq⟩)
+    have hpacking : G.IsTrianglePacking (insert r S) :=
+      G.isTrianglePacking_insert hS.1 hr hcompat
+    have hrNotS : r ∉ S := by
+      intro hrS
+      have hsmall := hcompat hrS
+      rw [Finset.inter_self, hrCard] at hsmall
+      omega
+    have hcard : (insert r S).card = S.card + 1 :=
+      Finset.card_insert_of_notMem hrNotS
+    have hbound := G.card_le_trianglePackingNumber hpacking
+    rw [hcard, ← hS.2.1] at hbound
+    omega
+
+/-- In the absence of a triangle-isolated `K₄`, each packed triangle contains
+at most one labelled edge. -/
+theorem card_labelled_edges_in_packed_triangle_le_one
+    (G : SimpleGraph V) {S : Finset (Finset V)}
+    (hS : G.IsSupportMaximalPacking S)
+    (hNoK4 : ∀ Q : Finset V, ¬G.IsTriangleIsolatedK4 Q)
+    {t : Finset V} (htS : t ∈ S) :
+    (t.powersetCard 2 ∩ G.labelledPackingEdges S).card ≤ 1 := by
+  classical
+  rw [Finset.card_le_one_iff]
+  intro e f he hf
+  simp only [Finset.mem_inter] at he hf
+  by_contra hef
+  obtain ⟨x, hx⟩ :=
+    (G.mem_labelledPackingEdges_iff.mp he.2).2
+  obtain ⟨y, hy⟩ :=
+    (G.mem_labelledPackingEdges_iff.mp hf.2).2
+  have hxy : x = y :=
+    G.eq_of_mem_spanners_of_distinct_edges hS htS he.1 hf.1 hef hx hy
+  subst y
+  rw [G.mem_packingEdgeSpanners_iff] at hx hy
+  have hIso := G.isTriangleIsolatedK4_of_spans_two_edges hS htS
+    he.1 hf.1 hef hx.1 hx.2 hy.2
+  exact hNoK4 _ hIso
+
 end SimpleGraph

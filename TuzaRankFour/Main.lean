@@ -13,6 +13,7 @@ import TuzaRankFour.CrownExtraction
 import TuzaRankFour.ResidualIndependence
 import TuzaRankFour.Exchange
 import TuzaRankFour.TransferLedger
+import TuzaRankFour.ComponentTransfer
 
 /-!
 # Tuza's conjecture for packing number at most four

@@ -26,9 +26,12 @@ The planned finite endpoint converts the 66 independently checked DRAT
 refutations to LRAT. Mathlib's LRAT importer has been smoke-tested on the
 frozen certificates and produces ordinary Lean theorems using only Palomar's
 permitted axioms. Parker's theorem through packing rank three, triangle-support
-invariance, and the exact isolated-`K₄` and fat-head-crown offsets are proved
-in Lean. The rank-four discharging argument and graph-to-certificate bridge
-remain ordinary Lean proof obligations.
+invariance, the exact isolated-`K₄` and fat-head-crown offsets, and the complete
+canonical-splitting interface are proved in Lean. In particular, splitting
+preserves the packing number, does not lower the transversal number, produces
+a split-normal graph, and preserves triangle support. The twelve-vertex
+discharge bound, the 65 remaining certificate imports, and the semantic
+graph-to-certificate bridge remain ordinary Lean proof obligations.
 
 ## Build
 

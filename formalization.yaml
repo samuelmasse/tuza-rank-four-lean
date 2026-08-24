@@ -65,10 +65,14 @@ status:
   scope: >-
     The audited definitions and exact rank-four theorem statement are present.
     The foundational extremal theory and Parker's theorem through packing rank
-    three are proved in Lean. The twelve-vertex analytic reduction, the
-    graph-to-certificate translation for the 66 finite cases, and the final
-    rank-four theorem are still being formalized. The stronger K4-free nu=4,
-    tau<=7 statement is intentionally outside scope.
+    three are proved in Lean. Triangle support, canonical splitting, and the
+    exact isolated-K4 and fat-head-crown reductions are also proved, including
+    preservation of the packing number, transversal projection, split
+    normality, and the strict-counterexample kernel assembly. The twelve-vertex
+    discharge bound, 65 remaining certificate imports, the semantic
+    graph-to-certificate translation, and the final rank-four theorem are still
+    being formalized. The stronger K4-free nu=4, tau<=7 statement is
+    intentionally outside scope.
   sorry_count: 1
   sorry_in_definitions: 0
   axioms: ["sorryAx"]

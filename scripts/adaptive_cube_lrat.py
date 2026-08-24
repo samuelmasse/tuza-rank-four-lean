@@ -19,7 +19,9 @@ import time
 from concurrent.futures import ProcessPoolExecutor
 from dataclasses import asdict, dataclass
 from pathlib import Path
+from typing import BinaryIO, Protocol, cast
 
+import pysolvers
 from pysat.solvers import Solver
 
 type Clause = list[int]
@@ -58,6 +60,19 @@ class InternalRecord:
     discarded_lrat_bytes: int
     solve_seconds: float
     trim_seconds: float
+
+
+class CadicalBackend(Protocol):
+    cadical: object | None
+    prfile: BinaryIO | None
+
+
+class SolverWithBackend(Protocol):
+    solver: CadicalBackend | None
+
+
+class NativeCadicalApi(Protocol):
+    def cadical195_del(self, cadical: object, proof_file: BinaryIO) -> None: ...
 
 
 def sha256_file(path: Path) -> str:
@@ -109,6 +124,65 @@ def flush_native_streams() -> None:
         raise RuntimeError("native proof stream flush failed")
 
 
+def binary_proof_to_text(raw: bytearray) -> list[str]:
+    """Decode PySAT's binary DRUP stream without crossing an untyped API."""
+
+    proof: list[str] = []
+    literals: list[str] = []
+    literal = 0
+    shift = 0
+    new_clause = True
+    for byte in raw:
+        if new_clause:
+            if byte == ord("d"):
+                literals.append("d")
+            elif byte != ord("a"):
+                raise ValueError("binary proof clause does not begin with 'a' or 'd'")
+            new_clause = False
+        elif byte:
+            literal |= (byte & 0x7F) << shift
+            shift += 7
+            if byte >> 7 == 0:
+                sign = 1 if literal % 2 == 0 else -1
+                literals.append(str(sign * (literal >> 1)))
+                literal = 0
+                shift = 0
+        else:
+            literals.append("0")
+            proof.append(" ".join(literals))
+            literals = []
+            new_clause = True
+    if not new_clause:
+        raise ValueError("binary proof ends inside a clause")
+    return proof
+
+
+def finalized_cadical_proof(solver: Solver) -> list[str]:
+    """Finalize CaDiCaL before decoding PySAT's binary proof stream.
+
+    PySAT normally decodes the temporary proof file while the native solver is
+    still alive.  On large Windows traces the C runtime can leave a partial
+    record buffered even after ``_flushall``.  Calling the same native
+    destructor used by ``Cadical195.delete`` first closes the proof writer;
+    the Python temporary file remains readable until we close it below.
+    """
+
+    wrapper = cast(SolverWithBackend, cast(object, solver))
+    backend = wrapper.solver
+    if backend is None or backend.cadical is None or backend.prfile is None:
+        raise RuntimeError("CaDiCaL proof backend is unavailable")
+    proof_file = backend.prfile
+    native_api = cast(NativeCadicalApi, cast(object, pysolvers))
+    native_api.cadical195_del(backend.cadical, proof_file)
+    backend.cadical = None
+    flush_native_streams()
+    proof_file.seek(0)
+    raw = bytearray(proof_file.read()).strip()
+    proof_file.close()
+    backend.prfile = None
+    return binary_proof_to_text(raw)
+
+
 def solve_node(
     job: tuple[NodeSpec, int, list[Clause], str, str]
 ) -> NodeResult:
@@ -127,13 +201,8 @@ def solve_node(
     try:
         if solver.solve():
             raise RuntimeError(f"node {spec.node_id or 'root'} is satisfiable")
-        flush_native_streams()
-        try:
-            proof = solver.get_proof()
-        except AssertionError:
-            flush_native_streams()
-            proof = solver.get_proof()
-        if proof is None or not proof or "0" not in proof:
+        proof = finalized_cadical_proof(solver)
+        if not proof or "0" not in proof:
             raise RuntimeError(f"node {spec.node_id or 'root'} proof lacks the empty clause")
         with drat_path.open("w", encoding="ascii", newline="\n") as stream:
             for line in proof:

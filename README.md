@@ -35,8 +35,10 @@ component bound, the excellent/pretty-good/bad classification, and the basic
 crown-side outside-vertex lemmas. A Hall-deficient residual family is now
 reduced to a cardinality-minimal deficient core and packaged as the exact
 nonempty fat-head crown used by the kernel reduction. The component-transfer
-and residual-zero steps, the 65 remaining certificate imports, and the
-semantic graph-to-certificate bridge remain ordinary Lean proof obligations.
+bridge and residual-zero spanner statements, the 65 remaining certificate
+imports, and the semantic graph-to-certificate bridge remain ordinary Lean
+proof obligations. The full residual zero-vertex domain has independently
+been proved to be an independent set.
 
 ## Build
 

@@ -72,8 +72,9 @@ status:
     formal through the labelled-edge count, connected-component size bound,
     packing-triangle classification, and crown-side outside-vertex lemmas.
     Hall deficiency is reduced to a minimal deficient core, matched back, and
-    packaged as the exact nonempty fat-head crown structure. Component
-    transfer and residual-zero analysis remain, as do 65 certificate imports,
+    packaged as the exact nonempty fat-head crown structure. The residual
+    zero-vertex domain is proved independent. Component transfer and the two
+    residual-zero spanner statements remain, as do 65 certificate imports,
     the semantic graph-to-certificate translation, and the final rank-four
     theorem. The stronger K4-free nu=4, tau<=7 statement is intentionally
     outside scope.

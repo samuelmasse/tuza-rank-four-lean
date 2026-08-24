@@ -733,4 +733,145 @@ theorem card_labelled_edges_in_packed_triangle_le_one
     he.1 hf.1 hef hx.1 hx.2 hy.2
   exact hNoK4 _ hIso
 
+/-- Labelled edges owned by a specified packed triangle. -/
+noncomputable def labelledEdgesInTriangle (G : SimpleGraph V)
+    (S : Finset (Finset V)) (t : Finset V) : Finset (Finset V) :=
+  t.powersetCard 2 ∩ G.labelledPackingEdges S
+
+/-- Packed triangles carrying a labelled edge. -/
+noncomputable def goodPackingTriangles (G : SimpleGraph V)
+    (S : Finset (Finset V)) : Finset (Finset V) :=
+  S.filter fun t ↦ (G.labelledEdgesInTriangle S t).Nonempty
+
+/-- Packed triangles carrying no labelled edge. -/
+noncomputable def badPackingTriangles (G : SimpleGraph V)
+    (S : Finset (Finset V)) : Finset (Finset V) :=
+  S.filter fun t ↦ G.labelledEdgesInTriangle S t = ∅
+
+@[simp]
+theorem mem_goodPackingTriangles_iff (G : SimpleGraph V)
+    {S : Finset (Finset V)} {t : Finset V} :
+    t ∈ G.goodPackingTriangles S ↔
+      t ∈ S ∧ (G.labelledEdgesInTriangle S t).Nonempty := by
+  classical
+  simp [goodPackingTriangles]
+
+@[simp]
+theorem mem_badPackingTriangles_iff (G : SimpleGraph V)
+    {S : Finset (Finset V)} {t : Finset V} :
+    t ∈ G.badPackingTriangles S ↔
+      t ∈ S ∧ G.labelledEdgesInTriangle S t = ∅ := by
+  classical
+  simp [badPackingTriangles]
+
+/-- The good and bad packed triangles partition the packing. -/
+theorem good_union_bad_eq (G : SimpleGraph V)
+    (S : Finset (Finset V)) :
+    G.goodPackingTriangles S ∪ G.badPackingTriangles S = S := by
+  classical
+  ext t
+  simp only [Finset.mem_union, G.mem_goodPackingTriangles_iff,
+    G.mem_badPackingTriangles_iff]
+  constructor
+  · rintro (⟨ht, _⟩ | ⟨ht, _⟩) <;> exact ht
+  · intro ht
+    by_cases h : (G.labelledEdgesInTriangle S t).Nonempty
+    · exact Or.inl ⟨ht, h⟩
+    · exact Or.inr ⟨ht, Finset.not_nonempty_iff_eq_empty.mp h⟩
+
+theorem disjoint_good_bad (G : SimpleGraph V)
+    (S : Finset (Finset V)) :
+    Disjoint (G.goodPackingTriangles S) (G.badPackingTriangles S) := by
+  classical
+  rw [Finset.disjoint_left]
+  intro t htGood htBad
+  rw [G.mem_goodPackingTriangles_iff] at htGood
+  rw [G.mem_badPackingTriangles_iff] at htBad
+  exact htGood.2.ne_empty htBad.2
+
+/-- Every labelled packing edge occurs in the labelled-edge slice of its
+unique packed owner. -/
+theorem labelledPackingEdges_eq_biUnion (G : SimpleGraph V)
+    (S : Finset (Finset V)) :
+    G.labelledPackingEdges S =
+      S.biUnion (G.labelledEdgesInTriangle S) := by
+  classical
+  ext e
+  constructor
+  · intro he
+    have heFamily := (G.mem_labelledPackingEdges_iff.mp he).1
+    obtain ⟨t, htS, heSub, heCard⟩ := mem_triangleFamilyEdges_iff.mp heFamily
+    apply Finset.mem_biUnion.mpr
+    refine ⟨t, htS, ?_⟩
+    simp [labelledEdgesInTriangle, he, heSub, heCard]
+  · intro he
+    obtain ⟨t, htS, heSlice⟩ := Finset.mem_biUnion.mp he
+    exact (Finset.mem_inter.mp heSlice).2
+
+/-- The labelled-edge slices of distinct packing members are disjoint. -/
+theorem pairwiseDisjoint_labelledEdgesInTriangle
+    (G : SimpleGraph V) {S : Finset (Finset V)}
+    (hS : G.IsTrianglePacking S) :
+    (S : Set (Finset V)).PairwiseDisjoint
+      (G.labelledEdgesInTriangle S) := by
+  classical
+  intro s hs t ht hst
+  change Disjoint (G.labelledEdgesInTriangle S s)
+    (G.labelledEdgesInTriangle S t)
+  apply Disjoint.mono Finset.inter_subset_left Finset.inter_subset_left
+  change Disjoint (s.powersetCard 2) (t.powersetCard 2)
+  exact G.pairwiseDisjoint_powersetCard_two_of_isTrianglePacking hS hs ht hst
+
+/-- Under the one-label-per-packed-triangle conclusion, the number of
+labelled edges equals the number of good packed triangles. -/
+theorem card_labelledPackingEdges_eq_card_goodPackingTriangles
+    (G : SimpleGraph V) {S : Finset (Finset V)}
+    (hS : G.IsSupportMaximalPacking S)
+    (hNoK4 : ∀ Q : Finset V, ¬G.IsTriangleIsolatedK4 Q) :
+    (G.labelledPackingEdges S).card =
+      (G.goodPackingTriangles S).card := by
+  classical
+  rw [G.labelledPackingEdges_eq_biUnion,
+    Finset.card_biUnion (G.pairwiseDisjoint_labelledEdgesInTriangle hS.1)]
+  calc
+    ∑ t ∈ S, (G.labelledEdgesInTriangle S t).card =
+        ∑ t ∈ S, if (G.labelledEdgesInTriangle S t).Nonempty then 1 else 0 := by
+      apply Finset.sum_congr rfl
+      intro t ht
+      have hle : (G.labelledEdgesInTriangle S t).card ≤ 1 := by
+        simpa [labelledEdgesInTriangle] using
+          G.card_labelled_edges_in_packed_triangle_le_one hS hNoK4 ht
+      by_cases hnonempty : (G.labelledEdgesInTriangle S t).Nonempty
+      · have hpos := Finset.card_pos.mpr hnonempty
+        simp [hnonempty]
+        omega
+      · have hempty := Finset.not_nonempty_iff_eq_empty.mp hnonempty
+        simp [hnonempty, hempty]
+    _ = (G.goodPackingTriangles S).card := by
+      simp [goodPackingTriangles]
+
+/-- The labelled-edge and bad-triangle charge sources carry exactly one source
+per packed triangle. -/
+theorem card_labelled_add_card_bad_eq_card_packing
+    (G : SimpleGraph V) {S : Finset (Finset V)}
+    (hS : G.IsSupportMaximalPacking S)
+    (hNoK4 : ∀ Q : Finset V, ¬G.IsTriangleIsolatedK4 Q) :
+    (G.labelledPackingEdges S).card +
+      (G.badPackingTriangles S).card = S.card := by
+  rw [G.card_labelledPackingEdges_eq_card_goodPackingTriangles hS hNoK4]
+  have hunion := congrArg Finset.card (G.good_union_bad_eq S)
+  rw [Finset.card_union_of_disjoint (G.disjoint_good_bad S)] at hunion
+  exact hunion
+
+/-- Placing three charge units on every labelled edge and every bad packed
+triangle gives total charge `3|S|`. -/
+theorem initial_discharge_total
+    (G : SimpleGraph V) {S : Finset (Finset V)}
+    (hS : G.IsSupportMaximalPacking S)
+    (hNoK4 : ∀ Q : Finset V, ¬G.IsTriangleIsolatedK4 Q) :
+    3 * (G.labelledPackingEdges S).card +
+      3 * (G.badPackingTriangles S).card = 3 * S.card := by
+  have hcount := G.card_labelled_add_card_bad_eq_card_packing hS hNoK4
+  omega
+
 end SimpleGraph

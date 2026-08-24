@@ -30,8 +30,12 @@ invariance, the exact isolated-`K₄` and fat-head-crown offsets, and the comple
 canonical-splitting interface are proved in Lean. In particular, splitting
 preserves the packing number, does not lower the transversal number, produces
 a split-normal graph, and preserves triangle support. The twelve-vertex
-discharge bound, the 65 remaining certificate imports, and the semantic
-graph-to-certificate bridge remain ordinary Lean proof obligations.
+discharge is formalized through the labelled-edge count, the connected
+component bound, the excellent/pretty-good/bad classification, and the basic
+crown-side outside-vertex lemmas. The component-transfer and residual-zero
+steps, the Hall-to-crown construction, the 65 remaining certificate imports,
+and the semantic graph-to-certificate bridge remain ordinary Lean proof
+obligations.
 
 ## Build
 

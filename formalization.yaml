@@ -68,11 +68,13 @@ status:
     three are proved in Lean. Triangle support, canonical splitting, and the
     exact isolated-K4 and fat-head-crown reductions are also proved, including
     preservation of the packing number, transversal projection, split
-    normality, and the strict-counterexample kernel assembly. The twelve-vertex
-    discharge bound, 65 remaining certificate imports, the semantic
-    graph-to-certificate translation, and the final rank-four theorem are still
-    being formalized. The stronger K4-free nu=4, tau<=7 statement is
-    intentionally outside scope.
+    normality, and the strict-counterexample kernel assembly. The discharge is
+    formal through the labelled-edge count, connected-component size bound,
+    packing-triangle classification, and crown-side outside-vertex lemmas. Its
+    component transfer, residual-zero analysis, and Hall-to-crown step remain,
+    as do 65 certificate imports, the semantic graph-to-certificate
+    translation, and the final rank-four theorem. The stronger K4-free nu=4,
+    tau<=7 statement is intentionally outside scope.
   sorry_count: 1
   sorry_in_definitions: 0
   axioms: ["sorryAx"]

@@ -267,6 +267,60 @@ theorem mem_prettyGoodResidualVertices_iff
   classical
   simp [prettyGoodResidualVertices]
 
+/-- Every pretty-good packed triangle contains an unlabelled-edge vertex in
+`prettyGoodResidualVertices`. -/
+theorem exists_prettyGoodResidualVertex_of_mem_prettyGoodPackingTriangles
+    (G : SimpleGraph V) {S : Finset (Finset V)}
+    (hS : G.IsSupportMaximalPacking S)
+    (hNoK4 : ∀ Q : Finset V, ¬G.IsTriangleIsolatedK4 Q)
+    {t : Finset V} (htPretty : t ∈ G.prettyGoodPackingTriangles S) :
+    ∃ w ∈ t, w ∈ G.prettyGoodResidualVertices S := by
+  classical
+  have htGood := (G.mem_prettyGoodPackingTriangles_iff.mp htPretty).1
+  obtain ⟨e, heSlice⟩ := (G.mem_goodPackingTriangles_iff.mp htGood).2
+  have heData := Finset.mem_inter.mp heSlice
+  have htS := (G.mem_goodPackingTriangles_iff.mp htGood).1
+  have htCard : t.card = 3 := G.card_eq_three_of_mem_triangles (hS.1.1 htS)
+  have heCard : e.card = 2 := (Finset.mem_powersetCard.mp heData.1).2
+  have hdiffNonempty : (t \ e).Nonempty := by
+    apply Finset.nonempty_iff_ne_empty.mpr
+    intro hEmpty
+    have hsub : t ⊆ e := by
+      intro v hvt
+      by_contra hve
+      have : v ∈ t \ e := Finset.mem_sdiff.mpr ⟨hvt, hve⟩
+      simpa [hEmpty] using this
+    have := Finset.card_le_card hsub
+    omega
+  obtain ⟨w, hwDiff⟩ := hdiffNonempty
+  have hwData := Finset.mem_sdiff.mp hwDiff
+  have hwNotLabelled := G.opposite_vertex_not_mem_labelledPackingVertices
+    hS hNoK4 htS heSlice hwData.1 hwData.2
+  refine ⟨w, hwData.1, ?_⟩
+  rw [G.mem_prettyGoodResidualVertices_iff]
+  exact ⟨Finset.mem_biUnion.mpr ⟨t, htPretty, hwData.1⟩,
+    hwNotLabelled⟩
+
+/-- Nonexcellence supplies an unlabelled edge contained in a triangle that
+survives deletion of all labelled packing edges. -/
+theorem exists_avoiding_triangle_on_unlabelled_edge_of_prettyGood
+    (G : SimpleGraph V) {S : Finset (Finset V)} {t : Finset V}
+    (htPretty : t ∈ G.prettyGoodPackingTriangles S) :
+    ∃ e : Finset V,
+      e ∈ t.powersetCard 2 ∧ e ∉ G.labelledPackingEdges S ∧
+      ∃ r : Finset V, G.TriangleAvoidsPackingLabels S r ∧ e ⊆ r := by
+  classical
+  have htData := G.mem_prettyGoodPackingTriangles_iff.mp htPretty
+  have hNotAll :
+      ¬∀ ⦃e : Finset V⦄, e ∈ t.powersetCard 2 →
+        e ∉ G.labelledPackingEdges S →
+        ∀ ⦃r : Finset V⦄, G.TriangleAvoidsPackingLabels S r →
+          ¬e ⊆ r := by
+    intro hAll
+    exact htData.2 ⟨htData.1, hAll⟩
+  push Not at hNotAll
+  exact hNotAll
+
 /-- Good packed triangles lying in one packing-intersection component. -/
 noncomputable def goodTrianglesInComponent (G : SimpleGraph V)
     (S : Finset (Finset V))

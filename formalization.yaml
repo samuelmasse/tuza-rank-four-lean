@@ -73,8 +73,10 @@ status:
     packing-triangle classification, and crown-side outside-vertex lemmas.
     Hall deficiency is reduced to a minimal deficient core, matched back, and
     packaged as the exact nonempty fat-head crown structure. The residual
-    zero-vertex domain is proved independent. Component transfer and the two
-    residual-zero spanner statements remain. Twenty-two of 66 finite cases
+    zero-vertex domain is proved independent, and the final Hall/crown
+    cardinal inequality is formal for an audited transfer ledger. Component
+    transfer and the internal residual-zero spanner statement remain.
+    Twenty-two of 66 finite cases
     have kernel-checked imports; the other 44 need partitioned imports. The
     semantic graph-to-certificate translation and final rank-four theorem also
     remain. The stronger K4-free nu=4, tau<=7 statement is intentionally

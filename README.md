@@ -38,7 +38,9 @@ nonempty fat-head crown used by the kernel reduction. The component-transfer
 bridge, the residual-zero spanner statements, and the semantic
 graph-to-certificate bridge remain ordinary Lean proof obligations. The full
 residual zero-vertex domain has independently been proved to be an independent
-set. Twenty-two of the 66 finite cases now have kernel-checked imports: all 21
+set. The transfer ledger and final Hall/crown cardinal inequality are formal,
+including crowns whose vertices mix outside and internal residual vertices.
+Twenty-two of the 66 finite cases now have kernel-checked imports: all 21
 cases of orders six through nine, plus the partitioned order-ten reference
 case. The remaining 44 require partitioned imports.
 

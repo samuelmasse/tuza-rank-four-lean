@@ -1,5 +1,6 @@
 import TuzaRankFour.KernelReduction
 import TuzaRankFour.PackingSaturation
+import Mathlib.Combinatorics.SimpleGraph.Connectivity.Finite
 
 /-!
 # Foundations for the twelve-vertex discharge
@@ -873,5 +874,124 @@ theorem initial_discharge_total
       3 * (G.badPackingTriangles S).card = 3 * S.card := by
   have hcount := G.card_labelled_add_card_bad_eq_card_packing hS hNoK4
   omega
+
+/-- The intersection graph of a triangle family: its vertices are the family
+members, and two distinct members are adjacent when they share a vertex. -/
+def packingIntersectionGraph (S : Finset (Finset V)) :
+    SimpleGraph {t : Finset V // t ∈ S} where
+  Adj s t := s ≠ t ∧ (s.1 ∩ t.1).Nonempty
+  symm.symm := by
+    rintro s t ⟨hst, hinter⟩
+    exact ⟨hst.symm, by simpa [Finset.inter_comm] using hinter⟩
+  loopless.irrefl := by
+    intro s h
+    exact h.1 rfl
+
+noncomputable instance packingIntersectionGraphDecidableAdj
+    (S : Finset (Finset V)) :
+    DecidableRel (packingIntersectionGraph S).Adj :=
+  Classical.decRel _
+
+omit [Fintype V] in
+@[simp]
+theorem packingIntersectionGraph_adj_iff
+    {S : Finset (Finset V)}
+    {s t : {q : Finset V // q ∈ S}} :
+    (packingIntersectionGraph S).Adj s t ↔
+      s ≠ t ∧ (s.1 ∩ t.1).Nonempty :=
+  Iff.rfl
+
+/-- A packing-intersection component, represented as its finite family of
+original triangles. -/
+noncomputable def packingComponentTriangles
+    (S : Finset (Finset V))
+    (C : (packingIntersectionGraph S).ConnectedComponent) :
+    Finset (Finset V) :=
+  Finset.univ.image fun q : C.supp ↦ q.1.1
+
+theorem mem_packingComponentTriangles_iff
+    {S : Finset (Finset V)}
+    {C : (packingIntersectionGraph S).ConnectedComponent}
+    {t : Finset V} :
+    t ∈ packingComponentTriangles S C ↔
+      ∃ q : C.supp, q.1.1 = t := by
+  classical
+  simp [packingComponentTriangles]
+
+theorem packingComponentTriangles_subset
+    {S : Finset (Finset V)}
+    (C : (packingIntersectionGraph S).ConnectedComponent) :
+    packingComponentTriangles S C ⊆ S := by
+  intro t ht
+  obtain ⟨q, rfl⟩ := mem_packingComponentTriangles_iff.mp ht
+  exact q.1.2
+
+theorem card_packingComponentTriangles
+    {S : Finset (Finset V)}
+    (C : (packingIntersectionGraph S).ConnectedComponent) :
+    (packingComponentTriangles S C).card = Fintype.card C.supp := by
+  classical
+  have hinj : Function.Injective (fun q : C.supp ↦ q.1.1) := by
+    intro q r hqr
+    apply Subtype.ext
+    apply Subtype.ext
+    exact hqr
+  rw [packingComponentTriangles, Finset.card_image_iff.mpr hinj.injOn,
+    Finset.card_univ]
+
+/-- Vertices covered by the packed triangles in one intersection component. -/
+noncomputable def packingComponentVertexSupport
+    (S : Finset (Finset V))
+    (C : (packingIntersectionGraph S).ConnectedComponent) : Finset V :=
+  triangleFamilyVertexSupport (packingComponentTriangles S C)
+
+theorem packingComponentVertexSupport_subset
+    {S : Finset (Finset V)}
+    (C : (packingIntersectionGraph S).ConnectedComponent) :
+    packingComponentVertexSupport S C ⊆ triangleFamilyVertexSupport S := by
+  intro v hv
+  obtain ⟨t, htC, hvt⟩ := Finset.mem_biUnion.mp hv
+  exact Finset.mem_biUnion.mpr
+    ⟨t, packingComponentTriangles_subset C htC, hvt⟩
+
+/-- Different components of the packing-intersection graph cover disjoint
+vertex sets.  Indeed, triangles from different components cannot share a
+vertex, since such a shared vertex would make their corresponding component
+vertices equal or adjacent. -/
+theorem disjoint_packingComponentVertexSupport
+    {S : Finset (Finset V)}
+    {C D : (packingIntersectionGraph S).ConnectedComponent}
+    (hCD : C ≠ D) :
+    Disjoint (packingComponentVertexSupport S C)
+      (packingComponentVertexSupport S D) := by
+  classical
+  rw [Finset.disjoint_left]
+  intro v hvC hvD
+  obtain ⟨s, hsC, hvs⟩ := Finset.mem_biUnion.mp hvC
+  obtain ⟨t, htD, hvt⟩ := Finset.mem_biUnion.mp hvD
+  obtain ⟨q, rfl⟩ := mem_packingComponentTriangles_iff.mp hsC
+  obtain ⟨r, rfl⟩ := mem_packingComponentTriangles_iff.mp htD
+  have hqC :
+      (packingIntersectionGraph S).connectedComponentMk q.1 = C :=
+    (C.mem_supp_iff q.1).mp q.2
+  have hrD :
+      (packingIntersectionGraph S).connectedComponentMk r.1 = D :=
+    (D.mem_supp_iff r.1).mp r.2
+  have hmk :
+      (packingIntersectionGraph S).connectedComponentMk q.1 =
+        (packingIntersectionGraph S).connectedComponentMk r.1 := by
+    by_cases hqr : q.1 = r.1
+    · exact congrArg _ hqr
+    · apply ConnectedComponent.sound
+      apply SimpleGraph.Adj.reachable
+      have hinter : (q.1.1 ∩ r.1.1).Nonempty :=
+        ⟨v, Finset.mem_inter.mpr ⟨hvs, hvt⟩⟩
+      exact packingIntersectionGraph_adj_iff.mpr
+        ⟨hqr, hinter⟩
+  apply hCD
+  calc
+    C = (packingIntersectionGraph S).connectedComponentMk q.1 := hqC.symm
+    _ = (packingIntersectionGraph S).connectedComponentMk r.1 := hmk
+    _ = D := hrD
 
 end SimpleGraph

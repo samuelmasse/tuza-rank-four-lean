@@ -4,6 +4,7 @@ import TuzaRankFour.K4Reduction
 import TuzaRankFour.CrownReduction
 import TuzaRankFour.RankFourReduction
 import TuzaRankFour.PackingSaturation
+import TuzaRankFour.VertexSplitting
 
 /-!
 # Tuza's conjecture for packing number at most four

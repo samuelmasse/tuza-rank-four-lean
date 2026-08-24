@@ -579,4 +579,57 @@ theorem triangleTransversalNumber_le_splitGraph (G : SimpleGraph V) :
     _ ≤ C.card := G.card_projectSplitEdgeFamily_le C
     _ = G.splitGraph.triangleTransversalNumber := hcard
 
+/-- The connected link component carried by a split vertex maps onto that
+vertex's entire link in the split graph. -/
+def splitLinkComponentHom (G : SimpleGraph V) (a : G.SplitVertex) :
+    a.2.toSimpleGraph →g G.splitGraph.triangleLink a where
+  toFun x := by
+    let b := G.splitEndpoint (G.symm.symm _ _ x.1.2)
+    refine ⟨b, ?_⟩
+    have ha : G.splitEndpoint x.1.2 = a := by
+      rcases a with ⟨v, c⟩
+      exact Sigma.ext rfl (heq_of_eq x.2)
+    rw [← ha]
+    exact G.splitGraph_adj_splitEndpoints x.1.2
+  map_rel' := by
+    intro x y hxy
+    change G.splitGraph.Adj
+      (G.splitEndpoint (G.symm.symm _ _ x.1.2))
+      (G.splitEndpoint (G.symm.symm _ _ y.1.2))
+    have hxyG : G.Adj x.1.1 y.1.1 := hxy
+    have hx : G.splitEndpoint (G.symm.symm _ _ x.1.2) =
+        G.splitEndpoint hxyG :=
+      G.splitEndpoint_eq_of_triangle (G.symm.symm _ _ x.1.2)
+        hxyG y.1.2
+    have hy : G.splitEndpoint (G.symm.symm _ _ y.1.2) =
+        G.splitEndpoint (G.symm.symm _ _ hxyG) :=
+      G.splitEndpoint_eq_of_triangle (G.symm.symm _ _ y.1.2)
+        (G.symm.symm _ _ hxyG) x.1.2
+    rw [hx, hy]
+    exact G.splitGraph_adj_splitEndpoints hxyG
+
+omit [Fintype V] [DecidableEq V] in
+theorem splitLinkComponentHom_surjective (G : SimpleGraph V)
+    (a : G.SplitVertex) : Function.Surjective (G.splitLinkComponentHom a) := by
+  intro b
+  obtain ⟨hab, ha, hb⟩ := b.2
+  let x0 : G.neighborSet a.1 := ⟨b.1.1, hab⟩
+  have hx0 : x0 ∈ a.2.supp := by
+    rw [ConnectedComponent.mem_supp_iff]
+    exact ha.symm
+  let x : a.2.supp := ⟨x0, hx0⟩
+  refine ⟨x, ?_⟩
+  apply Subtype.ext
+  change G.splitEndpoint (G.symm.symm _ _ hab) = b.1
+  refine Sigma.ext (by rfl) ?_
+  exact heq_of_eq hb.symm
+
+/-- A single simultaneous canonical split makes every vertex link
+preconnected. -/
+theorem isSplitNormal_splitGraph (G : SimpleGraph V) :
+    G.splitGraph.IsSplitNormal := by
+  intro a
+  exact a.2.connected_toSimpleGraph.preconnected.map
+    (G.splitLinkComponentHom a) (G.splitLinkComponentHom_surjective a)
+
 end SimpleGraph

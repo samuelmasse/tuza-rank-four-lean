@@ -1,0 +1,13 @@
+import TuzaRankFour.Certificates.Order10Skeleton06Adaptive.Formula
+
+set_option maxHeartbeats 0
+
+namespace TuzaRankFour.Certificates.Order10Skeleton06Adaptive
+
+lrat_cube_core_proof_binary leaf011
+  formula
+  (include_str "../../../Certificates/cnf/order10-skeleton06.cnf")
+  "-9 0\n12 0\n14 0\n"
+  "../../../Certificates/cubes/order10-skeleton06-adaptive/leaf-011.lratb"
+
+end TuzaRankFour.Certificates.Order10Skeleton06Adaptive

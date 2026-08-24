@@ -1,0 +1,732 @@
+{
+  "schema": "tuza-q4-adaptive-cube-lean-v1",
+  "source_cnf": "../../cnf/order10-skeleton06.cnf",
+  "source_cnf_sha256": "8e638d162cee43ee17086227f0a6ebee138b68a5e7427d89d1c2e5bdb52778dd",
+  "order": 10,
+  "edge_variables": 45,
+  "max_lrat_bytes": 500000,
+  "workers": 4,
+  "skip_variables": 4,
+  "candidate_variables": [
+    9,
+    12,
+    14,
+    15,
+    16,
+    17,
+    18,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30,
+    31,
+    32,
+    33,
+    34,
+    35,
+    36,
+    37,
+    38,
+    39,
+    42,
+    44,
+    45
+  ],
+  "internal_nodes": [
+    {
+      "node_id": "",
+      "assignment": [],
+      "split_variable": 9,
+      "negative_child": "0",
+      "positive_child": "1",
+      "discarded_lrat_bytes": 3450534,
+      "solve_seconds": 0.3048707999987528,
+      "trim_seconds": 0.4254868999996688
+    },
+    {
+      "node_id": "0",
+      "assignment": [
+        -9
+      ],
+      "split_variable": 12,
+      "negative_child": "00",
+      "positive_child": "01",
+      "discarded_lrat_bytes": 2090846,
+      "solve_seconds": 0.2281204000028083,
+      "trim_seconds": 0.28799789999902714
+    },
+    {
+      "node_id": "1",
+      "assignment": [
+        9
+      ],
+      "split_variable": 12,
+      "negative_child": "10",
+      "positive_child": "11",
+      "discarded_lrat_bytes": 1679155,
+      "solve_seconds": 0.1709405000001425,
+      "trim_seconds": 0.23363200000312645
+    },
+    {
+      "node_id": "00",
+      "assignment": [
+        -9,
+        -12
+      ],
+      "split_variable": 14,
+      "negative_child": "000",
+      "positive_child": "001",
+      "discarded_lrat_bytes": 1539568,
+      "solve_seconds": 0.16890659999626223,
+      "trim_seconds": 0.23473670000385027
+    },
+    {
+      "node_id": "01",
+      "assignment": [
+        -9,
+        12
+      ],
+      "split_variable": 14,
+      "negative_child": "010",
+      "positive_child": "011",
+      "discarded_lrat_bytes": 827821,
+      "solve_seconds": 0.10693460000038613,
+      "trim_seconds": 0.16870989999733865
+    },
+    {
+      "node_id": "10",
+      "assignment": [
+        9,
+        -12
+      ],
+      "split_variable": 14,
+      "negative_child": "100",
+      "positive_child": "101",
+      "discarded_lrat_bytes": 1314697,
+      "solve_seconds": 0.14675689999421593,
+      "trim_seconds": 0.2029435000004014
+    },
+    {
+      "node_id": "11",
+      "assignment": [
+        9,
+        12
+      ],
+      "split_variable": 14,
+      "negative_child": "110",
+      "positive_child": "111",
+      "discarded_lrat_bytes": 500520,
+      "solve_seconds": 0.06946159999642987,
+      "trim_seconds": 0.13119339999684598
+    },
+    {
+      "node_id": "000",
+      "assignment": [
+        -9,
+        -12,
+        -14
+      ],
+      "split_variable": 15,
+      "negative_child": "0000",
+      "positive_child": "0001",
+      "discarded_lrat_bytes": 1044714,
+      "solve_seconds": 0.1306413000129396,
+      "trim_seconds": 0.18992450000951067
+    },
+    {
+      "node_id": "001",
+      "assignment": [
+        -9,
+        -12,
+        14
+      ],
+      "split_variable": 15,
+      "negative_child": "0010",
+      "positive_child": "0011",
+      "discarded_lrat_bytes": 698745,
+      "solve_seconds": 0.09634800000640098,
+      "trim_seconds": 0.14743450000241864
+    },
+    {
+      "node_id": "010",
+      "assignment": [
+        -9,
+        12,
+        -14
+      ],
+      "split_variable": 15,
+      "negative_child": "0100",
+      "positive_child": "0101",
+      "discarded_lrat_bytes": 601684,
+      "solve_seconds": 0.08691019999969285,
+      "trim_seconds": 0.1379853000107687
+    },
+    {
+      "node_id": "100",
+      "assignment": [
+        9,
+        -12,
+        -14
+      ],
+      "split_variable": 15,
+      "negative_child": "1000",
+      "positive_child": "1001",
+      "discarded_lrat_bytes": 947034,
+      "solve_seconds": 0.1393467000016244,
+      "trim_seconds": 0.18725160000030883
+    },
+    {
+      "node_id": "101",
+      "assignment": [
+        9,
+        -12,
+        14
+      ],
+      "split_variable": 15,
+      "negative_child": "1010",
+      "positive_child": "1011",
+      "discarded_lrat_bytes": 561334,
+      "solve_seconds": 0.08662040000490379,
+      "trim_seconds": 0.13977340000565164
+    },
+    {
+      "node_id": "0000",
+      "assignment": [
+        -9,
+        -12,
+        -14,
+        -15
+      ],
+      "split_variable": 16,
+      "negative_child": "00000",
+      "positive_child": "00001",
+      "discarded_lrat_bytes": 849768,
+      "solve_seconds": 0.12973129999591038,
+      "trim_seconds": 0.1734390999918105
+    },
+    {
+      "node_id": "0100",
+      "assignment": [
+        -9,
+        12,
+        -14,
+        -15
+      ],
+      "split_variable": 16,
+      "negative_child": "01000",
+      "positive_child": "01001",
+      "discarded_lrat_bytes": 506070,
+      "solve_seconds": 0.08194379998894874,
+      "trim_seconds": 0.12266330000420567
+    },
+    {
+      "node_id": "1000",
+      "assignment": [
+        9,
+        -12,
+        -14,
+        -15
+      ],
+      "split_variable": 16,
+      "negative_child": "10000",
+      "positive_child": "10001",
+      "discarded_lrat_bytes": 711536,
+      "solve_seconds": 0.09343680000165477,
+      "trim_seconds": 0.14952120000089053
+    },
+    {
+      "node_id": "00000",
+      "assignment": [
+        -9,
+        -12,
+        -14,
+        -15,
+        -16
+      ],
+      "split_variable": 17,
+      "negative_child": "000000",
+      "positive_child": "000001",
+      "discarded_lrat_bytes": 610061,
+      "solve_seconds": 0.11487180000403896,
+      "trim_seconds": 0.15214030000788625
+    },
+    {
+      "node_id": "10000",
+      "assignment": [
+        9,
+        -12,
+        -14,
+        -15,
+        -16
+      ],
+      "split_variable": 17,
+      "negative_child": "100000",
+      "positive_child": "100001",
+      "discarded_lrat_bytes": 517192,
+      "solve_seconds": 0.0724742000020342,
+      "trim_seconds": 0.12092290000873618
+    }
+  ],
+  "leaves": [
+    {
+      "node_id": "000000",
+      "assignment": [
+        -9,
+        -12,
+        -14,
+        -15,
+        -16,
+        -17
+      ],
+      "cnf_path": "cnf\\node-000000.cnf",
+      "drat_path": "drat\\node-000000.drat",
+      "lrat_path": "lrat\\node-000000.lrat",
+      "cnf_sha256": "fe76fd87d48affe3ab47dd6155e172045853c6c141bb7921631dc6078b405915",
+      "drat_sha256": "11588c78fd68786a931ea53cf014833dec5c667ed61d6c69854a916bf6c57ead",
+      "lrat_sha256": "40254445064748499bb33817a5e12e9be5924c61aca1989ad4b676b5f8c5dc26",
+      "drat_bytes": 970424,
+      "lrat_bytes": 261813,
+      "solve_seconds": 0.07139630000165198,
+      "trim_seconds": 0.1197530000063125,
+      "binary_lrat_path": "leaf-000000.lratb",
+      "binary_lrat_bytes": 122096,
+      "binary_lrat_sha256": "8a9eacfbf4df8b6e2c78780a329b833f81bb19003224e27867da0a94cd22dd21",
+      "lean_module": "TuzaRankFour.Certificates.Order10Skeleton06Adaptive.Leaf000000",
+      "lean_theorem": "TuzaRankFour.Certificates.Order10Skeleton06Adaptive.leaf000000"
+    },
+    {
+      "node_id": "000001",
+      "assignment": [
+        -9,
+        -12,
+        -14,
+        -15,
+        -16,
+        17
+      ],
+      "cnf_path": "cnf\\node-000001.cnf",
+      "drat_path": "drat\\node-000001.drat",
+      "lrat_path": "lrat\\node-000001.lrat",
+      "cnf_sha256": "7bd257afe7d87bb3b65ed18422f4972736a1e2e3410e905a2944ad830125840e",
+      "drat_sha256": "a188850ab14bc1d0a4990ab9e941004b62dd34e9b17751e88e316eed9a3b5732",
+      "lrat_sha256": "39a902a547f8b52658b5c4baf7ee1d488ea3d334bf66fc1ea8ce23036ed47d22",
+      "drat_bytes": 1172515,
+      "lrat_bytes": 419349,
+      "solve_seconds": 0.09968059998936951,
+      "trim_seconds": 0.13659960000950377,
+      "binary_lrat_path": "leaf-000001.lratb",
+      "binary_lrat_bytes": 198248,
+      "binary_lrat_sha256": "6a094d49c76dd28009e5e464261e53b320330a185eca1c91333d7a7144fbbac3",
+      "lean_module": "TuzaRankFour.Certificates.Order10Skeleton06Adaptive.Leaf000001",
+      "lean_theorem": "TuzaRankFour.Certificates.Order10Skeleton06Adaptive.leaf000001"
+    },
+    {
+      "node_id": "00001",
+      "assignment": [
+        -9,
+        -12,
+        -14,
+        -15,
+        16
+      ],
+      "cnf_path": "cnf\\node-00001.cnf",
+      "drat_path": "drat\\node-00001.drat",
+      "lrat_path": "lrat\\node-00001.lrat",
+      "cnf_sha256": "55fbf71e95a17611ce0bbd663c496e0d94c37635551f5a6483d8a7a92c18198a",
+      "drat_sha256": "c8de271309c69ab79b6f96b8ff72322074b7c9ebc82f4d925fbc11c123cf9630",
+      "lrat_sha256": "3af4736c739a8bf2a60542d449e24e2622bf57e73f495aa798ae2e7a044b5bea",
+      "drat_bytes": 985374,
+      "lrat_bytes": 342778,
+      "solve_seconds": 0.06129429998691194,
+      "trim_seconds": 0.11445380000805017,
+      "binary_lrat_path": "leaf-00001.lratb",
+      "binary_lrat_bytes": 160648,
+      "binary_lrat_sha256": "143b8187779ae120c0d5c0c930e6a7f5aea0430715598c5b2218e0c6000958b0",
+      "lean_module": "TuzaRankFour.Certificates.Order10Skeleton06Adaptive.Leaf00001",
+      "lean_theorem": "TuzaRankFour.Certificates.Order10Skeleton06Adaptive.leaf00001"
+    },
+    {
+      "node_id": "0001",
+      "assignment": [
+        -9,
+        -12,
+        -14,
+        15
+      ],
+      "cnf_path": "cnf\\node-0001.cnf",
+      "drat_path": "drat\\node-0001.drat",
+      "lrat_path": "lrat\\node-0001.lrat",
+      "cnf_sha256": "c7b44abbdbfb1f02d5f6df2ca4f8e65d86bf290fb5793156655db0dc811291c8",
+      "drat_sha256": "3a8a59c8d11dae1863642121be177284bd0656db12fc2b1c429825f11fdc527f",
+      "lrat_sha256": "b98e756e27df880289093e266668fcc517f08cc487a492f3be1d7b57dba57ad0",
+      "drat_bytes": 1200112,
+      "lrat_bytes": 464184,
+      "solve_seconds": 0.08802660000219475,
+      "trim_seconds": 0.12931219999154564,
+      "binary_lrat_path": "leaf-0001.lratb",
+      "binary_lrat_bytes": 218597,
+      "binary_lrat_sha256": "9531b1e57a5798980f45476eb2e90174a395d8c3d26e5f77a1b13be4bd3c9c0a",
+      "lean_module": "TuzaRankFour.Certificates.Order10Skeleton06Adaptive.Leaf0001",
+      "lean_theorem": "TuzaRankFour.Certificates.Order10Skeleton06Adaptive.leaf0001"
+    },
+    {
+      "node_id": "0010",
+      "assignment": [
+        -9,
+        -12,
+        14,
+        -15
+      ],
+      "cnf_path": "cnf\\node-0010.cnf",
+      "drat_path": "drat\\node-0010.drat",
+      "lrat_path": "lrat\\node-0010.lrat",
+      "cnf_sha256": "c4727e7caa0776071e3d805c5472f2a2b8e3efdf5af625ed277e813dcd3ea60d",
+      "drat_sha256": "8a5692c5f30b8b9b6f0b5358564858f4bdabb4ebec72cc4cb6bbb6b90d2dd217",
+      "lrat_sha256": "5e3f1863ebfed5aee35bf114be254c89926c99329f4dd6a5418c783584b92db6",
+      "drat_bytes": 1228970,
+      "lrat_bytes": 484448,
+      "solve_seconds": 0.0866976999968756,
+      "trim_seconds": 0.13521480000053998,
+      "binary_lrat_path": "leaf-0010.lratb",
+      "binary_lrat_bytes": 228541,
+      "binary_lrat_sha256": "e2c4ffb841a7b1106c68738fee36d1ab73189990bcaec18ce4400ae00f900b9a",
+      "lean_module": "TuzaRankFour.Certificates.Order10Skeleton06Adaptive.Leaf0010",
+      "lean_theorem": "TuzaRankFour.Certificates.Order10Skeleton06Adaptive.leaf0010"
+    },
+    {
+      "node_id": "0011",
+      "assignment": [
+        -9,
+        -12,
+        14,
+        15
+      ],
+      "cnf_path": "cnf\\node-0011.cnf",
+      "drat_path": "drat\\node-0011.drat",
+      "lrat_path": "lrat\\node-0011.lrat",
+      "cnf_sha256": "7a4de02c7d8d90ecc27914ebb6a236f41387d0b75dc26c6a91dff519f298b845",
+      "drat_sha256": "84594fb16d6865310f143bd00ae0cf9bea1bc1a9c859c5022c00fbfa1b35d6ea",
+      "lrat_sha256": "1dfb4e47f297a987ccc0296cb4a4e91ec7b9ad1ef959346b7849fe3d78170e40",
+      "drat_bytes": 880347,
+      "lrat_bytes": 257986,
+      "solve_seconds": 0.06692639998800587,
+      "trim_seconds": 0.11903790000360459,
+      "binary_lrat_path": "leaf-0011.lratb",
+      "binary_lrat_bytes": 119138,
+      "binary_lrat_sha256": "8f74905ebf159076d90cdf6e7eee0f1619223d06a21d952b9f5ed55d7cef0915",
+      "lean_module": "TuzaRankFour.Certificates.Order10Skeleton06Adaptive.Leaf0011",
+      "lean_theorem": "TuzaRankFour.Certificates.Order10Skeleton06Adaptive.leaf0011"
+    },
+    {
+      "node_id": "01000",
+      "assignment": [
+        -9,
+        12,
+        -14,
+        -15,
+        -16
+      ],
+      "cnf_path": "cnf\\node-01000.cnf",
+      "drat_path": "drat\\node-01000.drat",
+      "lrat_path": "lrat\\node-01000.lrat",
+      "cnf_sha256": "1e7aa46b1ab6d57105cd75a08f1f53a45d36b136d01a7a28fbc7890155ea10ee",
+      "drat_sha256": "02cbaef79a2a388f448c80fc56c182b4deee9727ad1297243f1eea17bbe48ae0",
+      "lrat_sha256": "b3c78518b849ec03031dccfe727e5011cb47ff8fa55a3b4f62d3424b33b9a0c4",
+      "drat_bytes": 975181,
+      "lrat_bytes": 409216,
+      "solve_seconds": 0.06338619999587536,
+      "trim_seconds": 0.12073090000194497,
+      "binary_lrat_path": "leaf-01000.lratb",
+      "binary_lrat_bytes": 195260,
+      "binary_lrat_sha256": "88e1fb19872ae13a2279cb8e649250dcccf3ee281d571c0c5247a565fd0d1441",
+      "lean_module": "TuzaRankFour.Certificates.Order10Skeleton06Adaptive.Leaf01000",
+      "lean_theorem": "TuzaRankFour.Certificates.Order10Skeleton06Adaptive.leaf01000"
+    },
+    {
+      "node_id": "01001",
+      "assignment": [
+        -9,
+        12,
+        -14,
+        -15,
+        16
+      ],
+      "cnf_path": "cnf\\node-01001.cnf",
+      "drat_path": "drat\\node-01001.drat",
+      "lrat_path": "lrat\\node-01001.lrat",
+      "cnf_sha256": "4addd08d1ce27caa1ed88b43885f76182160abab1f8413d636d0dc76fe4aa407",
+      "drat_sha256": "790d6554ffd28fe2b526c1f98ee952fc4ce32632076b11b3b658209369035566",
+      "lrat_sha256": "7d00e6481dfea37a54a29711b3a618a5162c2b0a4357b8e984c3abc0b0c7cfc2",
+      "drat_bytes": 868037,
+      "lrat_bytes": 203704,
+      "solve_seconds": 0.05116220000491012,
+      "trim_seconds": 0.10301750000508036,
+      "binary_lrat_path": "leaf-01001.lratb",
+      "binary_lrat_bytes": 93980,
+      "binary_lrat_sha256": "3b9e3b60a654ae73c95802ec2d6c3c0ad08f30898b81fdec45fc80cb6f9a3f9a",
+      "lean_module": "TuzaRankFour.Certificates.Order10Skeleton06Adaptive.Leaf01001",
+      "lean_theorem": "TuzaRankFour.Certificates.Order10Skeleton06Adaptive.leaf01001"
+    },
+    {
+      "node_id": "0101",
+      "assignment": [
+        -9,
+        12,
+        -14,
+        15
+      ],
+      "cnf_path": "cnf\\node-0101.cnf",
+      "drat_path": "drat\\node-0101.drat",
+      "lrat_path": "lrat\\node-0101.lrat",
+      "cnf_sha256": "776ab3640dad813197968b30ed9aaf41baf9b0640767acbc87d6b90a589347e1",
+      "drat_sha256": "6ffa6123d40c9ca007ceb96f67bc188cf591f325a4a6a23320c3ce2c679f41fe",
+      "lrat_sha256": "30a9934886d5b27cfffcb7380f070165315c2695a1caf08a7b715ac16037e4ce",
+      "drat_bytes": 921642,
+      "lrat_bytes": 239068,
+      "solve_seconds": 0.056647900011739694,
+      "trim_seconds": 0.10668850000365637,
+      "binary_lrat_path": "leaf-0101.lratb",
+      "binary_lrat_bytes": 111290,
+      "binary_lrat_sha256": "6aa002a736f66506e9c1d2e61d9aadf260987f371c9a73bba01dd813f220862f",
+      "lean_module": "TuzaRankFour.Certificates.Order10Skeleton06Adaptive.Leaf0101",
+      "lean_theorem": "TuzaRankFour.Certificates.Order10Skeleton06Adaptive.leaf0101"
+    },
+    {
+      "node_id": "011",
+      "assignment": [
+        -9,
+        12,
+        14
+      ],
+      "cnf_path": "cnf\\node-011.cnf",
+      "drat_path": "drat\\node-011.drat",
+      "lrat_path": "lrat\\node-011.lrat",
+      "cnf_sha256": "5db169a024697991228f16e5a0f3ce677ba3668a83a85a0f472e5396fc6bc20b",
+      "drat_sha256": "d07f60fa42e9e99de47427e15e0c34b3f156d9f63916ab9804fcebd30367af73",
+      "lrat_sha256": "be31f39b813092b1c5ef84a12605cf168b92cd02a74989c96f7a0f90bcbcd845",
+      "drat_bytes": 938761,
+      "lrat_bytes": 314681,
+      "solve_seconds": 0.08250589999079239,
+      "trim_seconds": 0.11814249999588355,
+      "binary_lrat_path": "leaf-011.lratb",
+      "binary_lrat_bytes": 148794,
+      "binary_lrat_sha256": "e772c05908878126fdc01dc677c388632e149185f59bbcbe3d233b924ce603fb",
+      "lean_module": "TuzaRankFour.Certificates.Order10Skeleton06Adaptive.Leaf011",
+      "lean_theorem": "TuzaRankFour.Certificates.Order10Skeleton06Adaptive.leaf011"
+    },
+    {
+      "node_id": "100000",
+      "assignment": [
+        9,
+        -12,
+        -14,
+        -15,
+        -16,
+        -17
+      ],
+      "cnf_path": "cnf\\node-100000.cnf",
+      "drat_path": "drat\\node-100000.drat",
+      "lrat_path": "lrat\\node-100000.lrat",
+      "cnf_sha256": "3454163996186761b13d4e3f90d87ef7283fd6f99f8cc8a92f7973efd8c6e790",
+      "drat_sha256": "39bbcd1135fbc0dd70b5527ff6fdebf7b57f04179818b67a6cd29b591b4d12c9",
+      "lrat_sha256": "f4d30bc47da4b509c72e796768574d04fc9a50c8f6b241b8674ef39b90f8302f",
+      "drat_bytes": 974294,
+      "lrat_bytes": 236893,
+      "solve_seconds": 0.06697070000518579,
+      "trim_seconds": 0.12101399998937268,
+      "binary_lrat_path": "leaf-100000.lratb",
+      "binary_lrat_bytes": 110448,
+      "binary_lrat_sha256": "5a19c1ecda752e0146c240ac15e4320e4c8218967dc9f91b70484d635c40021b",
+      "lean_module": "TuzaRankFour.Certificates.Order10Skeleton06Adaptive.Leaf100000",
+      "lean_theorem": "TuzaRankFour.Certificates.Order10Skeleton06Adaptive.leaf100000"
+    },
+    {
+      "node_id": "100001",
+      "assignment": [
+        9,
+        -12,
+        -14,
+        -15,
+        -16,
+        17
+      ],
+      "cnf_path": "cnf\\node-100001.cnf",
+      "drat_path": "drat\\node-100001.drat",
+      "lrat_path": "lrat\\node-100001.lrat",
+      "cnf_sha256": "1bcb065c253944fce487e0d2355677559531a1c6222e4350973b14ea1ef55233",
+      "drat_sha256": "196d863ca396f83e4983a64e5a964609a59db57b4015fd04f115c59f92b7303c",
+      "lrat_sha256": "3d7470a4b6e3433cd6e4a0ff31f10bfcdfa5fe162ac9398a119d554d980140e7",
+      "drat_bytes": 946714,
+      "lrat_bytes": 323433,
+      "solve_seconds": 0.06393000000389293,
+      "trim_seconds": 0.12262729999201838,
+      "binary_lrat_path": "leaf-100001.lratb",
+      "binary_lrat_bytes": 153187,
+      "binary_lrat_sha256": "2c6f67a391f03ba901a9e1fb173272d514da8da1e9d5d828166858fe625e369c",
+      "lean_module": "TuzaRankFour.Certificates.Order10Skeleton06Adaptive.Leaf100001",
+      "lean_theorem": "TuzaRankFour.Certificates.Order10Skeleton06Adaptive.leaf100001"
+    },
+    {
+      "node_id": "10001",
+      "assignment": [
+        9,
+        -12,
+        -14,
+        -15,
+        16
+      ],
+      "cnf_path": "cnf\\node-10001.cnf",
+      "drat_path": "drat\\node-10001.drat",
+      "lrat_path": "lrat\\node-10001.lrat",
+      "cnf_sha256": "406275ed38571bb0bb0eadd5d5fb63f429371375e9b0ab49641ece78f2fb662f",
+      "drat_sha256": "3ffb50cd78c485458ba2ea86b7a10c3eca7e01d28b40a633e409e552dbd7348b",
+      "lrat_sha256": "1e5abf8fb58b3fa47cdd530d00bbb11c3f7f20ce044b1ffe23838fe6710ff26a",
+      "drat_bytes": 976551,
+      "lrat_bytes": 271104,
+      "solve_seconds": 0.05984419999003876,
+      "trim_seconds": 0.1073130000004312,
+      "binary_lrat_path": "leaf-10001.lratb",
+      "binary_lrat_bytes": 126921,
+      "binary_lrat_sha256": "7f92c8ad812f19ed0984b0246df66eb2c817960c1fb248c6e6bb87ce2b730d3b",
+      "lean_module": "TuzaRankFour.Certificates.Order10Skeleton06Adaptive.Leaf10001",
+      "lean_theorem": "TuzaRankFour.Certificates.Order10Skeleton06Adaptive.leaf10001"
+    },
+    {
+      "node_id": "1001",
+      "assignment": [
+        9,
+        -12,
+        -14,
+        15
+      ],
+      "cnf_path": "cnf\\node-1001.cnf",
+      "drat_path": "drat\\node-1001.drat",
+      "lrat_path": "lrat\\node-1001.lrat",
+      "cnf_sha256": "fc338e7c3c0db8e47483dd12e6eee32e788bd297e33d15beb78af687c368c937",
+      "drat_sha256": "5bfad9c4f36c16b37eb9f35756f42f201e4111d5055f6edc173f5dc29011f183",
+      "lrat_sha256": "8baad695afd6876a889309bb78ba9a7c924c9861a95fe7771aa38d0d647c1515",
+      "drat_bytes": 997156,
+      "lrat_bytes": 352336,
+      "solve_seconds": 0.06607749999966472,
+      "trim_seconds": 0.11770950000209268,
+      "binary_lrat_path": "leaf-1001.lratb",
+      "binary_lrat_bytes": 165765,
+      "binary_lrat_sha256": "546b40c3b2d6183bcb5e78c738afd0dc3d0a662e996a7356513abc577df9cb10",
+      "lean_module": "TuzaRankFour.Certificates.Order10Skeleton06Adaptive.Leaf1001",
+      "lean_theorem": "TuzaRankFour.Certificates.Order10Skeleton06Adaptive.leaf1001"
+    },
+    {
+      "node_id": "1010",
+      "assignment": [
+        9,
+        -12,
+        14,
+        -15
+      ],
+      "cnf_path": "cnf\\node-1010.cnf",
+      "drat_path": "drat\\node-1010.drat",
+      "lrat_path": "lrat\\node-1010.lrat",
+      "cnf_sha256": "9d2202d0b55934ef546ef6e469b54ce90550fe74f1916fe1f230ee143bf5978e",
+      "drat_sha256": "0917daf55d8927979edc45799ca35e6a1b41fc377d9d5c97d4e246d7da80fa23",
+      "lrat_sha256": "afd7b8a14a10ca947c41d983c33ca4b50b081631cf6c9b3ac64678d8af30dc22",
+      "drat_bytes": 987882,
+      "lrat_bytes": 370284,
+      "solve_seconds": 0.064770299999509,
+      "trim_seconds": 0.1134021999896504,
+      "binary_lrat_path": "leaf-1010.lratb",
+      "binary_lrat_bytes": 174767,
+      "binary_lrat_sha256": "feb8586439458e1b78fce635050422adbdd011dff8f2b5a60147735128485672",
+      "lean_module": "TuzaRankFour.Certificates.Order10Skeleton06Adaptive.Leaf1010",
+      "lean_theorem": "TuzaRankFour.Certificates.Order10Skeleton06Adaptive.leaf1010"
+    },
+    {
+      "node_id": "1011",
+      "assignment": [
+        9,
+        -12,
+        14,
+        15
+      ],
+      "cnf_path": "cnf\\node-1011.cnf",
+      "drat_path": "drat\\node-1011.drat",
+      "lrat_path": "lrat\\node-1011.lrat",
+      "cnf_sha256": "7ffa57b06c5f856a72db62824a9250a8d373e8e951cd27af412cf19e648c52d9",
+      "drat_sha256": "131041969b4588563c8a8b5a39e04f43fbd52a4c4ef76fd2d61a2b8ce636f703",
+      "lrat_sha256": "4598c82a076e18ec0cc128723f7363fd74a71ebbf5a213a0e9ba43a5ca98d43d",
+      "drat_bytes": 881264,
+      "lrat_bytes": 252950,
+      "solve_seconds": 0.06041579999146052,
+      "trim_seconds": 0.1022646000055829,
+      "binary_lrat_path": "leaf-1011.lratb",
+      "binary_lrat_bytes": 117339,
+      "binary_lrat_sha256": "0ffbe00dc05b63cccb59b72c20771619a84dd9e7a1b20338337648331b7bf3e1",
+      "lean_module": "TuzaRankFour.Certificates.Order10Skeleton06Adaptive.Leaf1011",
+      "lean_theorem": "TuzaRankFour.Certificates.Order10Skeleton06Adaptive.leaf1011"
+    },
+    {
+      "node_id": "110",
+      "assignment": [
+        9,
+        12,
+        -14
+      ],
+      "cnf_path": "cnf\\node-110.cnf",
+      "drat_path": "drat\\node-110.drat",
+      "lrat_path": "lrat\\node-110.lrat",
+      "cnf_sha256": "87f9f515ee1e3e1ea3d224cbb9dbf98661fc28f0f69cda3a6f9216c04d0c20ae",
+      "drat_sha256": "6dd18836cfc23f9fda23de8e2552340bbaecadeccfa9fdae9c5fbf9c491a3b5d",
+      "lrat_sha256": "102f07cdac24faf90f1a374367b06698a62a3f4ccbd2d8934f1d79226031bc9e",
+      "drat_bytes": 1120606,
+      "lrat_bytes": 447334,
+      "solve_seconds": 0.0714330000046175,
+      "trim_seconds": 0.12878210000053514,
+      "binary_lrat_path": "leaf-110.lratb",
+      "binary_lrat_bytes": 216174,
+      "binary_lrat_sha256": "d3a6f0db16e69f77cd17835f64c875964834098cbf00a108e9f9b42bfc411028",
+      "lean_module": "TuzaRankFour.Certificates.Order10Skeleton06Adaptive.Leaf110",
+      "lean_theorem": "TuzaRankFour.Certificates.Order10Skeleton06Adaptive.leaf110"
+    },
+    {
+      "node_id": "111",
+      "assignment": [
+        9,
+        12,
+        14
+      ],
+      "cnf_path": "cnf\\node-111.cnf",
+      "drat_path": "drat\\node-111.drat",
+      "lrat_path": "lrat\\node-111.lrat",
+      "cnf_sha256": "70dcc088f6cc9100a63e8e0f99e8de8978b5d52118d0202b43e05a6f3239e76b",
+      "drat_sha256": "15a232bbdb42ba400872f0a176eaed76fb025915412eee3b32cc20b29486f028",
+      "lrat_sha256": "ab2b99b6050229002d32ff70983bc0f41a3e030143b60d2639344374915701b7",
+      "drat_bytes": 615666,
+      "lrat_bytes": 197211,
+      "solve_seconds": 0.038843899994390085,
+      "trim_seconds": 0.09686710000096355,
+      "binary_lrat_path": "leaf-111.lratb",
+      "binary_lrat_bytes": 90532,
+      "binary_lrat_sha256": "a06af68be944f2c9c34cb76ffabb8e05b6eaaf424506fccf807e6182dfa3ac4c",
+      "lean_module": "TuzaRankFour.Certificates.Order10Skeleton06Adaptive.Leaf111",
+      "lean_theorem": "TuzaRankFour.Certificates.Order10Skeleton06Adaptive.leaf111"
+    }
+  ],
+  "summary": {
+    "internal_nodes": 17,
+    "leaves": 18,
+    "maximum_depth": 6,
+    "retained_lrat_bytes": 5848772,
+    "largest_leaf_lrat_bytes": 484448,
+    "elapsed_seconds": 3.8118824000121094
+  },
+  "lean": {
+    "formula_module": "TuzaRankFour.Certificates.Order10Skeleton06Adaptive.Formula",
+    "aggregate_module": "TuzaRankFour.Certificates.Order10Skeleton06Adaptive.All",
+    "refutation_theorem": "TuzaRankFour.Certificates.Order10Skeleton06Adaptive.refutation"
+  }
+}

@@ -2,3 +2,8 @@
 /.lake/
 /docbuild/.lake/
 
+# Regenerable development artifacts.  The committed certificate source uses
+# compact binary LRAT; the much larger textual traces are retained locally.
+/Certificates/lrat/
+/Certificates/adaptive-smoke/
+

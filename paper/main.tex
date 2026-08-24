@@ -1,0 +1,729 @@
+\documentclass[11pt]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+\usepackage[margin=1in]{geometry}
+
+\hypersetup{
+  pdftitle={Tuza's Conjecture for Graphs with at Most Four Edge-Disjoint Triangles},
+  pdfauthor={Samuel Masse},
+  pdfsubject={A bounded-packing case of Tuza's triangle packing-covering conjecture},
+  pdfkeywords={Tuza conjecture, triangle packing, triangle transversal, SAT, LRAT, Lean}
+}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{claim}[theorem]{Claim}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}[theorem]{Remark}
+
+\newcommand{\Tcal}{\mathcal{T}}
+\newcommand{\supp}{\operatorname{supp}_{\triangle}}
+\newcommand{\defect}{\operatorname{def}}
+
+\title{Tuza's Conjecture for Graphs with at Most Four\\Edge-Disjoint Triangles}
+\author{Samuel Masse}
+\date{}
+
+\begin{document}
+
+\maketitle
+\vspace{-2em}
+
+\begin{abstract}
+For a finite simple graph $G$, let $\nu(G)$ be the maximum number of
+pairwise edge-disjoint triangles and let $\tau(G)$ be the minimum number of
+edges meeting every triangle.  We prove that $\tau(G)\leq 2\nu(G)$ whenever
+$\nu(G)\leq 4$.  The cases $\nu(G)\leq 3$ were proved by Parker.  For
+$\nu(G)=4$, a discharging reduction based on the method of Sheng and Xiao
+shows that a counterexample would have triangle support on at most twelve
+vertices.  Marking a maximum four-packing leaves 66 finite order-type cases.
+We encode these cases as SAT instances and certify each resulting formula by
+an LRAT refutation.  A Lean formalization reconstructs the semantic clauses,
+checks the exact formulas and all 66 refutations, and derives the stated
+graph theorem.
+\end{abstract}
+
+\section{Introduction}
+
+A triangle packing in a graph is a family of pairwise edge-disjoint
+triangles, and a triangle transversal is a set of graph edges meeting every
+triangle.  Tuza conjectured that every finite simple graph $G$ satisfies
+\begin{equation}\label{eq:tuza}
+  \tau(G)\leq 2\nu(G).
+\end{equation}
+The factor two is best possible already for $K_4$ and $K_5$.  The conjecture
+remains open in general; see Tuza's original paper~\cite{Tuza1990} and the
+subsequent literature cited by Parker~\cite{Parker2025}.
+
+The best universal quantitative bound currently available is weaker than
+factor two; Haxell's bound~\cite{Haxell1999}, for example, gives only
+$\tau(G)\leq11$ when $\nu(G)=4$.  Many exact results instead impose a graph
+class, such as maximum average degree below seven~\cite{Puleo2015} or maximum
+degree at most seven~\cite{Gupta2026}.  Parker proved the exact
+bounded-packing statement
+\begin{equation}\label{eq:parker}
+  \nu(G)\leq 3 \quad\Longrightarrow\quad \tau(G)\leq 2\nu(G).
+\end{equation}
+We establish the next bounded-packing case.
+
+\begin{theorem}\label{thm:main}
+Every finite simple graph $G$ with $\nu(G)\leq 4$ satisfies
+$\tau(G)\leq 2\nu(G)$.
+\end{theorem}
+
+The proof has an analytic part and a computer-assisted finite part.  The analytic
+part adapts the $3k$ discharging framework of Sheng and
+Xiao~\cite{ShengXiao2024}.  Starting from a maximal packing saturated under
+three local exchanges, the argument either finds an exact fat-head crown or
+bounds the triangle support by three times the packing size.  Exact offset
+identities for crowns and triangle-isolated copies of $K_4$ then give the
+following reduction.
+
+\begin{proposition}\label{prop:twelve}
+If $\nu(G)=4$ and $\tau(G)\geq 9$, then the triangle support of $G$ has at
+most twelve vertices.
+\end{proposition}
+
+For the finite part, mark four edge-disjoint triangles.  Their vertex
+intersection pattern is a linear $3$-uniform hypergraph with four edges.
+There are 66 order-type scopes on orders six through twelve.  In each scope,
+all other graph edges remain free.  A SAT formula represents the literal graph
+and its complete triangle set.  Whenever a model has five edge-disjoint
+triangles or a transversal of at most eight edges, a semantic clause recording
+that exact witness is added.  Exhaustion yields 66 final formulas.  Their DRAT
+proofs were converted to LRAT and checked in Lean; the original DRAT traces
+were also checked independently with
+\texttt{drat-trim}~\cite{HeuleWetzlerHunt2014}.
+
+The finite verification does not rely on a catalogue of unlabeled graphs or
+on the solver's UNSAT declaration.  The reduction to twelve vertices,
+completeness of the marked support types, graph-to-CNF translation, and case
+dispatch are part of the Lean proof.
+
+\section{Preliminaries}
+
+All graphs are finite, undirected, loopless, and simple.  Write $\Tcal(G)$
+for the set of triangles of $G$.  We identify a triangle with either its
+three vertices or its three graph edges when no ambiguity is possible.
+
+The \emph{triangle packing number} $\nu(G)$ is the largest cardinality of a
+subfamily of $\Tcal(G)$ whose members are pairwise edge-disjoint.  The
+\emph{triangle transversal number} $\tau(G)$ is the minimum size of a set
+$C\subseteq E(G)$ such that $C$ meets the edge set of every triangle.
+Define the integral Tuza defect
+\[
+  \defect(G)=\tau(G)-2\nu(G).
+\]
+A strict counterexample to~\eqref{eq:tuza} is therefore a graph with
+$\defect(G)>0$.
+
+The \emph{triangle support} $\supp(G)$ is the graph whose edge set consists
+of the edges lying in at least one triangle of $G$, and whose vertex set
+consists of their endpoints.  Then
+\begin{equation}\label{eq:support}
+  \nu(\supp(G))=\nu(G),\qquad
+  \tau(\supp(G))=\tau(G).
+\end{equation}
+
+For a vertex $v$, form the auxiliary graph whose vertices are the graph edges
+incident with $v$, with two such edges adjacent when they lie together in a
+triangle.  If this auxiliary graph is disconnected, split $v$ into one vertex
+for each component, attaching each incident edge to the corresponding copy.
+The edge ground set is unchanged, and three edges form a triangle before the
+split exactly when their corresponding edges form a triangle afterward.
+Consequently a sequence of such splits preserves the entire triangle
+hypergraph, and hence preserves both $\nu$ and $\tau$.  We call the resulting
+graph \emph{split-normal}.
+
+We need one further reduction object from Sheng and Xiao.
+
+\begin{definition}[fat-head crown]\label{def:crown}
+A fat-head crown in a graph $G=(V,E)$ is a triple $(C,H,X)$ such that $C$ and
+$X$ partition $V$, $H\subseteq E$, and:
+\begin{enumerate}[label=(\roman*)]
+  \item $C$ is independent;
+  \item $H$ is exactly the set of edges spanned by vertices of $C$, meaning
+        $uv\in H$ exactly when $cuv$ is a triangle for some $c\in C$;
+  \item no vertex of $C$ is adjacent to a vertex of $X\setminus V(H)$; and
+  \item there is an edge-disjoint packing $P$ of $|H|$ triangles, each with
+        exactly one vertex in $C$ and exactly one edge in $H$.
+\end{enumerate}
+The packing $P$ is a \emph{witness packing}.
+\end{definition}
+
+The exact witness requirement is essential.  A subset passing a relaxed
+matching test need not be a crown.
+
+\begin{lemma}[exact crown offsets]\label{lem:crown-offset}
+Let $(C,H,X)$ be a fat-head crown with witness packing $P$, put $h=|H|$, and
+let $G'=G-C-H$.  Then
+\[
+  \nu(G)=\nu(G')+h,
+  \qquad
+  \tau(G)=\tau(G')+h.
+\]
+\end{lemma}
+
+\begin{proof}
+Adjoining $P$ lifts every packing of $G'$.  Conversely, delete from a packing
+of $G$ every triangle meeting $C$ or $H$.  Each deleted triangle contains a
+head edge, and distinct packed triangles contain distinct head edges, so at
+most $h$ triangles are deleted.
+
+Adjoining $H$ lifts every transversal of $G'$.  Conversely, a transversal of
+$G$ meets the $h$ pairwise edge-disjoint triangles of $P$ in at least $h$
+distinct graph edges.  These edges disappear on intersection with $E(G')$,
+and that intersection remains a transversal of $G'$.  Both identities follow.
+\end{proof}
+
+\begin{lemma}[triangle-isolated $K_4$ edge block]\label{lem:k4-offset}
+Suppose a copy $Q\cong K_4$ has no edge in a triangle outside the four faces
+of $Q$, and let $G'=G-E(Q)$.  Then
+\[
+  \nu(G)=\nu(G')+1,
+  \qquad
+  \tau(G)=\tau(G')+2.
+\]
+\end{lemma}
+
+\begin{proof}
+At most one face of $Q$ can occur in an edge-disjoint packing, while any one
+face can be added to a packing of $G'$.  A transversal of the four faces uses
+at least two local edges, and any pair of opposite edges meets all four faces.
+The isolation hypothesis separates these local choices from $G'$.
+\end{proof}
+
+\section{The twelve-vertex reduction}\label{sec:reduction}
+
+We isolate the form of the Sheng--Xiao discharging argument needed here.  Let
+$S$ be a maximal triangle packing, let $F=V(G)\setminus V(S)$, and let
+$R=E(G)\setminus E(S)$.  We allow the following packing-only improvements:
+\begin{enumerate}[label=(E\arabic*)]
+  \item replace one member of $S$ by at least two triangles using only $R$
+        and the three edges of the removed triangle;
+  \item replace two members of $S$ by at least three triangles using only
+        $R$ and the six edges of the removed triangles;
+  \item replace two members $T_1,T_2$ by two triangles $T'_1,T'_2$ such that
+        $(S\setminus\{T_1,T_2\})\cup\{T'_1,T'_2\}$ is a packing whose vertex
+        support is strictly larger than the vertex support of $S$.
+\end{enumerate}
+After each exchange, extend greedily to a maximal packing.  The lexicographic
+pair $(|S|,|V(S)|)$ strictly increases and is bounded by
+$(\nu(G),3\nu(G))$, so the process terminates.
+
+An edge $uv\in E(S)$ is \emph{labelled} if some $x\in F$ spans it, that is,
+$xuv$ is a triangle.  Let $L$ be the set of labelled edges.
+
+\begin{lemma}[discharge bound]\label{lem:discharge}
+Let $G$ be triangle-supported and split-normal.  Assume that:
+\begin{enumerate}[label=(\alph*)]
+  \item $G$ has no triangle-isolated $K_4$ edge block as in
+        Lemma~\ref{lem:k4-offset};
+  \item $S$ is a maximal packing saturated under (E1)--(E3); and
+  \item there is no nonempty fat-head crown $(C,H,X)$ with
+        $C\subseteq V(G)\setminus V(L)$ and $H\subseteq L$.
+\end{enumerate}
+Then $|V(G)|\leq 3|S|$.
+\end{lemma}
+
+\begin{proof}
+We give the charge argument in full.
+
+First, each triangle of $S$ has at most one labelled edge.  If two of its
+edges are spanned by distinct vertices of $F$, (E1) applies.  Suppose instead
+that $x\in F$ spans $uv$ and $vw$ in the packed triangle $uvw$.  The vertices
+$u,v,w,x$ induce $K_4$.  Since it is not a triangle-isolated edge block, some
+edge belongs to an external triangle.  Up to interchanging $u$ and $w$, there
+are four edge orbits, and all four give a permitted exchange:
+\begin{enumerate}[label=(\roman*)]
+  \item if the labelled edge $vw$ lies in $vwy$, use $xuv$ and $vwy$ for
+        (E1) when neither $vy$ nor $wy$ lies in $E(S)$.  If $vy$ lies in a
+        retained packing triangle, retain that triangle and insert $xuw$;
+        if $wy$ lies in a retained packing triangle, retain it and insert
+        $xuv$.  Either choice is a safe (E3) exchange, even when both edges
+        belong to retained packing triangles;
+  \item if the outside spoke $xw$ lies in $xwy$, maximality forces $wy$ into
+        a packing triangle; retain that triangle and insert $xuv$ by (E3);
+  \item if the opposite edge $uw$ lies in $uwy$, use $xuv$ and $uwy$ for
+        (E1), unless $uy$ or $wy$ belongs to $E(S)$; in those cases retain
+        its packing triangle and insert $xvw$ or $xuv$, respectively;
+  \item if the central spoke $xv$ lies in $xvy$, maximality forces $vy$ into
+        a packing triangle; retain it and insert $xuw$.
+\end{enumerate}
+Here an external triangle means a triangle other than the four faces of the
+displayed $K_4$.  In every two-for-two move, the inserted face contains one
+edge of a removed packing triangle and two spokes incident with $x\in F$.
+It is therefore
+edge-disjoint from every retained packing triangle.  Moreover the retained
+triangle keeps every old vertex omitted by the inserted face, while the new
+face adds $x\notin V(S)$.  Each two-for-two move is consequently a globally
+safe (E3) exchange with strictly larger vertex union.  Thus at most one edge
+of each member of $S$ is labelled.
+
+Call a packing triangle \emph{bad} if it has no labelled edge and
+\emph{good} otherwise.  Delete $L$ temporarily.  A good triangle is
+\emph{excellent} if neither unlabelled edge lies in another remaining
+triangle, and \emph{pretty-good} otherwise.  Write $S_1,S_2,S_3$ for the
+excellent, pretty-good, and bad triangles.  Put
+\[
+  V_1=V(S_1)\setminus\bigl(V(L)\cup V(S_2)\cup V(S_3)\bigr),
+  \qquad
+  V_2=V(S_2)\setminus V(L).
+\]
+
+The third vertex of every good packing triangle lies outside $V(L)$.  Indeed,
+write such a triangle as $uvw$, with labelled edge $uv$ spanned by
+$q\in F$, and suppose that $w\in V(L)$.  A different retained packing
+triangle then contains a labelled edge incident with $w$.  Retain that
+triangle and replace $uvw$ by $quv$.  The result is a packing: $uv$ belonged
+to the removed triangle, while the two edges incident with $q\notin V(S)$
+belong to no member of $S$.  The retained triangle preserves $w$, the new
+triangle preserves $u,v$, and $q$ is a new support vertex.  This is an (E3)
+improvement, a contradiction.  In particular, every component meeting
+$S_2$ contains a vertex of $V_2$.
+
+Place three units on each labelled edge and on each bad triangle.  Since every
+member of $S_1\cup S_2$ has exactly one labelled edge, the total charge is
+exactly $3|S|$.  Move one unit from each labelled edge to each endpoint, and
+move one unit from each bad triangle to each of its vertices.  Each labelled
+edge retains one unit.  At this point only vertices in $F\cup V_1\cup V_2$
+can have charge zero.
+
+Consider a connected component of the graph formed by the edges of $S$.  If
+it contains $x$ packing triangles and covers $m$ vertices, form the bipartite
+incidence graph between those triangles and those vertices.  This incidence
+graph is connected, has $x+m$ vertices, and has exactly $3x$ edges.  Hence
+$x+m\leq 3x+1$, so $m\leq 2x+1$.  If $x_2$ of the component's triangles are
+bad, the charge available on its vertices after the first move is $2x+x_2$.
+Move surplus charge inside the component, prioritizing vertices of $V_1$.
+Each component then has at most one zero; a component meeting $S_3$ has none,
+and a component meeting $S_2$ can have a zero only in $V_2$.
+
+We next establish the component transfer and the residual-zero statements
+that complete the discharging step; compare
+Sheng--Xiao~\cite[Lemmas~8--12]{ShengXiao2024}.
+
+\begin{claim}[componentwise transfer]\label{clm:transfer}
+For every packing component whose unique zero is a vertex $w\in V_2$, there
+are two labelled edges in that component with one common, unique spanner
+$q\in F$.  Moving one of their remaining units to $w$ and the other to $q$
+makes $w$ positive.  This can be done once in every such component without
+using any labelled edge twice.  Whenever a labelled edge is reduced to zero,
+its unique spanner in $F$ receives a unit in the same component transfer.
+\end{claim}
+
+\begin{proof}[Proof of the claim]
+Choose the pretty-good triangle $wuv\in S_2$ containing $w$, with labelled
+edge $uv$ spanned by some $q\in F$.  Since it is pretty-good, after possibly
+interchanging $u$ and $v$, the unlabelled edge $uw$ lies in a triangle $uwx$
+of $G-L$.  If neither $ux$ nor $wx$ lies in $E(S)$, then $quv$ and $uwx$
+replace $wuv$ by (E1), a contradiction.  If $wx$ lies in a packing triangle,
+retain that triangle and replace $wuv$ by $quv$.  The two spokes at $q$ avoid
+every retained member, and the new pair gains the vertex $q$, so this is a
+globally safe (E3), again a contradiction.  We may therefore assume that
+$ux$ lies in a packing triangle $uxy$ and that $wx\notin E(S)$.
+
+The triangle $uxy$ is not bad, since its packing component still has a zero
+after the component redistribution.  Its labelled edge is not $ux$, because
+$uwx$ lies in $G-L$.  If its labelled edge were $xy$, with spanner $q'\in F$,
+then retaining $wuv$ and replacing $uxy$ by $q'xy$ would be a globally safe
+(E3) exchange whose vertex union gains $q'$.  Hence $uy$ is labelled.  The
+triangle $uxy$ is pretty-good because its unlabelled edge $ux$ lies in
+$uwx\subseteq G-L$.
+
+The labelled edges $uv$ and $uy$ have one common unique spanner.  Indeed, if
+$q_1\in F$ spans $uv$ and $q_2\in F$ spans $uy$ with $q_1\ne q_2$, then the
+three triangles
+\[
+  q_1uv,\qquad q_2uy,\qquad uwx
+\]
+are pairwise edge-disjoint and use only edges outside $E(S)$ together with
+edges of the two removed triangles $wuv$ and $uxy$; recall that
+$wx\notin E(S)$.  They give (E2).  Applying this observation with every
+choice of spanner shows both uniqueness and equality; call the common vertex
+$q$.  Transfer the unit on $uv$ to $w$ and the unit on $uy$ to $q$.
+
+There is at most one zero in a packing component.  We make the displayed
+choice only once for that component.  Distinct components contain disjoint
+packing edges, so their two labelled edges are disjoint and no charge is
+spent twice.  The last assertion follows from the construction: every edge
+that loses its last unit is one of the displayed pair, and the common spanner
+$q$ receives the other edge's unit in the same transfer.
+\end{proof}
+
+Perform the transfer of Claim~\ref{clm:transfer} in every eligible component.
+Every vertex in $V_2$ is now positive.  Let $I$ be the zero-charge vertices
+remaining in $F\cup V_1$, and let $L'$ be the labelled edges that still carry
+one unit.
+
+\begin{claim}[residual independence]\label{clm:independent}
+The set $F\cup V_1$, and hence $I$, is independent.
+\end{claim}
+
+\begin{proof}[Proof of the claim]
+Suppose that $uv$ is an edge with $u,v\in F\cup V_1$.  Triangle support gives
+a triangle $uvw$, and maximality of $S$ forces at least one of its three
+edges into $E(S)$.  If $uv\in E(S)$, then $u,v\in V_1$ and the packing
+triangle containing $uv$ is neither bad nor good: it cannot be bad because
+$V_1$ avoids $V(S_3)$, while each possible labelled edge of a good triangle
+has endpoint $u$ or $v$, contrary to $V_1\cap V(L)=\varnothing$.
+
+Otherwise, say $uw\in E(S)$.  Then $u\in V_1$, and the packing triangle
+containing $uw$ belongs to $S_1$, since $u$ lies in no triangle of
+$S_2\cup S_3$.  None of $uv,vw,uw$ is labelled because neither $u$ nor $v$
+lies in $V(L)$.  Thus the unlabelled packing edge $uw$ lies in the other
+triangle $uvw$ of $G-L$, contradicting excellence.  Both cases are
+impossible.
+\end{proof}
+
+\begin{claim}[outside residual zeros]\label{clm:fzero}
+Every vertex of $I\cap F$ spans only edges of $L'$.
+\end{claim}
+
+\begin{proof}[Proof of the claim]
+A vertex of $F$ can span only an edge of $E(S)$: otherwise its triangle would
+be edge-disjoint from the maximal packing.  Such an edge is labelled.  If
+$z\in I\cap F$ spanned an edge of $L\setminus L'$, that edge must have lost
+its last unit in Claim~\ref{clm:transfer}, the only operation that depletes a
+labelled edge.  The claim then sends the unit to the edge's unique spanner
+$z$, contradicting that $z$ still has charge zero.
+\end{proof}
+
+\begin{claim}[internal residual zeros]\label{clm:vonezero}
+Every vertex of $I\cap V_1$ spans only edges of $L'$.
+\end{claim}
+
+\begin{proof}[Proof of the claim]
+Fix $v'\in I\cap V_1$ and let $Y$ be its packing component.  We first show
+that every neighbour of $v'$ lies in $V(Y)$.  Partition the incident edges at
+$v'$ into those whose other endpoint lies in $V(Y)$ and those whose other
+endpoint does not.  The first part is nonempty.  No triangle can use one edge
+from each part.  For if $x'v'u'$ were such a triangle and
+$x'v'\notin E(S)$, then none of its three edges could belong to $E(S)$---any
+such packing edge would join the two packing components---contradicting
+maximality.  If $x'v'\in E(S)$, write $x'v'y'\in S$.  The component $Y$
+contains only excellent triangles: a zero in a component meeting $S_3$ is
+impossible, and a zero in a component meeting $S_2$ lies in $V_2$, whereas
+$v'\in V_1$.  Thus $x'v'y'\in S_1$, and its labelled edge is $x'y'$ because
+$v'\notin V(L)$.  Let $q'\in F$ span $x'y'$.  If $q'=u'$, then $q'$ also
+spans $x'v'$, giving two labelled edges in $x'v'y'$.  If $q'\ne u'$, then
+$q'x'y'$ and $u'x'v'$ replace $x'v'y'$ by (E1).  Both alternatives are
+impossible.  Split-normality now forces the second part of the incident star
+to be empty, proving $N(v')\subseteq V(Y)$.
+
+Suppose that $v'$ spans an edge $ab$.  Then $a,b\in V(Y)$.  If $ab\in L$,
+it is the labelled edge of an excellent packing triangle in $Y$ and was not
+used by Claim~\ref{clm:transfer}, which uses only edges of $S_2$; hence
+$ab\in L'$.  Assume instead that $ab\notin L$.  If $ab\in E(S)$, write
+$abd\in S_1$.  When $d=v'$, this packing triangle has no labelled edge,
+contrary to its membership in $S_1$.  When $d\ne v'$, the triangle $abv'$ is
+in $G-L$, so the unlabelled edge $ab$ of the excellent triangle $abd$ lies in
+another triangle of $G-L$, again a contradiction.
+
+It remains that $ab\notin E(S)\cup L$.  Maximality applied to the triangle
+$abv'$ forces one of $av'$ and $bv'$ into $E(S)$; say $bv'\in E(S)$ and
+write $bv'c\in S_1$.  Here $c\ne a$.  The triangle $abv'$ lies in $G-L$, so
+the unlabelled edge $bv'$ of the excellent triangle $bv'c$ again lies in
+another triangle of $G-L$.  This final contradiction proves the claim.
+\end{proof}
+
+We finish with the crown step, spelling out the matching equality.  Form the
+bipartite graph $B$ with left part $I$, right part
+\[
+  S_G(I)=\{e\in L': e\text{ is spanned by a vertex of }I\},
+\]
+and incidence $ce\in E(B)$ exactly when $c$ spans $e$.  If $|I|>|L'|$, then
+a maximum matching of $B$ leaves a left vertex unmatched.  Start alternating
+paths at all unmatched left vertices, traverse unmatched edges left-to-right
+and matched edges right-to-left, and let $C$ and $H$ be the reached left and
+right vertices.  Every neighbour of a reached left vertex is reached; every
+reached right vertex is matched, or the path would augment; and its matched
+mate is reached.  Consequently
+\[
+  N_B(C)=H=S_G(C),
+\]
+and the matching saturates $H$.  In particular $C$ is nonempty.
+
+For each matched pair $ce$, choose the triangle consisting of $c$, the edge
+$e$, and its endpoints.  Notice that $C\cap V(H)=\varnothing$: vertices of
+$F$ lie outside $V(S)$, vertices of $V_1$ lie outside $V(L)$, and every edge
+of $H\subseteq L$ has both endpoints in $V(L)$.  The chosen triangles are
+therefore edge-disjoint: their head edges and crown vertices are distinct,
+and $C$ is independent by Claim~\ref{clm:independent}.  Finally, if $c\in C$
+had a neighbour outside
+$C\cup V(H)$, triangle support of that incident edge would give an edge
+spanned by $c$ outside $H=S_G(C)$, a contradiction.  Thus
+$(C,H,V(G)\setminus C)$ is an actual fat-head crown, contrary to (c).
+
+Therefore $|I|\leq |L'|$.  Choose an injection from $I$ to $L'$ and move the
+unit on each selected edge to its assigned vertex; unused edge charge may
+remain.  Every graph vertex now has at least one unit, while total charge
+remained $3|S|$.  Hence $|V(G)|\leq3|S|$.
+\end{proof}
+
+\begin{proof}[Proof of Proposition~\ref{prop:twelve}]
+Assume $\nu(G)=4$ and $\tau(G)\geq9$.  Replace $G$ by its triangle support
+and split vertices until the graph is split-normal.  These operations preserve
+the triangle hypergraph and therefore preserve $\nu$ and $\tau$; splitting can
+only increase the number of vertices.
+
+A triangle-isolated $K_4$ edge block would, by
+Lemma~\ref{lem:k4-offset}, leave a graph $G'$ with
+\[
+  \nu(G')=3,
+  \qquad
+  \tau(G')\geq7>2\nu(G'),
+\]
+contradicting Parker's theorem~\eqref{eq:parker}.  Similarly, a nonempty crown
+of size $h$ would, by Lemma~\ref{lem:crown-offset}, leave
+\[
+  \nu(G')=4-h\leq3,
+  \qquad
+  \tau(G')-2\nu(G')
+    =\tau(G)-8+h>0,
+\]
+again contradicting~\eqref{eq:parker}.
+
+Choose a maximal packing and saturate it under (E1)--(E3).  All hypotheses of
+Lemma~\ref{lem:discharge} now hold, so the split graph has at most
+$3|S|\leq3\nu(G)=12$ vertices.  The original triangle support has no more
+vertices than its split graph, proving the proposition.
+\end{proof}
+
+\section{Marked four-packing types}\label{sec:types}
+
+Let $P=\{T_1,T_2,T_3,T_4\}$ be four edge-disjoint triangles.  Any two members
+of $P$ share at most one vertex.  For every vertex lying in at least two
+members, record the non-singleton subset of $[4]$ consisting of the triangles
+that contain it.  No pair $\{i,j\}$ occurs in two recorded subsets, and every
+index occurs at most three times.  Private vertices fill the remaining
+incidences so that every $T_i$ has size three.
+
+Conversely, any family of non-singleton subsets of $[4]$ with these two
+properties defines a linear four-edge, $3$-uniform hypergraph, hence a marked
+four-packing type.  There are at most six shared vertices because they consume
+at least two of the twelve incidences.  We quotient only by the 24
+permutations of the marked triangles.  We do not quotient the ambient graph.
+
+For an ambient order $n$, include every marked type whose union uses at most
+$n$ vertices; the remaining vertices are outside the marked packing.  The 16
+canonical incidence families are listed in Appendix~\ref{app:types}.
+Counting each family at every ambient order at least its support order gives
+Table~\ref{tab:types}.
+
+\begin{table}[ht]
+\centering
+\caption{Marked support types used at each ambient order.}\label{tab:types}
+\begin{tabular}{crrrrrrrr}
+\toprule
+order $n$ & 6 & 7 & 8 & 9 & 10 & 11 & 12 & total \\
+\midrule
+types & 1 & 3 & 6 & 11 & 14 & 15 & 16 & 66 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Orders below six are impossible: four edge-disjoint triangles use twelve
+distinct graph edges, while $K_5$ has only ten.  Every graph with $\nu(G)=4$
+contains a maximum marked four-packing.  Relabelling its packing blocks and
+vertices places it in one of the 66 order-type scopes above.  Thus the marked
+scope is complete for every triangle-supported graph of order at most twelve.
+
+\section{The SAT encoding}\label{sec:sat}
+
+Fix an order $n$ and one marked type.  For every possible graph edge
+$e\in\binom{[n]}2$, introduce a variable $x_e$.  For every possible triangle
+$T\in\binom{[n]}3$, introduce a variable $y_T$.  The base formula contains:
+\begin{align}
+  y_T &\longrightarrow x_e &&(e\in\tbinom{T}{2}),\label{eq:tri-forward}\\
+  \bigwedge_{e\in\binom{T}{2}}x_e &\longrightarrow y_T,
+      \label{eq:tri-backward}\\
+  x_e &\longrightarrow \bigvee_{T\supset e}y_T,
+      \label{eq:edge-support}\\
+  \bigvee_{T\ni v}y_T &&& (v\in[n]),\label{eq:vertex-support}
+\end{align}
+and a unit clause $y_T$ for each of the four marked triangles.
+Equations~\eqref{eq:tri-forward}--\eqref{eq:tri-backward} make the $y$-variables
+the complete literal triangle closure of the graph selected by the
+$x$-variables.  Equations~\eqref{eq:edge-support}--\eqref{eq:vertex-support}
+make the graph triangle-supported.
+
+The incremental search uses only two kinds of learned semantic clause.
+
+\begin{lemma}[packing cut]\label{lem:packing-cut}
+If a decoded model contains five edge-disjoint triangles
+$T_1,\ldots,T_5$, then
+\[
+  \neg y_{T_1}\vee\cdots\vee\neg y_{T_5}
+\]
+is valid for every graph with $\nu\leq4$.
+\end{lemma}
+
+\begin{lemma}[cover cut]\label{lem:cover-cut}
+If a decoded model has a triangle transversal $C$ with $|C|\leq8$, then
+\[
+  \bigvee_{T:\,E(T)\cap C=\varnothing} y_T
+\]
+is valid for every graph with $\tau\geq9$.
+\end{lemma}
+
+\begin{proof}
+The packing clause merely says that the five displayed triangles cannot all
+exist.  For the cover clause, a graph with no triangle disjoint from $C$ has
+$C\cap E(G)$ as a transversal of size at most eight, even if some edges of
+$C$ disappear in a later assignment.
+\end{proof}
+
+The algorithm solves the base formula, reconstructs the literal graph and its
+complete triangle set, and searches by exact recursion first for a
+five-packing and then for a transversal of size at most eight.  It appends the
+corresponding valid clause and repeats; no additional graph-specific clause is
+used.  When the final formula is unsatisfiable, every
+triangle-supported graph in that marked scope has either a five-packing or an
+eight-edge transversal.
+
+\section{Certificate verification}\label{sec:computation}
+
+Each case is encoded directly as a SAT instance over the possible graph
+edges, with semantic clauses obtained from exact packing and covering
+calculations.  The Lean development~\cite{Lean4,Mathlib} reconstructs every
+serialized witness,
+validates all 331,430 semantic clauses, checks their exact agreement with the
+final DIMACS formulas, and discharges each of the 66 formulas by a
+kernel-checked LRAT refutation.  An independent executable verifier performs
+the same witness reconstruction and formula comparison, and the original
+DRAT traces are checked separately with \texttt{drat-trim}.
+
+A separate coverage checker reconstructs every expected marked type at each
+order and verifies that the resulting 66 cases occur exactly once.
+
+Table~\ref{tab:campaign} records the complete computation.  Here ``models''
+means decoded assignments that produced a semantic cut; it does not denote
+isomorphism classes.
+
+\begin{table}[ht]
+\centering
+\caption{Certified finite computation.}\label{tab:campaign}
+\begin{tabular}{rrrrrr}
+\toprule
+order & cases & models & five-packing cuts & cover cuts & result \\
+\midrule
+6  & 1  & 4       & 0       & 4      & UNSAT \\
+7  & 3  & 220     & 96      & 124    & UNSAT \\
+8  & 6  & 2,955   & 1,865   & 1,090  & UNSAT \\
+9  & 11 & 18,660  & 12,963  & 5,697  & UNSAT \\
+10 & 14 & 50,781  & 36,413  & 14,368 & UNSAT \\
+11 & 15 & 95,176  & 67,324  & 27,852 & UNSAT \\
+12 & 16 & 163,634 & 113,286 & 50,348 & UNSAT \\
+\midrule
+total & 66 & 331,430 & 231,947 & 99,483 & UNSAT \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+All 66 DRAT proofs were accepted by \texttt{drat-trim}; together they contain
+570,595,138 bytes.  Their 572 binary LRAT segments occupy 250.98 MiB.  Each
+formula, proof, computation record, and verification program is identified by
+its SHA-256 digest.
+
+The formal proof covers the graph-theoretic definitions, Parker's
+packing-rank-three bound, the twelve-vertex reduction, the classification of
+marked four-packings, the graph-to-CNF interpretation, and the final case
+dispatch.  The SAT solver, witness-generation scripts, and DRAT-to-LRAT
+converter are not trusted: their outputs are checked by the formal
+development.  The trusted base consists of the Lean kernel, the imported
+Mathlib definitions and proof infrastructure, and the checked source and
+certificate data.
+
+\begin{proposition}\label{prop:finite}
+Every triangle-supported graph $G$ on at most twelve vertices with
+$\nu(G)=4$ has $\tau(G)\leq8$.
+\end{proposition}
+
+\begin{proof}
+Mark a maximum four-packing.  By Section~\ref{sec:types}, the marked graph
+belongs to one of the 66 scopes.  The corresponding final formula is
+DRAT-refuted.  Lemmas~\ref{lem:packing-cut} and~\ref{lem:cover-cut} show that
+every graph with $\nu\leq4$ and $\tau\geq9$ satisfies every learned clause.
+Hence no such graph exists in the marked scope.
+\end{proof}
+
+\section{Proof of the main theorem}
+
+\begin{proof}[Proof of Theorem~\ref{thm:main}]
+If $\nu(G)\leq3$, the result is Parker's theorem~\eqref{eq:parker}.  Suppose
+$\nu(G)=4$ and, for a contradiction, $\tau(G)\geq9$.  Put
+$H=\supp(G)$.  Proposition~\ref{prop:twelve} and~\eqref{eq:support} give
+$|V(H)|\leq12$, $\nu(H)=4$, and $\tau(H)=\tau(G)$.  Applying
+Proposition~\ref{prop:finite} to the triangle-supported graph $H$ gives
+$\tau(G)=\tau(H)\leq8$, a contradiction.
+\end{proof}
+
+\section{Concluding remarks}
+
+Theorem~\ref{thm:main} extends the exact inequality from packing number three
+to packing number four.  The reduction in Proposition~\ref{prop:twelve} is
+specific to this bounded case and does not provide an induction on the packing
+number.  Extending the method beyond rank four will therefore require an
+additional structural principle.
+
+\paragraph{Acknowledgments.}
+ChatGPT 5.6 Sol (OpenAI) and Claude Fable 5 (Anthropic) assisted with research,
+exposition, software, and formalization.  The author checked their output and
+takes responsibility for the paper.
+
+\appendix
+
+\section{Canonical marked-packing incidence families}\label{app:types}
+
+For compactness, write $13$ for the shared vertex belonging to marked
+triangles $T_1$ and $T_3$, and similarly write $234$ or $1234$ for a vertex
+shared by three or four marked triangles.  The complete canonical list is:
+
+\begin{center}
+\begin{tabular}{cl}
+\toprule
+support order & non-singleton incidence subsets \\
+\midrule
+6  & $12,13,23,14,24,34$ \\
+7  & $12,13,23,14,24$ \\
+7  & $12,13,14,234$ \\
+8  & $12,13,23,14$ \\
+8  & $12,13,24,34$ \\
+8  & $12,13,234$ \\
+9  & $12,13,23$ \\
+9  & $12,13,14$ \\
+9  & $12,13,24$ \\
+9  & $12,134$ \\
+9  & $1234$ \\
+10 & $12,13$ \\
+10 & $12,34$ \\
+10 & $123$ \\
+11 & $12$ \\
+12 & none \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Every row satisfies the pair-occupancy and degree conditions in
+Section~\ref{sec:types}.  Conversely, recursively add a non-singleton subset
+of $[4]$ only when it repeats no pair and raises no block degree above three;
+then quotient the resulting family by the 24 permutations of $[4]$.  This
+produces exactly the rows above.  Private vertices fill each block to degree
+three, giving the displayed support order.  Taking all rows of support order
+at most $n$ yields the cumulative counts $1,3,6,11,14,15,16$ for
+$n=6,\ldots,12$ and therefore 66 order-type scopes.
+
+\small
+\bibliographystyle{plain}
+\bibliography{tuza-rank-four}
+
+\end{document}

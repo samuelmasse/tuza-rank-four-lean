@@ -21,32 +21,32 @@ sources:
   - title: "Tuza's Conjecture for Graphs with at Most Four Edge-Disjoint Triangles"
     authors:
       - "Samuel Masse"
-    id: "sha256:b308e6ec97f5509936dcdf0687ebd6a62e62e5c589b0587a9333eb5f38d52430"
+    id: "sha256:00e91f28a80c21814e72f98f8cab37e68fb11e53f7c03705304a898da09adc9f"
     type: "original-proof"
     relationship: "other"
     note: >-
-      Publication-form manuscript dated 2026-08-23. The formalization targets
+      Publication-form manuscript dated 2026-08-24. The formalization targets
       its main theorem and excludes the separate stronger K4-free statement.
   - title: "A conjecture on triangles of graphs"
     authors:
       - "Zsolt Tuza"
     id: "doi:10.1007/BF01787705"
-    type: "article"
+    type: "paper"
     location: "https://doi.org/10.1007/BF01787705"
     relationship: "background"
   - title: "New bounds on a generalization of Tuza's conjecture"
     authors:
-      - "Kevin Parker"
+      - "Alex Parker"
     id: "doi:10.37236/13355"
-    type: "article"
+    type: "paper"
     location: "https://doi.org/10.37236/13355"
     relationship: "background"
-  - title: "A 3k-vertex kernel for Tuza's conjecture"
+  - title: "Kernelization for edge triangle packing and covering via a discharging method"
     authors:
-      - "Guiying Sheng"
-      - "Mingqing Xiao"
+      - "Zimo Sheng"
+      - "Mingyu Xiao"
     id: "doi:10.1016/j.tcs.2024.114635"
-    type: "article"
+    type: "paper"
     location: "https://doi.org/10.1016/j.tcs.2024.114635"
     relationship: "background"
   - title: "Trimming while checking clausal proofs"
@@ -55,7 +55,7 @@ sources:
       - "Warren A. Hunt Jr."
       - "Nathan Wetzler"
     id: "doi:10.1007/978-3-319-09284-3_31"
-    type: "conference paper"
+    type: "paper"
     location: "https://doi.org/10.1007/978-3-319-09284-3_31"
     relationship: "background"
 
@@ -63,29 +63,27 @@ related_formalizations: []
 
 status:
   scope: >-
-    The audited definitions and exact rank-four theorem statement are present.
-    The foundational extremal theory and Parker's theorem through packing rank
-    three are proved in Lean. Triangle support, canonical splitting, and the
-    exact isolated-K4 and fat-head-crown reductions are also proved, including
-    preservation of the packing number, transversal projection, split
-    normality, and the strict-counterexample kernel assembly. The discharge is
-    formal through the labelled-edge count, connected-component size bound,
-    packing-triangle classification, and crown-side outside-vertex lemmas.
-    Hall deficiency is reduced to a minimal deficient core, matched back, and
-    packaged as the exact nonempty fat-head crown structure. The residual
-    zero-vertex domain is proved independent, and the final Hall/crown
-    cardinal inequality is formal for an audited transfer ledger. Component
-    transfer and the internal residual-zero spanner statement remain.
-    Twenty-two of 66 finite cases
-    have kernel-checked imports; the other 44 need partitioned imports. The
-    semantic graph-to-certificate translation and final rank-four theorem also
-    remain. The stronger K4-free nu=4, tau<=7 statement is intentionally
-    outside scope.
-  sorry_count: 1
+    Complete proof of the exact finite-simple-graph statement. The development
+    formalizes Parker's theorem through packing rank three, triangle-support
+    and splitting reductions, exact isolated-K4 and fat-head-crown offsets, the
+    twelve-vertex discharge, canonical classification of marked four-packings,
+    the graph-to-CNF semantic bridge, and the dispatch over all 66 finite cases.
+    Lean reconstructs all 331,430 semantic cuts and kernel-checks 572 LRAT
+    segments refuting the 66 final formulas. The stronger K4-free nu=4,
+    tau<=7 statement is intentionally outside scope.
+  sorry_count: 0
   sorry_in_definitions: 0
-  axioms: ["sorryAx"]
+  axioms: ["propext", "Classical.choice", "Quot.sound"]
   main_results:
-    - "SimpleGraph.tuza_rank_four"
+    - declaration: "SimpleGraph.tuza_rank_four"
+      file: "Solution.lean"
+      sorry_count: 0
+      axioms: ["propext", "Classical.choice", "Quot.sound"]
+      comparator_config: "comparator.json"
+    - declaration: "SimpleGraph.no_supported_rank_four_counterexample"
+      file: "TuzaRankFour/FiniteEndpoint.lean"
+      sorry_count: 0
+      axioms: ["propext", "Classical.choice", "Quot.sound"]
 
 automation:
   methods:
@@ -97,7 +95,7 @@ automation:
         certificate engineering, and Lean development; all generated claims
         are subject to kernel, certificate, and human review.
       cost:
-        wall_time: "ongoing"
+        wall_time: "multi-day development; exact elapsed time not tracked"
         spend_usd: "subscription-based; not separately tracked"
         hardware: "local Windows workstation and GitHub Actions"
       prompting_notes: >-
@@ -108,7 +106,9 @@ automation:
   notes: >-
     Samuel Masse directs the work and is responsible for the theorem and
     artifact. AI systems are credited as assistance, not as responsible
-    mathematical authors.
+    mathematical authors. The sorry count applies to Solution and its imported
+    proof development; Challenge contains the single deliberate theorem hole
+    required by the Palomar Challenge/Solution comparison format.
 
 fidelity:
   divergences: >-
@@ -117,24 +117,26 @@ fidelity:
     tau<=7 claim in the wider research dossier is not formalized here.
 
 review:
-  status: "self-assessed; independent expert review pending"
-  reviewers:
-    - "none"
+  status: "self-assessed"
+  reviewers: []
   notes: >-
-    The manuscript has internal hostile and independent verification records.
-    The completed Lean development, statement translation, certificate bridge,
-    and final axiom report still require independent review before release.
+    The complete development builds locally. Its axiom report contains only
+    propext, Classical.choice, and Quot.sound. The manuscript has internal
+    hostile and independent-verification records. A clean Linux replay,
+    Palomar Comparator/NanoDa check, and independent human review remain release
+    gates.
 
 alignment:
   namespace: "SimpleGraph"
   statements:
-    - source: "Main theorem of the 2026-08-23 manuscript"
+    - source: "Main theorem of the 2026-08-24 manuscript"
       lean: "SimpleGraph.tuza_rank_four"
       module: "Challenge"
-      status: "partial"
+      status: "complete"
       note: >-
         The Lean declaration is the exact inequality tau(G) <= 2 nu(G) under
-        nu(G) <= 4 for arbitrary finite simple graphs; its proof is incomplete.
+        nu(G) <= 4 for arbitrary finite simple graphs. Solution provides a
+        placeholder-free proof of this declaration.
 
 acknowledgements: >-
   Samuel Masse thanks the Mathlib community and the Palomar Registry project.

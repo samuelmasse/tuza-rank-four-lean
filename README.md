@@ -2,79 +2,102 @@
 
 [![CI](https://github.com/samuelmasse/tuza-rank-four-lean/actions/workflows/ci.yml/badge.svg)](https://github.com/samuelmasse/tuza-rank-four-lean/actions/workflows/ci.yml)
 
-This repository formalizes the theorem that every finite simple graph `G`
-with triangle-packing number `ν(G) ≤ 4` has edge triangle-transversal
-number `τ(G) ≤ 2ν(G)`.
+This repository proves in Lean that every finite simple graph \(G\) with
+triangle-packing number \(\nu(G)\leq 4\) has an edge set meeting every triangle
+whose cardinality is at most \(2\nu(G)\).
 
-The formal definitions use two-element cliques as edges and three-element
-cliques as triangles. A packing is a finite family of triangles whose distinct
-members intersect in at most one vertex; a transversal is a finite family of
-edges such that every triangle contains one of them. The advertised statement
-in `Challenge.lean` quantifies over an arbitrary finite vertex type and an
-arbitrary `SimpleGraph` on it.
+A triangle packing is a family of pairwise edge-disjoint triangles. A triangle
+transversal is a set of graph edges meeting every triangle. The compared
+declaration is:
 
-## Verification structure
+    theorem SimpleGraph.tuza_rank_four
+        {V : Type*} [Fintype V] [DecidableEq V]
+        (G : SimpleGraph V)
+        (hν : G.trianglePackingNumber ≤ 4) :
+        G.triangleTransversalNumber ≤ 2 * G.trianglePackingNumber
 
-- `Challenge.lean` contains only the audited definitions and theorem statement.
-- `Solution.lean` connects that statement to the proof development.
-- `TuzaRankFour/` contains the mathematical proof and certificate interface.
-- `comparator.json` fixes the declarations compared by Palomar Comparator.
-- `formalization.yaml` records statement provenance, authorship, automation,
-  fidelity, and review status.
+The stronger statement for \(K_4\)-free graphs with \(\nu(G)=4\) and
+\(\tau(G)\leq 7\) is not part of this repository.
 
-The planned finite endpoint converts the 66 independently checked DRAT
-refutations to LRAT. Mathlib's LRAT importer has been smoke-tested on the
-frozen certificates and produces ordinary Lean theorems using only Palomar's
-permitted axioms. Parker's theorem through packing rank three, triangle-support
-invariance, the exact isolated-`K₄` and fat-head-crown offsets, and the complete
-canonical-splitting interface are proved in Lean. In particular, splitting
-preserves the packing number, does not lower the transversal number, produces
-a split-normal graph, and preserves triangle support. The twelve-vertex
-discharge is formalized through the labelled-edge count, the connected
-component bound, the excellent/pretty-good/bad classification, and the basic
-crown-side outside-vertex lemmas. A Hall-deficient residual family is now
-reduced to a cardinality-minimal deficient core and packaged as the exact
-nonempty fat-head crown used by the kernel reduction. The component-transfer
-bridge, the residual-zero spanner statements, and the semantic
-graph-to-certificate bridge remain ordinary Lean proof obligations. The full
-residual zero-vertex domain has independently been proved to be an independent
-set. The transfer ledger and final Hall/crown cardinal inequality are formal,
-including crowns whose vertices mix outside and internal residual vertices.
-Twenty-two of the 66 finite cases now have kernel-checked imports: all 21
-cases of orders six through nine, plus the partitioned order-ten reference
-case. The remaining 44 require partitioned imports.
+## Proof structure
 
-## Build
+The proof has an analytic reduction and a certified finite endpoint.
 
-The repository pins Lean 4.32.0 and Mathlib 4.32.0.
+1. Parker's packing-rank-three argument is formalized directly.
+2. A strict rank-four counterexample is replaced by a triangle-supported,
+   split-normal kernel with the same packing number, no smaller transversal
+   number, and at most twelve vertices.
+3. The incidence family of a marked maximum four-packing is classified into
+   sixteen canonical types. Across orders six through twelve this gives 66
+   labelled cases.
+4. Each case has a SAT formula whose semantic cuts come from exact
+   five-packing or eight-transversal witnesses. Lean reconstructs and validates
+   all 331,430 cuts and checks their exact agreement with the final formulas.
+5. Each final formula is refuted by a kernel-checked LRAT proof. The 66 proofs
+   are stored as 572 binary segments.
+6. The canonical-packing dispatch connects those refutations to the finite
+   graph theorem, which is then composed with the analytic reduction.
 
-```text
-lake update
-lake exe cache get
-lake build
-ruby scripts/validate-formalization.rb
-```
+The SAT solver, witness generator, and DRAT-to-LRAT converter are not trusted:
+their outputs are checked in Lean. The advertised theorem uses exactly
+propext, Classical.choice, and Quot.sound, the three axioms permitted by
+Palomar. It does not use sorryAx, Lean.ofReduceBool, native_decide, or a custom
+axiom.
 
-On Linux, the full independent statement check is:
+## Repository layout
 
-```text
-./scripts/verify-comparator.sh
-```
+- Challenge.lean is the short, Mathlib-only statement of record. Its deliberate
+  theorem hole is allowed by the Palomar Challenge/Solution format.
+- Solution.lean supplies the proof of the compared theorem.
+- TuzaRankFour/ contains the analytic proof, finite classification, semantic
+  encoding, case dispatch, and axiom audit.
+- Certificates/ contains the frozen CNFs, compact semantic witnesses, binary
+  LRAT segments, and manifests.
+- paper/ contains the article source; the rendered article is placed in
+  output/pdf/.
+- comparator.json fixes the declarations and permitted axioms checked by
+  Palomar Comparator.
+- formalization.yaml records provenance, authorship, automation, fidelity, and
+  review status.
+- docs/publication-readiness-2026-08-24.md records the proof boundary,
+  literature search, hostile audit, and release gates.
 
-## Authorship and assistance
+## Verification
+
+The project pins Lean 4.32.0 and Mathlib 4.32.0. A clean build is deliberately
+substantial because it replays every proof certificate.
+
+    lake update
+    lake exe cache get
+    lake build Solution
+    lake env lean TuzaRankFour/Audit.lean
+    ruby scripts/validate-formalization.rb
+
+On Linux, the independent statement comparison and NanoDa replay are:
+
+    ./scripts/verify-comparator.sh
+
+TuzaRankFour/Audit.lean prints the axiom set for both the advertised theorem
+and the carrier-independent finite endpoint.
+
+## Authorship
 
 Samuel Masse is the author and responsible maintainer. ChatGPT 5.6 Sol
 (OpenAI) and Claude Fable 5 (Anthropic) assisted with research, exposition,
-software, and formalization. Samuel Masse is responsible for the mathematical
-claims and the released artifact.
+software, and formalization. Samuel Masse checked their output and is
+responsible for the mathematical claims and released artifact.
 
-## Palomar status
+## Publication and Palomar status
 
-This is a private development repository. A Palomar submission requires a
-completed, placeholder-free proof at a fixed commit in a public GitHub
-repository. No submission should be made until those conditions and the
-independent review gates recorded in `formalization.yaml` are satisfied. The
-current submission form is <https://submit.palomar-registry.org/>.
+The repository remains private while the manuscript and artifact undergo
+independent review. A targeted primary-source search found no exact statement
+of the rank-four theorem, but absence of a match is not a novelty verdict.
+Neither the paper nor this repository should claim priority before a
+specialist literature review.
+
+Palomar requires a completed proof at a fixed commit in a public GitHub
+repository. No submission or public release is authorized yet. The submission
+portal is <https://submit.palomar-registry.org/>.
 
 The repository is licensed under Apache-2.0. Cited papers and dependencies
 retain their own licences.

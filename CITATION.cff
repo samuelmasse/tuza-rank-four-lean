@@ -1,0 +1,18 @@
+cff-version: 1.2.0
+message: "Please cite the accompanying paper and this formalization."
+title: "Tuza's Conjecture for Packing Number at Most Four"
+type: software
+authors:
+  - family-names: "Masse"
+    given-names: "Samuel"
+version: 0.1.0
+date-released: 2026-08-24
+license: Apache-2.0
+repository-code: "https://github.com/samuelmasse/tuza-rank-four-lean"
+preferred-citation:
+  type: article
+  title: "Tuza's Conjecture for Graphs with at Most Four Edge-Disjoint Triangles"
+  authors:
+    - family-names: "Masse"
+      given-names: "Samuel"
+  year: 2026

@@ -1,0 +1,1331 @@
+{
+  "schema": "tuza-semantic-cut-bundles-v1",
+  "campaign": "ambient rank-four endpoint: nu<=4 and tau>=9",
+  "encoding": "TCUT0001",
+  "case_count": 66,
+  "cut_count": 331430,
+  "packing_cut_count": 231947,
+  "cover_cut_count": 99483,
+  "cases": [
+    {
+      "case": "order06-skeleton00",
+      "order": 6,
+      "skeleton": 0,
+      "marked_triangle_indices": [
+        1,
+        5,
+        12,
+        19
+      ],
+      "cut_count": 4,
+      "clause_count": 109,
+      "packing_cut_count": 0,
+      "cover_cut_count": 4,
+      "source": "ambient-maplesat-order6/skeleton-00.jsonl",
+      "source_sha256": "d000598e35bca4dd3c79a118f42cd111e1f2e24bc3285bab31c8fd242fb432f8",
+      "bundle": "order06-skeleton00.cutb",
+      "bundle_bytes": 43,
+      "bundle_sha256": "b802b5ec3fff501ca1bb6eb655cf5a80cddf146b2fd4c5a35d8bdcaa7b01c627"
+    },
+    {
+      "case": "order07-skeleton00",
+      "order": 7,
+      "skeleton": 0,
+      "marked_triangle_indices": [
+        1,
+        6,
+        17,
+        31
+      ],
+      "cut_count": 50,
+      "clause_count": 222,
+      "packing_cut_count": 21,
+      "cover_cut_count": 29,
+      "source": "ambient-maplesat-order7/skeleton-00.jsonl",
+      "source_sha256": "a717c15cc910a7b9e0ee83c21e7b02336986a0d35aa66e1d7959d179cc3e9bd6",
+      "bundle": "order07-skeleton00.cutb",
+      "bundle_bytes": 373,
+      "bundle_sha256": "7b026a930db4ca718239a0a3f9c4656bf07e8dc55948ecb2cd4f3f321cc42b3d"
+    },
+    {
+      "case": "order07-skeleton01",
+      "order": 7,
+      "skeleton": 1,
+      "marked_triangle_indices": [
+        1,
+        6,
+        17,
+        32
+      ],
+      "cut_count": 92,
+      "clause_count": 264,
+      "packing_cut_count": 39,
+      "cover_cut_count": 53,
+      "source": "ambient-maplesat-order7/skeleton-01.jsonl",
+      "source_sha256": "fa001259f25894eb9be802c674e39012a0094a731d5397c60894b063fffdaa4f",
+      "bundle": "order07-skeleton01.cutb",
+      "bundle_bytes": 669,
+      "bundle_sha256": "c1a3072718bd9886c9a99ef6ddbfdbca3a57f61f2ca1804f38684392c224b399"
+    },
+    {
+      "case": "order07-skeleton02",
+      "order": 7,
+      "skeleton": 2,
+      "marked_triangle_indices": [
+        0,
+        9,
+        20,
+        27
+      ],
+      "cut_count": 78,
+      "clause_count": 250,
+      "packing_cut_count": 36,
+      "cover_cut_count": 42,
+      "source": "ambient-maplesat-order7/skeleton-02.jsonl",
+      "source_sha256": "5e441ee2c2f34e5d9a7d80890710767458f5a27c72f91b5c06c511d3d976145f",
+      "bundle": "order07-skeleton02.cutb",
+      "bundle_bytes": 569,
+      "bundle_sha256": "366496d6a5031e50f98b795d95484e164a4a93ac88433ed36c98e508885bbd01"
+    },
+    {
+      "case": "order08-skeleton00",
+      "order": 8,
+      "skeleton": 0,
+      "marked_triangle_indices": [
+        1,
+        7,
+        23,
+        46
+      ],
+      "cut_count": 259,
+      "clause_count": 523,
+      "packing_cut_count": 218,
+      "cover_cut_count": 41,
+      "source": "ambient-maplesat-order8/skeleton-00.jsonl",
+      "source_sha256": "edd14470d8a725929ce408ca89d5d5704e4d8bafb0ffec2e943ca88888fbcfb6",
+      "bundle": "order08-skeleton00.cutb",
+      "bundle_bytes": 1843,
+      "bundle_sha256": "7f9404480f69fc9bc964f7c5748c1d09c023eb5f5df7583c4db8a8a7b968e9f5"
+    },
+    {
+      "case": "order08-skeleton01",
+      "order": 8,
+      "skeleton": 1,
+      "marked_triangle_indices": [
+        1,
+        7,
+        23,
+        47
+      ],
+      "cut_count": 455,
+      "clause_count": 719,
+      "packing_cut_count": 304,
+      "cover_cut_count": 151,
+      "source": "ambient-maplesat-order8/skeleton-01.jsonl",
+      "source_sha256": "9bcf1b56e864a995af868e60a66dca7582d0600535f3f9179fbd7599310cb4ca",
+      "bundle": "order08-skeleton01.cutb",
+      "bundle_bytes": 3273,
+      "bundle_sha256": "dd91eabe6d1f52f76b89267772e1c2ba3509fef808bb037565d6d782d54987ce"
+    },
+    {
+      "case": "order08-skeleton02",
+      "order": 8,
+      "skeleton": 2,
+      "marked_triangle_indices": [
+        0,
+        11,
+        27,
+        38
+      ],
+      "cut_count": 487,
+      "clause_count": 751,
+      "packing_cut_count": 311,
+      "cover_cut_count": 176,
+      "source": "ambient-maplesat-order8/skeleton-02.jsonl",
+      "source_sha256": "7bad1114529d07b039909a3c6bd72a002a9802ce792d811673bcc2e4b81c8004",
+      "bundle": "order08-skeleton02.cutb",
+      "bundle_bytes": 3556,
+      "bundle_sha256": "f71e1cdf4c2fed5c3d60c95f69485fc009ba02590779c16e11946ddf050622c7"
+    },
+    {
+      "case": "order08-skeleton03",
+      "order": 8,
+      "skeleton": 3,
+      "marked_triangle_indices": [
+        1,
+        7,
+        23,
+        51
+      ],
+      "cut_count": 547,
+      "clause_count": 811,
+      "packing_cut_count": 329,
+      "cover_cut_count": 218,
+      "source": "ambient-maplesat-order8/skeleton-03.jsonl",
+      "source_sha256": "e8dc73d00ad50ccbe64746c45e0071cf3a1c1c70249acde62b5c8f4fa31deac9",
+      "bundle": "order08-skeleton03.cutb",
+      "bundle_bytes": 3992,
+      "bundle_sha256": "1dca4a9dbc99c39c42caae26d15e9273874f1324d09af296fbcc12c222aa03d8"
+    },
+    {
+      "case": "order08-skeleton04",
+      "order": 8,
+      "skeleton": 4,
+      "marked_triangle_indices": [
+        2,
+        8,
+        28,
+        39
+      ],
+      "cut_count": 612,
+      "clause_count": 876,
+      "packing_cut_count": 365,
+      "cover_cut_count": 247,
+      "source": "ambient-maplesat-order8/skeleton-04.jsonl",
+      "source_sha256": "ded5e4a7baa02430fbf71b701417e089b8b0c23f7b3816f598aee0f22501361f",
+      "bundle": "order08-skeleton04.cutb",
+      "bundle_bytes": 4472,
+      "bundle_sha256": "6d90417b0ae56ca10b5d3d6db24c75cbddaaba6c7d4cafb062ab597734964120"
+    },
+    {
+      "case": "order08-skeleton05",
+      "order": 8,
+      "skeleton": 5,
+      "marked_triangle_indices": [
+        1,
+        7,
+        23,
+        45
+      ],
+      "cut_count": 595,
+      "clause_count": 859,
+      "packing_cut_count": 338,
+      "cover_cut_count": 257,
+      "source": "ambient-maplesat-order8/skeleton-05.jsonl",
+      "source_sha256": "c79426ea85e0c8d0253b2299c5175e06d9ba7b31ec2d0e2098ed34162ef58101",
+      "bundle": "order08-skeleton05.cutb",
+      "bundle_bytes": 4366,
+      "bundle_sha256": "4d26e099adf8e40e9cd256cf1343442a0a4ffcd36f253a7f47908de31f27988a"
+    },
+    {
+      "case": "order09-skeleton00",
+      "order": 9,
+      "skeleton": 0,
+      "marked_triangle_indices": [
+        1,
+        8,
+        30,
+        64
+      ],
+      "cut_count": 593,
+      "clause_count": 978,
+      "packing_cut_count": 536,
+      "cover_cut_count": 57,
+      "source": "ambient-maplesat-order9/skeleton-00.jsonl",
+      "source_sha256": "3442606e0e2ef27f2eb8ee16cb846236bbc35970d19a7db1775e6a722aa2dbb1",
+      "bundle": "order09-skeleton00.cutb",
+      "bundle_bytes": 4184,
+      "bundle_sha256": "9e0cdb9c44fc3e70f282a73b3e9b855927de0f38d4d0ef9877a25d5eda406d02"
+    },
+    {
+      "case": "order09-skeleton01",
+      "order": 9,
+      "skeleton": 1,
+      "marked_triangle_indices": [
+        1,
+        8,
+        30,
+        65
+      ],
+      "cut_count": 1340,
+      "clause_count": 1725,
+      "packing_cut_count": 1036,
+      "cover_cut_count": 304,
+      "source": "ambient-maplesat-order9/skeleton-01.jsonl",
+      "source_sha256": "65c40e47cfd1122be0f6e71e1ceb878712af9377402be9ea43262e3e6ffadb2a",
+      "bundle": "order09-skeleton01.cutb",
+      "bundle_bytes": 9580,
+      "bundle_sha256": "6996e0dd2d4adf381e343f819e2248a6297504641ab22d29a82083ce5ee4998f"
+    },
+    {
+      "case": "order09-skeleton02",
+      "order": 9,
+      "skeleton": 2,
+      "marked_triangle_indices": [
+        0,
+        13,
+        35,
+        51
+      ],
+      "cut_count": 1505,
+      "clause_count": 1890,
+      "packing_cut_count": 1136,
+      "cover_cut_count": 369,
+      "source": "ambient-maplesat-order9/skeleton-02.jsonl",
+      "source_sha256": "e9419fcb7e34c2c9e955f961cd03c415708b089cc85b7df4799063b52945ef35",
+      "bundle": "order09-skeleton02.cutb",
+      "bundle_bytes": 10797,
+      "bundle_sha256": "ba13f2f50cfb249d4dab3399c85ef61b44ec4dcb45c12fbf7ccf54fa64cba33a"
+    },
+    {
+      "case": "order09-skeleton03",
+      "order": 9,
+      "skeleton": 3,
+      "marked_triangle_indices": [
+        1,
+        8,
+        30,
+        71
+      ],
+      "cut_count": 1804,
+      "clause_count": 2189,
+      "packing_cut_count": 1291,
+      "cover_cut_count": 513,
+      "source": "ambient-maplesat-order9/skeleton-03.jsonl",
+      "source_sha256": "3ef6ef12bfa0d267db0d77c50b48c276f125800577b852b3d20590daf13e50fa",
+      "bundle": "order09-skeleton03.cutb",
+      "bundle_bytes": 13025,
+      "bundle_sha256": "4590cacfab67691267ef77290e7889d21c058acefd11769d7575fd0121d73bc2"
+    },
+    {
+      "case": "order09-skeleton04",
+      "order": 9,
+      "skeleton": 4,
+      "marked_triangle_indices": [
+        2,
+        9,
+        36,
+        52
+      ],
+      "cut_count": 1713,
+      "clause_count": 2098,
+      "packing_cut_count": 1189,
+      "cover_cut_count": 524,
+      "source": "ambient-maplesat-order9/skeleton-04.jsonl",
+      "source_sha256": "40c699513da55e1a1c781c758734d5e757d3a7192977d710bf5be7d3994807f6",
+      "bundle": "order09-skeleton04.cutb",
+      "bundle_bytes": 12465,
+      "bundle_sha256": "7dabee20757fd257e20659c32299e757989d3f17bd752c11f35c454b4950a058"
+    },
+    {
+      "case": "order09-skeleton05",
+      "order": 9,
+      "skeleton": 5,
+      "marked_triangle_indices": [
+        1,
+        8,
+        30,
+        61
+      ],
+      "cut_count": 1966,
+      "clause_count": 2351,
+      "packing_cut_count": 1407,
+      "cover_cut_count": 559,
+      "source": "ambient-maplesat-order9/skeleton-05.jsonl",
+      "source_sha256": "8df8b91b6834a6467f1937977c532e78c5e1ab4c6104b13ef93751217252c713",
+      "bundle": "order09-skeleton05.cutb",
+      "bundle_bytes": 14260,
+      "bundle_sha256": "048dc8ad559b4a514e03a48bc934ceb4f27a41e2e1dedfd7cb41c2ce7391ac64"
+    },
+    {
+      "case": "order09-skeleton06",
+      "order": 9,
+      "skeleton": 6,
+      "marked_triangle_indices": [
+        1,
+        8,
+        30,
+        83
+      ],
+      "cut_count": 2018,
+      "clause_count": 2403,
+      "packing_cut_count": 1351,
+      "cover_cut_count": 667,
+      "source": "ambient-maplesat-order9/skeleton-06.jsonl",
+      "source_sha256": "de8cf02ed3184836a69e145b678df5a275d84e3972fa7d038510013c8e0a6420",
+      "bundle": "order09-skeleton06.cutb",
+      "bundle_bytes": 14793,
+      "bundle_sha256": "a7111483ac2ffaf029fe2303a8a8372731a4bdbef8cea1138f30b448646b1d54"
+    },
+    {
+      "case": "order09-skeleton07",
+      "order": 9,
+      "skeleton": 7,
+      "marked_triangle_indices": [
+        0,
+        13,
+        43,
+        63
+      ],
+      "cut_count": 2086,
+      "clause_count": 2471,
+      "packing_cut_count": 1419,
+      "cover_cut_count": 667,
+      "source": "ambient-maplesat-order9/skeleton-07.jsonl",
+      "source_sha256": "f992155f88d6e91b1d73dfc016e913fd974c97d10c7ffacfedea3a6c9a0cdac1",
+      "bundle": "order09-skeleton07.cutb",
+      "bundle_bytes": 15185,
+      "bundle_sha256": "86ebd1e6dddee0c5a541ac1a922480e5308b40d95fedc2e26cb4845e0847c6d1"
+    },
+    {
+      "case": "order09-skeleton08",
+      "order": 9,
+      "skeleton": 8,
+      "marked_triangle_indices": [
+        1,
+        8,
+        43,
+        63
+      ],
+      "cut_count": 1944,
+      "clause_count": 2329,
+      "packing_cut_count": 1215,
+      "cover_cut_count": 729,
+      "source": "ambient-maplesat-order9/skeleton-08.jsonl",
+      "source_sha256": "7f5a0820932800f4ef1b6113056470be1f21007992d5d8dc1fe98d98cb703c09",
+      "bundle": "order09-skeleton08.cutb",
+      "bundle_bytes": 14316,
+      "bundle_sha256": "ed8c4c3faeb3136989d007888e31bbab81741702709bd9968d920dcac48a574e"
+    },
+    {
+      "case": "order09-skeleton09",
+      "order": 9,
+      "skeleton": 9,
+      "marked_triangle_indices": [
+        0,
+        13,
+        43,
+        48
+      ],
+      "cut_count": 2069,
+      "clause_count": 2454,
+      "packing_cut_count": 1247,
+      "cover_cut_count": 822,
+      "source": "ambient-maplesat-order9/skeleton-09.jsonl",
+      "source_sha256": "2b7fb790492c011d9b3ea600ee74f125c6045060bc8be04c684fa7d6437051a4",
+      "bundle": "order09-skeleton09.cutb",
+      "bundle_bytes": 15340,
+      "bundle_sha256": "8d997bbd7cb34737b4674aa3bfefda6c2578b4b59d868d5bb5b64364c6a9f197"
+    },
+    {
+      "case": "order09-skeleton10",
+      "order": 9,
+      "skeleton": 10,
+      "marked_triangle_indices": [
+        0,
+        13,
+        22,
+        27
+      ],
+      "cut_count": 1622,
+      "clause_count": 2007,
+      "packing_cut_count": 1136,
+      "cover_cut_count": 486,
+      "source": "ambient-maplesat-order9/skeleton-10.jsonl",
+      "source_sha256": "bfcf936e78926dd05a44a1456332b76e4b3b6b040ce7c26f7ff72c80d873ab87",
+      "bundle": "order09-skeleton10.cutb",
+      "bundle_bytes": 12272,
+      "bundle_sha256": "3ed52d05aa1224e7397cd26032537bbb869843f33d42777b69fdc38dbe09087c"
+    },
+    {
+      "case": "order10-skeleton00",
+      "order": 10,
+      "skeleton": 0,
+      "marked_triangle_indices": [
+        1,
+        9,
+        38,
+        85
+      ],
+      "cut_count": 1048,
+      "clause_count": 1587,
+      "packing_cut_count": 988,
+      "cover_cut_count": 60,
+      "source": "ambient-maplesat-order10/skeleton-00.jsonl",
+      "source_sha256": "ce0fb55ad560cce749d8c7ce826240e9d6d1b917ae0dc00a859dde6bed2975e4",
+      "bundle": "order10-skeleton00.cutb",
+      "bundle_bytes": 7371,
+      "bundle_sha256": "9c7bd5270a6d2f76abdf36d9c5ac39810115021e8f768bc5a71c4b909f32026d"
+    },
+    {
+      "case": "order10-skeleton01",
+      "order": 10,
+      "skeleton": 1,
+      "marked_triangle_indices": [
+        1,
+        9,
+        38,
+        86
+      ],
+      "cut_count": 2883,
+      "clause_count": 3422,
+      "packing_cut_count": 2407,
+      "cover_cut_count": 476,
+      "source": "ambient-maplesat-order10/skeleton-01.jsonl",
+      "source_sha256": "bbb3fd4b9ca4552036e9eb2b50a59dd0bc7215162862410d4e3f975cd70381bd",
+      "bundle": "order10-skeleton01.cutb",
+      "bundle_bytes": 20482,
+      "bundle_sha256": "215757b8b20d4555710969f6a673232e270de0312589f6048d3688fd3e197c1a"
+    },
+    {
+      "case": "order10-skeleton02",
+      "order": 10,
+      "skeleton": 2,
+      "marked_triangle_indices": [
+        0,
+        15,
+        44,
+        66
+      ],
+      "cut_count": 3063,
+      "clause_count": 3602,
+      "packing_cut_count": 2547,
+      "cover_cut_count": 516,
+      "source": "ambient-maplesat-order10/skeleton-02.jsonl",
+      "source_sha256": "f5cb25af66167c4155589901790a716203b48fc0b4f122bcaad28b6e5d3f6c06",
+      "bundle": "order10-skeleton02.cutb",
+      "bundle_bytes": 21786,
+      "bundle_sha256": "729c558ecd6636d44033af14225a7efbe96ee56f2e5c155547fa20152ccf0744"
+    },
+    {
+      "case": "order10-skeleton03",
+      "order": 10,
+      "skeleton": 3,
+      "marked_triangle_indices": [
+        1,
+        9,
+        38,
+        94
+      ],
+      "cut_count": 3596,
+      "clause_count": 4135,
+      "packing_cut_count": 2804,
+      "cover_cut_count": 792,
+      "source": "ambient-maplesat-order10/skeleton-03.jsonl",
+      "source_sha256": "9ab9ca189f7f074c42a18a07300afd96bfe177cc6e793403dbd908abe6607e32",
+      "bundle": "order10-skeleton03.cutb",
+      "bundle_bytes": 25835,
+      "bundle_sha256": "a446fdb8c7a36aff746f34d94a6fb3e8b46cec5ced2c7f07e76a257ea722d755"
+    },
+    {
+      "case": "order10-skeleton04",
+      "order": 10,
+      "skeleton": 4,
+      "marked_triangle_indices": [
+        2,
+        10,
+        45,
+        67
+      ],
+      "cut_count": 3315,
+      "clause_count": 3854,
+      "packing_cut_count": 2304,
+      "cover_cut_count": 1011,
+      "source": "ambient-maplesat-order10/skeleton-04.jsonl",
+      "source_sha256": "c28c569f3ce39905057625bcfba1fd33e0980e457e571a9449e326765d0cf4fd",
+      "bundle": "order10-skeleton04.cutb",
+      "bundle_bytes": 24291,
+      "bundle_sha256": "67a3597dfc832c5e1b39eedafe97e948508de71dc0ae1630cfdb867e0e1be57a"
+    },
+    {
+      "case": "order10-skeleton05",
+      "order": 10,
+      "skeleton": 5,
+      "marked_triangle_indices": [
+        1,
+        9,
+        38,
+        79
+      ],
+      "cut_count": 3960,
+      "clause_count": 4499,
+      "packing_cut_count": 3070,
+      "cover_cut_count": 890,
+      "source": "ambient-maplesat-order10/skeleton-05.jsonl",
+      "source_sha256": "6d05772b067ad2e1d247e107cd9b3b00e966d8a68e447cbf19f4104ec07c54af",
+      "bundle": "order10-skeleton05.cutb",
+      "bundle_bytes": 28598,
+      "bundle_sha256": "16d7056486e724628f8ce2c47d090567f72754f3f39aa476f42fcec31a9f66e7"
+    },
+    {
+      "case": "order10-skeleton06",
+      "order": 10,
+      "skeleton": 6,
+      "marked_triangle_indices": [
+        1,
+        9,
+        38,
+        116
+      ],
+      "cut_count": 3863,
+      "clause_count": 4402,
+      "packing_cut_count": 2712,
+      "cover_cut_count": 1151,
+      "source": "ambient-maplesat-order10/skeleton-06.jsonl",
+      "source_sha256": "4560e15d4c2d7ab80e92002b90b6ca34b58bc906bb4ee0306fc870f3da4580a2",
+      "bundle": "order10-skeleton06.cutb",
+      "bundle_bytes": 28379,
+      "bundle_sha256": "2b3725dc9c71b7ce0d77ae2064eb7edf5d19200d66ba9cae2c71bc753273a3f0"
+    },
+    {
+      "case": "order10-skeleton07",
+      "order": 10,
+      "skeleton": 7,
+      "marked_triangle_indices": [
+        0,
+        15,
+        54,
+        82
+      ],
+      "cut_count": 3632,
+      "clause_count": 4171,
+      "packing_cut_count": 2406,
+      "cover_cut_count": 1226,
+      "source": "ambient-maplesat-order10/skeleton-07.jsonl",
+      "source_sha256": "dbb46e3c7e165708e9dc2aecb502ed1a11b920e38c2377aebfc98c4cd3018ca9",
+      "bundle": "order10-skeleton07.cutb",
+      "bundle_bytes": 26565,
+      "bundle_sha256": "b548f4d9bd64cde1a2e61a632e62b35d289d95606527def2e57e7069221e5eee"
+    },
+    {
+      "case": "order10-skeleton08",
+      "order": 10,
+      "skeleton": 8,
+      "marked_triangle_indices": [
+        1,
+        9,
+        54,
+        82
+      ],
+      "cut_count": 3461,
+      "clause_count": 4000,
+      "packing_cut_count": 2148,
+      "cover_cut_count": 1313,
+      "source": "ambient-maplesat-order10/skeleton-08.jsonl",
+      "source_sha256": "ec651dbff6c86ad3a3d13f896cae2f081898524689cfa99dee91485e933aad26",
+      "bundle": "order10-skeleton08.cutb",
+      "bundle_bytes": 25835,
+      "bundle_sha256": "698d9ebcc4e3f98bd6729ff2a1ca246378a00c1edef0061a00c9968a34e1c487"
+    },
+    {
+      "case": "order10-skeleton09",
+      "order": 10,
+      "skeleton": 9,
+      "marked_triangle_indices": [
+        0,
+        15,
+        54,
+        61
+      ],
+      "cut_count": 3755,
+      "clause_count": 4294,
+      "packing_cut_count": 2532,
+      "cover_cut_count": 1223,
+      "source": "ambient-maplesat-order10/skeleton-09.jsonl",
+      "source_sha256": "5149a9e4c342b9fee896801b8993fdcb798d0ad0d77255b77b28a947b8e04c58",
+      "bundle": "order10-skeleton09.cutb",
+      "bundle_bytes": 27836,
+      "bundle_sha256": "19ebfeec21aa42efd532d9872410a59b52c077d772bd513377fb67c7b44c7fd1"
+    },
+    {
+      "case": "order10-skeleton10",
+      "order": 10,
+      "skeleton": 10,
+      "marked_triangle_indices": [
+        0,
+        15,
+        26,
+        33
+      ],
+      "cut_count": 3526,
+      "clause_count": 4065,
+      "packing_cut_count": 2782,
+      "cover_cut_count": 744,
+      "source": "ambient-maplesat-order10/skeleton-10.jsonl",
+      "source_sha256": "4ce238b0b557e6272c5bb87ea741881b981309001f8c9efa924af481a813227b",
+      "bundle": "order10-skeleton10.cutb",
+      "bundle_bytes": 26233,
+      "bundle_sha256": "8756b6e21f81723d6f060027da0a479296b911a77877e3de4db31a7781a30795"
+    },
+    {
+      "case": "order10-skeleton11",
+      "order": 10,
+      "skeleton": 11,
+      "marked_triangle_indices": [
+        0,
+        15,
+        54,
+        119
+      ],
+      "cut_count": 5557,
+      "clause_count": 6096,
+      "packing_cut_count": 3739,
+      "cover_cut_count": 1818,
+      "source": "ambient-maplesat-order10/skeleton-11.jsonl",
+      "source_sha256": "a65a955697177cc0ab1f04f2d61397e856273dc2ea711c4f2d5998a1ef533279",
+      "bundle": "order10-skeleton11.cutb",
+      "bundle_bytes": 41267,
+      "bundle_sha256": "3c5a574e714f4144dd7cc6fcdcf5c19d9e17acfe485f6c68daaea3faf0482362"
+    },
+    {
+      "case": "order10-skeleton12",
+      "order": 10,
+      "skeleton": 12,
+      "marked_triangle_indices": [
+        8,
+        21,
+        58,
+        63
+      ],
+      "cut_count": 3470,
+      "clause_count": 4009,
+      "packing_cut_count": 1777,
+      "cover_cut_count": 1693,
+      "source": "ambient-maplesat-order10/skeleton-12.jsonl",
+      "source_sha256": "0e902b1f2005bab76aff0a53140e3144177dd4cd538f64b8d1fab8d58e46552f",
+      "bundle": "order10-skeleton12.cutb",
+      "bundle_bytes": 26869,
+      "bundle_sha256": "d76044918686ea19a15a134165225e9d604487dab0536da7002751b526afa58f"
+    },
+    {
+      "case": "order10-skeleton13",
+      "order": 10,
+      "skeleton": 13,
+      "marked_triangle_indices": [
+        0,
+        15,
+        26,
+        119
+      ],
+      "cut_count": 5652,
+      "clause_count": 6191,
+      "packing_cut_count": 4197,
+      "cover_cut_count": 1455,
+      "source": "ambient-maplesat-order10/skeleton-13.jsonl",
+      "source_sha256": "bf4322b5bea93ea99ab405ac8a4ba96cf34b1c295c400b378febd06ce11a5c26",
+      "bundle": "order10-skeleton13.cutb",
+      "bundle_bytes": 41932,
+      "bundle_sha256": "64475338dfa6fdf351d116a59eaf8e9c1a2e403353e5bb0d5bec7829c379b9be"
+    },
+    {
+      "case": "order11-skeleton00",
+      "order": 11,
+      "skeleton": 0,
+      "marked_triangle_indices": [
+        1,
+        10,
+        47,
+        109
+      ],
+      "cut_count": 1726,
+      "clause_count": 2456,
+      "packing_cut_count": 1657,
+      "cover_cut_count": 69,
+      "source": "ambient-maplesat-order11/skeleton-00.jsonl",
+      "source_sha256": "b0d36caefd3f69469ad82817e57722471c8a2284a0c782da8aff6b66ff0c9e55",
+      "bundle": "order11-skeleton00.cutb",
+      "bundle_bytes": 12415,
+      "bundle_sha256": "0442a5465bfdf6b0e9ef99a5dff4d849c68b75bbd0cf5a29bf862b85e3a21fe7"
+    },
+    {
+      "case": "order11-skeleton01",
+      "order": 11,
+      "skeleton": 1,
+      "marked_triangle_indices": [
+        1,
+        10,
+        47,
+        110
+      ],
+      "cut_count": 5952,
+      "clause_count": 6682,
+      "packing_cut_count": 5259,
+      "cover_cut_count": 693,
+      "source": "ambient-maplesat-order11/skeleton-01.jsonl",
+      "source_sha256": "6ff6643bed2d77535ab2f7579160cbd33cb5b73d8769da812248a567096c5377",
+      "bundle": "order11-skeleton01.cutb",
+      "bundle_bytes": 43392,
+      "bundle_sha256": "2eb2c021529080df905c6ed4c7e2b696cd116f50613d101cd65cdcc2e2a31915"
+    },
+    {
+      "case": "order11-skeleton02",
+      "order": 11,
+      "skeleton": 2,
+      "marked_triangle_indices": [
+        0,
+        17,
+        54,
+        83
+      ],
+      "cut_count": 5348,
+      "clause_count": 6078,
+      "packing_cut_count": 4566,
+      "cover_cut_count": 782,
+      "source": "ambient-maplesat-order11/skeleton-02.jsonl",
+      "source_sha256": "bbaf39dd5c75afb7ae82b9bdde3e702fb14d4c36da3f3dedc9e1e6f701a63373",
+      "bundle": "order11-skeleton02.cutb",
+      "bundle_bytes": 37995,
+      "bundle_sha256": "02c728548742fd9d0e5c76f962567bdb4a708535bf55c09f84cd582aeb081f63"
+    },
+    {
+      "case": "order11-skeleton03",
+      "order": 11,
+      "skeleton": 3,
+      "marked_triangle_indices": [
+        1,
+        10,
+        47,
+        120
+      ],
+      "cut_count": 6036,
+      "clause_count": 6766,
+      "packing_cut_count": 4781,
+      "cover_cut_count": 1255,
+      "source": "ambient-maplesat-order11/skeleton-03.jsonl",
+      "source_sha256": "411aae734dde459ce3a14c2a8b3b922614f46cfeb9464198ee608e4887381927",
+      "bundle": "order11-skeleton03.cutb",
+      "bundle_bytes": 44460,
+      "bundle_sha256": "02e7193bbebb8ee05d7bafcc2994891d17239e70de067f5aa3e6c791cb9ecab6"
+    },
+    {
+      "case": "order11-skeleton04",
+      "order": 11,
+      "skeleton": 4,
+      "marked_triangle_indices": [
+        2,
+        11,
+        55,
+        84
+      ],
+      "cut_count": 5568,
+      "clause_count": 6298,
+      "packing_cut_count": 3736,
+      "cover_cut_count": 1832,
+      "source": "ambient-maplesat-order11/skeleton-04.jsonl",
+      "source_sha256": "819949d3e04b2fb903ef42a4500e6986c71134584b5bf1d26a4aab277b070a4b",
+      "bundle": "order11-skeleton04.cutb",
+      "bundle_bytes": 41287,
+      "bundle_sha256": "87366c4e4614ce5eeb8530e14d345559b9eaaa4870feb732a9e39a5963e17ced"
+    },
+    {
+      "case": "order11-skeleton05",
+      "order": 11,
+      "skeleton": 5,
+      "marked_triangle_indices": [
+        1,
+        10,
+        47,
+        99
+      ],
+      "cut_count": 6845,
+      "clause_count": 7575,
+      "packing_cut_count": 5471,
+      "cover_cut_count": 1374,
+      "source": "ambient-maplesat-order11/skeleton-05.jsonl",
+      "source_sha256": "6a3092050b36eb8a9ba7dfc489a217387a4dd709979d114efa4e5a511c451609",
+      "bundle": "order11-skeleton05.cutb",
+      "bundle_bytes": 50502,
+      "bundle_sha256": "32da5094c8a24d0ff47ce94e18adeedcef7a1b167b6b0a5a8b1d1eb586cd20d4"
+    },
+    {
+      "case": "order11-skeleton06",
+      "order": 11,
+      "skeleton": 6,
+      "marked_triangle_indices": [
+        1,
+        10,
+        47,
+        155
+      ],
+      "cut_count": 7145,
+      "clause_count": 7875,
+      "packing_cut_count": 5312,
+      "cover_cut_count": 1833,
+      "source": "ambient-maplesat-order11/skeleton-06.jsonl",
+      "source_sha256": "e7bb69c688d19ed2dba1c9ed1e64f1c57b13aa55f55110fefec1e530b3f7f184",
+      "bundle": "order11-skeleton06.cutb",
+      "bundle_bytes": 56150,
+      "bundle_sha256": "09f420f00827ffa9974412406faf07bfa72b826c9a432869d430509425338941"
+    },
+    {
+      "case": "order11-skeleton07",
+      "order": 11,
+      "skeleton": 7,
+      "marked_triangle_indices": [
+        0,
+        17,
+        66,
+        103
+      ],
+      "cut_count": 5481,
+      "clause_count": 6211,
+      "packing_cut_count": 3598,
+      "cover_cut_count": 1883,
+      "source": "ambient-maplesat-order11/skeleton-07.jsonl",
+      "source_sha256": "20c57de3d288904518c69dfdbcd0bd3354380573184efa9c7d448bef2d87e7d9",
+      "bundle": "order11-skeleton07.cutb",
+      "bundle_bytes": 41805,
+      "bundle_sha256": "e7944844b645f5a1ee2bd22d958561484cf904ef82dbfbebab3f058cdeb0bb99"
+    },
+    {
+      "case": "order11-skeleton08",
+      "order": 11,
+      "skeleton": 8,
+      "marked_triangle_indices": [
+        1,
+        10,
+        66,
+        103
+      ],
+      "cut_count": 5553,
+      "clause_count": 6283,
+      "packing_cut_count": 3289,
+      "cover_cut_count": 2264,
+      "source": "ambient-maplesat-order11/skeleton-08.jsonl",
+      "source_sha256": "3a6dddd9064d1fa8689e4c2fc6a7cf640e7cab49ea52c257848b4c8f3062022b",
+      "bundle": "order11-skeleton08.cutb",
+      "bundle_bytes": 42996,
+      "bundle_sha256": "9dbe6198ee90392cf1461bcfafe348cb7c0997469baf5deaa72877d9bfe2f88e"
+    },
+    {
+      "case": "order11-skeleton09",
+      "order": 11,
+      "skeleton": 9,
+      "marked_triangle_indices": [
+        0,
+        17,
+        66,
+        75
+      ],
+      "cut_count": 6402,
+      "clause_count": 7132,
+      "packing_cut_count": 4400,
+      "cover_cut_count": 2002,
+      "source": "ambient-maplesat-order11/skeleton-09.jsonl",
+      "source_sha256": "09e54ebfef228d49128757ba7107b0177f9e626c2abe974cb498e5b532923a4b",
+      "bundle": "order11-skeleton09.cutb",
+      "bundle_bytes": 49391,
+      "bundle_sha256": "40cfcfe483228ce480397eb4d30d8d89bff8f770dd9232ba5685bca6b75e7d8f"
+    },
+    {
+      "case": "order11-skeleton10",
+      "order": 11,
+      "skeleton": 10,
+      "marked_triangle_indices": [
+        0,
+        17,
+        30,
+        39
+      ],
+      "cut_count": 5850,
+      "clause_count": 6580,
+      "packing_cut_count": 4602,
+      "cover_cut_count": 1248,
+      "source": "ambient-maplesat-order11/skeleton-10.jsonl",
+      "source_sha256": "479c8fdaf1551b53041abb462f67ff54f5891234e99bd77d6be04cf7371153cd",
+      "bundle": "order11-skeleton10.cutb",
+      "bundle_bytes": 45803,
+      "bundle_sha256": "6faf70ba7a8217e69492cc92e91bd61bc235339436fe8aa59ffdc6a922fd4eb2"
+    },
+    {
+      "case": "order11-skeleton11",
+      "order": 11,
+      "skeleton": 11,
+      "marked_triangle_indices": [
+        0,
+        17,
+        66,
+        161
+      ],
+      "cut_count": 7497,
+      "clause_count": 8227,
+      "packing_cut_count": 4660,
+      "cover_cut_count": 2837,
+      "source": "ambient-maplesat-order11/skeleton-11.jsonl",
+      "source_sha256": "9933a987953af2046c0c4c6839c20aca070a967c6b6e55ff5db02cb527b8e46c",
+      "bundle": "order11-skeleton11.cutb",
+      "bundle_bytes": 60655,
+      "bundle_sha256": "9f889d26de2527afe40c7562a19ea94c7ff1736298c4a62763281742847449a9"
+    },
+    {
+      "case": "order11-skeleton12",
+      "order": 11,
+      "skeleton": 12,
+      "marked_triangle_indices": [
+        9,
+        24,
+        71,
+        78
+      ],
+      "cut_count": 6324,
+      "clause_count": 7054,
+      "packing_cut_count": 3219,
+      "cover_cut_count": 3105,
+      "source": "ambient-maplesat-order11/skeleton-12.jsonl",
+      "source_sha256": "a84150f5c4c663131204b01be68d2d17890dc9cbbea2295906ff207bc4d2a628",
+      "bundle": "order11-skeleton12.cutb",
+      "bundle_bytes": 50651,
+      "bundle_sha256": "fc496625c927e7672cb4908301ebe763a4d54e0a9b5ae7e31eebda7b140f4dc0"
+    },
+    {
+      "case": "order11-skeleton13",
+      "order": 11,
+      "skeleton": 13,
+      "marked_triangle_indices": [
+        0,
+        17,
+        30,
+        161
+      ],
+      "cut_count": 7771,
+      "clause_count": 8501,
+      "packing_cut_count": 5279,
+      "cover_cut_count": 2492,
+      "source": "ambient-maplesat-order11/skeleton-13.jsonl",
+      "source_sha256": "853d7acdad3ce4ee330375f52b4494a3aba31fed3d7246571a77a8d8dd72b130",
+      "bundle": "order11-skeleton13.cutb",
+      "bundle_bytes": 63708,
+      "bundle_sha256": "8298af11c5baee6f7b1c6dbb29a5cf298189a6dfe07d8be944ce0f933c6df984"
+    },
+    {
+      "case": "order11-skeleton14",
+      "order": 11,
+      "skeleton": 14,
+      "marked_triangle_indices": [
+        0,
+        17,
+        145,
+        164
+      ],
+      "cut_count": 11678,
+      "clause_count": 12408,
+      "packing_cut_count": 7495,
+      "cover_cut_count": 4183,
+      "source": "ambient-maplesat-order11/skeleton-14.jsonl",
+      "source_sha256": "9b397b16435e29ea0349ffc76e930fba5d67fde7d430bd8b41f44dd95a58d43d",
+      "bundle": "order11-skeleton14.cutb",
+      "bundle_bytes": 99058,
+      "bundle_sha256": "d84a2d7277b2a1fda8cb3b78476d704a3ff7f46ce9c913c9f1726ce82fb57e09"
+    },
+    {
+      "case": "order12-skeleton00",
+      "order": 12,
+      "skeleton": 0,
+      "marked_triangle_indices": [
+        1,
+        11,
+        57,
+        136
+      ],
+      "cut_count": 2436,
+      "clause_count": 3398,
+      "packing_cut_count": 2356,
+      "cover_cut_count": 80,
+      "source": "ambient-maplesat-order12/skeleton-00.jsonl",
+      "source_sha256": "ecd9f884a0efb70e04bb21c86ac53d746e3b0e4cd3cd9ff87ff49b72d7f49251",
+      "bundle": "order12-skeleton00.cutb",
+      "bundle_bytes": 18989,
+      "bundle_sha256": "8ec3a6706e62c59170002972e7886ec5d0f2f40bb29bf3371f5e5ddad553601d"
+    },
+    {
+      "case": "order12-skeleton01",
+      "order": 12,
+      "skeleton": 1,
+      "marked_triangle_indices": [
+        1,
+        11,
+        57,
+        137
+      ],
+      "cut_count": 8253,
+      "clause_count": 9215,
+      "packing_cut_count": 7304,
+      "cover_cut_count": 949,
+      "source": "ambient-maplesat-order12/skeleton-01.jsonl",
+      "source_sha256": "2e8aa2562492e689de3a880204899bf8e64e3fc42ad94e440905337c4d74e5e6",
+      "bundle": "order12-skeleton01.cutb",
+      "bundle_bytes": 64437,
+      "bundle_sha256": "0b5ea47fd97045722eb88f18f038307d66385155d314a06a5e9eb493f5cb88a3"
+    },
+    {
+      "case": "order12-skeleton02",
+      "order": 12,
+      "skeleton": 2,
+      "marked_triangle_indices": [
+        0,
+        19,
+        65,
+        102
+      ],
+      "cut_count": 8565,
+      "clause_count": 9527,
+      "packing_cut_count": 7602,
+      "cover_cut_count": 963,
+      "source": "ambient-maplesat-order12/skeleton-02.jsonl",
+      "source_sha256": "f72067ad99eed8ee994e14b65d18d98455117c9b8dd0d4495496180d85efc545",
+      "bundle": "order12-skeleton02.cutb",
+      "bundle_bytes": 67105,
+      "bundle_sha256": "a1f24888cfaa3243201d8a15ea3ca4036eebf338989c92e0a53d36a089c3ff75"
+    },
+    {
+      "case": "order12-skeleton03",
+      "order": 12,
+      "skeleton": 3,
+      "marked_triangle_indices": [
+        1,
+        11,
+        57,
+        149
+      ],
+      "cut_count": 9575,
+      "clause_count": 10537,
+      "packing_cut_count": 7711,
+      "cover_cut_count": 1864,
+      "source": "ambient-maplesat-order12/skeleton-03.jsonl",
+      "source_sha256": "9c4824b2434fa4839a25318c5dc80d1c2d90ecb263e6da207c1919679aa3ad79",
+      "bundle": "order12-skeleton03.cutb",
+      "bundle_bytes": 76108,
+      "bundle_sha256": "562a725fb0cb466d37bdc04f0d037706b65db49eb37b5816af6e353b608098aa"
+    },
+    {
+      "case": "order12-skeleton04",
+      "order": 12,
+      "skeleton": 4,
+      "marked_triangle_indices": [
+        2,
+        12,
+        66,
+        103
+      ],
+      "cut_count": 8430,
+      "clause_count": 9392,
+      "packing_cut_count": 5522,
+      "cover_cut_count": 2908,
+      "source": "ambient-maplesat-order12/skeleton-04.jsonl",
+      "source_sha256": "00f0ba46d99b15610961b853edbd7f3473b018f1b40353341dea371fe5c785f3",
+      "bundle": "order12-skeleton04.cutb",
+      "bundle_bytes": 65820,
+      "bundle_sha256": "4cd6b88cc9b32207f3aad1025b3d87b360dfc54a2d7c829faa6fc6da721f2918"
+    },
+    {
+      "case": "order12-skeleton05",
+      "order": 12,
+      "skeleton": 5,
+      "marked_triangle_indices": [
+        1,
+        11,
+        57,
+        121
+      ],
+      "cut_count": 11344,
+      "clause_count": 12306,
+      "packing_cut_count": 9268,
+      "cover_cut_count": 2076,
+      "source": "ambient-maplesat-order12/skeleton-05.jsonl",
+      "source_sha256": "7b9896efd6b58b484019814720c7947b731e31176967bc62ba77a1e00888247f",
+      "bundle": "order12-skeleton05.cutb",
+      "bundle_bytes": 84748,
+      "bundle_sha256": "136d2a145be24e27b200947e2a460d41289d4eed04e6268e82bde0ad55309d6c"
+    },
+    {
+      "case": "order12-skeleton06",
+      "order": 12,
+      "skeleton": 6,
+      "marked_triangle_indices": [
+        1,
+        11,
+        57,
+        200
+      ],
+      "cut_count": 11082,
+      "clause_count": 12044,
+      "packing_cut_count": 8445,
+      "cover_cut_count": 2637,
+      "source": "ambient-maplesat-order12/skeleton-06.jsonl",
+      "source_sha256": "dc113d5438626deab822ec129c2b333cd22193bdb4e7b035e5a87f20e52ae527",
+      "bundle": "order12-skeleton06.cutb",
+      "bundle_bytes": 87823,
+      "bundle_sha256": "8fe99755e554af2a6de38d3320ee29a2d70a5f0292bab89d3dcbea61384dcf65"
+    },
+    {
+      "case": "order12-skeleton07",
+      "order": 12,
+      "skeleton": 7,
+      "marked_triangle_indices": [
+        0,
+        19,
+        79,
+        126
+      ],
+      "cut_count": 7864,
+      "clause_count": 8826,
+      "packing_cut_count": 4984,
+      "cover_cut_count": 2880,
+      "source": "ambient-maplesat-order12/skeleton-07.jsonl",
+      "source_sha256": "4e5a03c846ee88755f21a3686bf0e4b1c979065ff022f09c212526fccbf495aa",
+      "bundle": "order12-skeleton07.cutb",
+      "bundle_bytes": 62575,
+      "bundle_sha256": "600d1f58cd887d4aa6721908a4eeaf7a14f55ceb885fccef0d386326647f77f9"
+    },
+    {
+      "case": "order12-skeleton08",
+      "order": 12,
+      "skeleton": 8,
+      "marked_triangle_indices": [
+        1,
+        11,
+        79,
+        126
+      ],
+      "cut_count": 8279,
+      "clause_count": 9241,
+      "packing_cut_count": 4757,
+      "cover_cut_count": 3522,
+      "source": "ambient-maplesat-order12/skeleton-08.jsonl",
+      "source_sha256": "03a7382554bf33cf742beadc0876bb4dca762cda643a76afb92f11de867fc534",
+      "bundle": "order12-skeleton08.cutb",
+      "bundle_bytes": 65381,
+      "bundle_sha256": "056b4cc69950d8e6d8107dc5c10dee488fac2359fdf71d1d8c91fe6d681038a7"
+    },
+    {
+      "case": "order12-skeleton09",
+      "order": 12,
+      "skeleton": 9,
+      "marked_triangle_indices": [
+        0,
+        19,
+        79,
+        90
+      ],
+      "cut_count": 8567,
+      "clause_count": 9529,
+      "packing_cut_count": 5555,
+      "cover_cut_count": 3012,
+      "source": "ambient-maplesat-order12/skeleton-09.jsonl",
+      "source_sha256": "242eaf2359b2082d478c102e40c0d495cacc8000e1775d8f93ace371aec55481",
+      "bundle": "order12-skeleton09.cutb",
+      "bundle_bytes": 68609,
+      "bundle_sha256": "dea8126c1ff2c93d2544e706ed9b6452bc67929e5a26ca6224e209ad64b217ef"
+    },
+    {
+      "case": "order12-skeleton10",
+      "order": 12,
+      "skeleton": 10,
+      "marked_triangle_indices": [
+        0,
+        19,
+        34,
+        45
+      ],
+      "cut_count": 8990,
+      "clause_count": 9952,
+      "packing_cut_count": 6937,
+      "cover_cut_count": 2053,
+      "source": "ambient-maplesat-order12/skeleton-10.jsonl",
+      "source_sha256": "4328a73d84fda16c5915914a159f371f2af478d9184f217ce373217234cc0b2c",
+      "bundle": "order12-skeleton10.cutb",
+      "bundle_bytes": 72144,
+      "bundle_sha256": "6d448b5db37596af472f3c2c7ddbc7973d756938cf934549827de3c00616a896"
+    },
+    {
+      "case": "order12-skeleton11",
+      "order": 12,
+      "skeleton": 11,
+      "marked_triangle_indices": [
+        0,
+        19,
+        79,
+        210
+      ],
+      "cut_count": 11381,
+      "clause_count": 12343,
+      "packing_cut_count": 7041,
+      "cover_cut_count": 4340,
+      "source": "ambient-maplesat-order12/skeleton-11.jsonl",
+      "source_sha256": "c09e37404ca7d03fa20d7ec926a925b01f0430b82329aa5fa72e0f41bcb5b1a0",
+      "bundle": "order12-skeleton11.cutb",
+      "bundle_bytes": 96159,
+      "bundle_sha256": "8e4ec6a2ec207fb809cc50378f3ae1ecec3414d00a2c9b94a439dfe9039d0123"
+    },
+    {
+      "case": "order12-skeleton12",
+      "order": 12,
+      "skeleton": 12,
+      "marked_triangle_indices": [
+        10,
+        27,
+        85,
+        94
+      ],
+      "cut_count": 8233,
+      "clause_count": 9195,
+      "packing_cut_count": 3583,
+      "cover_cut_count": 4650,
+      "source": "ambient-maplesat-order12/skeleton-12.jsonl",
+      "source_sha256": "dd2c00ee2c7241d27a2f61ab33bad5de2b3ff6e4eb2cc1dbe61c26cb65f86ccb",
+      "bundle": "order12-skeleton12.cutb",
+      "bundle_bytes": 67899,
+      "bundle_sha256": "a8468af72daeb4d1e3571c789f72b70673e0630489f82458f90553f16248aa73"
+    },
+    {
+      "case": "order12-skeleton13",
+      "order": 12,
+      "skeleton": 13,
+      "marked_triangle_indices": [
+        0,
+        19,
+        34,
+        210
+      ],
+      "cut_count": 12398,
+      "clause_count": 13360,
+      "packing_cut_count": 8947,
+      "cover_cut_count": 3451,
+      "source": "ambient-maplesat-order12/skeleton-13.jsonl",
+      "source_sha256": "fc1a6bb71b44b3b2b0ddc14140875be809dcd459d7ae97d2c316609eafa1696f",
+      "bundle": "order12-skeleton13.cutb",
+      "bundle_bytes": 105497,
+      "bundle_sha256": "a8d93fdc71a02b38d720072ce252e27d3047409a7ccff2e223134cc38938089d"
+    },
+    {
+      "case": "order12-skeleton14",
+      "order": 12,
+      "skeleton": 14,
+      "marked_triangle_indices": [
+        0,
+        19,
+        185,
+        216
+      ],
+      "cut_count": 13492,
+      "clause_count": 14454,
+      "packing_cut_count": 7604,
+      "cover_cut_count": 5888,
+      "source": "ambient-maplesat-order12/skeleton-14.jsonl",
+      "source_sha256": "d961cf12524218d7d49e8db53263855fc76143c525220249a3956d52bf5f8f4f",
+      "bundle": "order12-skeleton14.cutb",
+      "bundle_bytes": 120863,
+      "bundle_sha256": "bffbdd9570f3249e6d606b302fe9d1f76248edad58deab059b05ed8fe9a5064a"
+    },
+    {
+      "case": "order12-skeleton15",
+      "order": 12,
+      "skeleton": 15,
+      "marked_triangle_indices": [
+        0,
+        136,
+        200,
+        219
+      ],
+      "cut_count": 24745,
+      "clause_count": 25707,
+      "packing_cut_count": 15670,
+      "cover_cut_count": 9075,
+      "source": "ambient-maplesat-order12/skeleton-15.jsonl",
+      "source_sha256": "30102585cc842139ae5ba82ea353318edef7975daeb03b9650d9728aa2d67bd0",
+      "bundle": "order12-skeleton15.cutb",
+      "bundle_bytes": 230833,
+      "bundle_sha256": "6c157beeed77b3b22a2de30c84df336e979143f54dc22c6206e42da4d8a22aa0"
+    }
+  ]
+}

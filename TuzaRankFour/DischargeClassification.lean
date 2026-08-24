@@ -267,4 +267,89 @@ theorem mem_prettyGoodResidualVertices_iff
   classical
   simp [prettyGoodResidualVertices]
 
+/-- Good packed triangles lying in one packing-intersection component. -/
+noncomputable def goodTrianglesInComponent (G : SimpleGraph V)
+    (S : Finset (Finset V))
+    (C : (packingIntersectionGraph S).ConnectedComponent) :
+    Finset (Finset V) :=
+  packingComponentTriangles S C ∩ G.goodPackingTriangles S
+
+/-- Bad packed triangles lying in one packing-intersection component. -/
+noncomputable def badTrianglesInComponent (G : SimpleGraph V)
+    (S : Finset (Finset V))
+    (C : (packingIntersectionGraph S).ConnectedComponent) :
+    Finset (Finset V) :=
+  packingComponentTriangles S C ∩ G.badPackingTriangles S
+
+theorem goodTrianglesInComponent_union_badTrianglesInComponent
+    (G : SimpleGraph V) (S : Finset (Finset V))
+    (C : (packingIntersectionGraph S).ConnectedComponent) :
+    G.goodTrianglesInComponent S C ∪
+      G.badTrianglesInComponent S C = packingComponentTriangles S C := by
+  classical
+  ext t
+  simp only [goodTrianglesInComponent, badTrianglesInComponent,
+    Finset.mem_union, Finset.mem_inter]
+  constructor
+  · rintro (⟨ht, _⟩ | ⟨ht, _⟩) <;> exact ht
+  · intro ht
+    have htS := packingComponentTriangles_subset C ht
+    have htPartition :
+        t ∈ G.goodPackingTriangles S ∨ t ∈ G.badPackingTriangles S := by
+      have := congrArg (fun Q : Finset (Finset V) ↦ t ∈ Q)
+        (G.good_union_bad_eq S)
+      simpa using this.mpr htS
+    exact htPartition.elim (fun h ↦ Or.inl ⟨ht, h⟩)
+      (fun h ↦ Or.inr ⟨ht, h⟩)
+
+theorem disjoint_goodTrianglesInComponent_badTrianglesInComponent
+    (G : SimpleGraph V) (S : Finset (Finset V))
+    (C : (packingIntersectionGraph S).ConnectedComponent) :
+    Disjoint (G.goodTrianglesInComponent S C)
+      (G.badTrianglesInComponent S C) := by
+  classical
+  exact Disjoint.mono Finset.inter_subset_right Finset.inter_subset_right
+    (G.disjoint_good_bad S)
+
+/-- The charge placed on component vertices after the first move is
+`2 * good + 3 * bad = 2 * total + bad`. -/
+theorem component_vertex_charge_count
+    (G : SimpleGraph V) (S : Finset (Finset V))
+    (C : (packingIntersectionGraph S).ConnectedComponent) :
+    2 * (G.goodTrianglesInComponent S C).card +
+        3 * (G.badTrianglesInComponent S C).card =
+      2 * (packingComponentTriangles S C).card +
+        (G.badTrianglesInComponent S C).card := by
+  have hcard := congrArg Finset.card
+    (G.goodTrianglesInComponent_union_badTrianglesInComponent S C)
+  rw [Finset.card_union_of_disjoint
+    (G.disjoint_goodTrianglesInComponent_badTrianglesInComponent S C)] at hcard
+  omega
+
+/-- Independently of whether a component contains a bad triangle, its first
+round of vertex charge is short of its support size by at most one. -/
+theorem card_componentSupport_le_vertexCharge_add_one
+    {G : SimpleGraph V} {S : Finset (Finset V)}
+    (hS : G.IsTrianglePacking S)
+    (C : (packingIntersectionGraph S).ConnectedComponent) :
+    (packingComponentVertexSupport S C).card ≤
+      (2 * (packingComponentTriangles S C).card +
+        (G.badTrianglesInComponent S C).card) + 1 := by
+  have hbound := card_packingComponentVertexSupport_le hS C
+  omega
+
+/-- A component containing a bad triangle has enough first-round charge for
+all of its support vertices. -/
+theorem card_componentSupport_le_vertexCharge_of_bad_nonempty
+    {G : SimpleGraph V} {S : Finset (Finset V)}
+    (hS : G.IsTrianglePacking S)
+    (C : (packingIntersectionGraph S).ConnectedComponent)
+    (hBad : (G.badTrianglesInComponent S C).Nonempty) :
+    (packingComponentVertexSupport S C).card ≤
+      2 * (packingComponentTriangles S C).card +
+        (G.badTrianglesInComponent S C).card := by
+  have hbound := card_packingComponentVertexSupport_le hS C
+  have hpositive := Finset.card_pos.mpr hBad
+  omega
+
 end SimpleGraph

@@ -1,4 +1,5 @@
 import TuzaRankFour.DischargeClassification
+import TuzaRankFour.HallCore
 import Mathlib.Combinatorics.Hall.Basic
 
 /-!
@@ -195,6 +196,40 @@ theorem mem_spannedLabelledEdges_iff
       ⟨c, hcC, hcSpans⟩⟩
     exact mem_outsidePackingVertices_iff.mp (hCOutside hcC)
 
+/-- Every neighbour of a selected outside vertex lies on a labelled edge
+spanned by the selected family itself. -/
+theorem neighbor_mem_spannedLabelledEdges_biUnion_of_outside
+    (G : SimpleGraph V) {S : Finset (Finset V)}
+    (hS : G.IsSupportMaximalPacking S)
+    (hTriangleSupport : G.triangleSupport = G)
+    {C : Finset V} (hCOutside : C ⊆ outsidePackingVertices S)
+    {c x : V} (hcC : c ∈ C) (hcx : G.Adj c x) :
+    x ∈ (G.spannedLabelledEdges S C).biUnion id := by
+  classical
+  have hcOutside : c ∉ triangleFamilyVertexSupport S :=
+    mem_outsidePackingVertices_iff.mp (hCOutside hcC)
+  have hcxSupport : G.triangleSupport.Adj c x := by
+    rw [hTriangleSupport]
+    exact hcx
+  obtain ⟨t, ht, hct, hxt, hcxNe⟩ :=
+    G.triangleSupport_adj_iff.mp hcxSupport
+  let e := t.erase c
+  have htCard : t.card = 3 := G.card_eq_three_of_mem_triangles ht
+  have heCard : e.card = 2 := by
+    change (t.erase c).card = 2
+    rw [Finset.card_erase_of_mem hct, htCard]
+  have hInsert : insert c e = t := by
+    change insert c (t.erase c) = t
+    exact Finset.insert_erase hct
+  have hcSpans : G.Spans c e := by
+    exact ⟨heCard, by simpa [hInsert] using ht⟩
+  have heSpanned : e ∈ G.spannedLabelledEdges S C := by
+    rw [G.mem_spannedLabelledEdges_iff hS hCOutside]
+    exact ⟨c, hcC, hcSpans⟩
+  have hxe : x ∈ e := by
+    exact Finset.mem_erase.mpr ⟨hcxNe.symm, hxt⟩
+  exact Finset.mem_biUnion.mpr ⟨e, heSpanned, hxe⟩
+
 /-- Labelled-edge neighbours of a finite family of selected vertices, in the
 finite subtype formulation used by Hall's theorem. -/
 noncomputable def labelledSpannerNeighbors (G : SimpleGraph V)
@@ -246,5 +281,37 @@ theorem exists_injective_spanner_or_deficient_subfamily
   · right
     push Not at hCondition
     exact hCondition
+
+/-- A Hall-deficient spanner family contains a deficient core whose entire
+labelled-edge neighbourhood can be matched injectively back to spanners in
+the core. -/
+theorem exists_deficient_spanner_core_with_matching_back
+    (G : SimpleGraph V) (S : Finset (Finset V)) (I : Finset V)
+    {A : Finset {c : V // c ∈ I}}
+    (hA : (G.labelledSpannerNeighbors S I A).card < A.card) :
+    ∃ C : Finset {c : V // c ∈ I},
+      (G.labelledSpannerNeighbors S I C).card < C.card ∧
+      ∃ f :
+          {e : {e : Finset V // e ∈ G.labelledPackingEdges S} //
+            e ∈ G.labelledSpannerNeighbors S I C} →
+          {c : {c : V // c ∈ I} // c ∈ C},
+        Function.Injective f ∧ ∀ e, G.Spans (f e).1.1 e.1.1 := by
+  classical
+  let r : {c : V // c ∈ I} →
+      {e : Finset V // e ∈ G.labelledPackingEdges S} → Prop :=
+    fun c e ↦ G.Spans c.1 e.1
+  have hNeighbors (D : Finset {c : V // c ∈ I}) :
+      FiniteRelation.neighbors r D =
+        G.labelledSpannerNeighbors S I D := by
+    ext e
+    simp [FiniteRelation.neighbors, labelledSpannerNeighbors, r]
+  have hAr : (FiniteRelation.neighbors r A).card < A.card := by
+    simpa [hNeighbors A] using hA
+  obtain ⟨C, hCdef, f, hfInjective, hfRelation⟩ :=
+    FiniteRelation.exists_deficient_core_with_injective_matching_back r hAr
+  have hCeq := hNeighbors C
+  refine ⟨C, by simpa [← hCeq] using hCdef, ?_⟩
+  rw [← hCeq]
+  exact ⟨f, hfInjective, hfRelation⟩
 
 end SimpleGraph

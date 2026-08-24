@@ -9,7 +9,7 @@ import TuzaRankFour.KernelReduction
 import TuzaRankFour.Discharge
 import TuzaRankFour.ComponentBound
 import TuzaRankFour.DischargeClassification
-import TuzaRankFour.DischargeCrown
+import TuzaRankFour.CrownExtraction
 
 /-!
 # Tuza's conjecture for packing number at most four

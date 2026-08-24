@@ -32,10 +32,11 @@ preserves the packing number, does not lower the transversal number, produces
 a split-normal graph, and preserves triangle support. The twelve-vertex
 discharge is formalized through the labelled-edge count, the connected
 component bound, the excellent/pretty-good/bad classification, and the basic
-crown-side outside-vertex lemmas. The component-transfer and residual-zero
-steps, the Hall-to-crown construction, the 65 remaining certificate imports,
-and the semantic graph-to-certificate bridge remain ordinary Lean proof
-obligations.
+crown-side outside-vertex lemmas. A Hall-deficient residual family is now
+reduced to a cardinality-minimal deficient core and packaged as the exact
+nonempty fat-head crown used by the kernel reduction. The component-transfer
+and residual-zero steps, the 65 remaining certificate imports, and the
+semantic graph-to-certificate bridge remain ordinary Lean proof obligations.
 
 ## Build
 

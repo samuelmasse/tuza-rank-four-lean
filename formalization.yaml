@@ -70,11 +70,13 @@ status:
     preservation of the packing number, transversal projection, split
     normality, and the strict-counterexample kernel assembly. The discharge is
     formal through the labelled-edge count, connected-component size bound,
-    packing-triangle classification, and crown-side outside-vertex lemmas. Its
-    component transfer, residual-zero analysis, and Hall-to-crown step remain,
-    as do 65 certificate imports, the semantic graph-to-certificate
-    translation, and the final rank-four theorem. The stronger K4-free nu=4,
-    tau<=7 statement is intentionally outside scope.
+    packing-triangle classification, and crown-side outside-vertex lemmas.
+    Hall deficiency is reduced to a minimal deficient core, matched back, and
+    packaged as the exact nonempty fat-head crown structure. Component
+    transfer and residual-zero analysis remain, as do 65 certificate imports,
+    the semantic graph-to-certificate translation, and the final rank-four
+    theorem. The stronger K4-free nu=4, tau<=7 statement is intentionally
+    outside scope.
   sorry_count: 1
   sorry_in_definitions: 0
   axioms: ["sorryAx"]

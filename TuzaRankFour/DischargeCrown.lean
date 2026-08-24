@@ -117,4 +117,81 @@ theorem neighbor_mem_labelledPackingVertices_of_outside
   exact (G.mem_labelledPackingVertices_iff).mpr
     ⟨e, heLabelled, hye⟩
 
+/-- Any two-edge set spanned by an outside vertex is necessarily a labelled
+edge of the maximum packing. -/
+theorem mem_labelledPackingEdges_of_spans_outside
+    (G : SimpleGraph V) {S : Finset (Finset V)}
+    (hS : G.IsSupportMaximalPacking S)
+    {x : V} (hxOutside : x ∉ triangleFamilyVertexSupport S)
+    {e : Finset V} (hSpans : G.Spans x e) :
+    e ∈ G.labelledPackingEdges S := by
+  classical
+  have heCard : e.card = 2 := hSpans.1
+  have hxeCard : (insert x e).card = 3 :=
+    G.card_eq_three_of_mem_triangles hSpans.2
+  have hxe : x ∉ e := by
+    intro hxe
+    rw [Finset.insert_eq_of_mem hxe, hSpans.1] at hxeCard
+    omega
+  obtain ⟨q, hqS, hinterLower⟩ :=
+    G.exists_two_le_card_inter_of_isSupportMaximalPacking hS hSpans.2
+  have hxq : x ∉ q := by
+    intro hxq
+    exact hxOutside (Finset.mem_biUnion.mpr ⟨q, hqS, hxq⟩)
+  have hsub : q ∩ insert x e ⊆ e := by
+    intro v hv
+    have hvData := Finset.mem_inter.mp hv
+    rcases Finset.mem_insert.mp hvData.2 with rfl | hve
+    · exact (hxq hvData.1).elim
+    · exact hve
+  have hinterUpper := Finset.card_le_card hsub
+  have hinterCard : (q ∩ insert x e).card = 2 := by
+    omega
+  have hinterEq : q ∩ insert x e = e :=
+    Finset.eq_of_subset_of_card_le hsub (by omega)
+  have heFamily : e ∈ triangleFamilyEdges S := by
+    rw [mem_triangleFamilyEdges_iff]
+    refine ⟨q, hqS, ?_, heCard⟩
+    intro v hve
+    have : v ∈ q ∩ insert x e := by
+      rw [hinterEq]
+      exact hve
+    exact (Finset.mem_inter.mp this).1
+  rw [G.mem_labelledPackingEdges_iff]
+  refine ⟨heFamily, ⟨x, ?_⟩⟩
+  rw [G.mem_packingEdgeSpanners_iff]
+  exact ⟨hxOutside, hSpans.2⟩
+
+/-- Labelled packing edges spanned by at least one member of a chosen vertex
+set. -/
+noncomputable def spannedLabelledEdges (G : SimpleGraph V)
+    (S : Finset (Finset V)) (C : Finset V) : Finset (Finset V) := by
+  classical
+  exact (G.labelledPackingEdges S).filter fun e ↦
+    ∃ c ∈ C, G.Spans c e
+
+/-- For a set of outside vertices, `spannedLabelledEdges` is exactly the set
+of all edges they span; maximality guarantees that no spanned edge is omitted
+by the labelled-edge filter. -/
+theorem mem_spannedLabelledEdges_iff
+    (G : SimpleGraph V) {S : Finset (Finset V)}
+    (hS : G.IsSupportMaximalPacking S)
+    {C : Finset V}
+    (hCOutside : C ⊆ outsidePackingVertices S)
+    {e : Finset V} :
+    e ∈ G.spannedLabelledEdges S C ↔
+      ∃ c ∈ C, G.Spans c e := by
+  classical
+  constructor
+  · intro he
+    exact (Finset.mem_filter.mp he).2
+  · intro hSpanned
+    obtain ⟨c, hcC, hcSpans⟩ := hSpanned
+    change e ∈ (G.labelledPackingEdges S).filter
+      (fun f ↦ ∃ z ∈ C, G.Spans z f)
+    apply Finset.mem_filter.mpr
+    refine ⟨G.mem_labelledPackingEdges_of_spans_outside hS ?_ hcSpans,
+      ⟨c, hcC, hcSpans⟩⟩
+    exact mem_outsidePackingVertices_iff.mp (hCOutside hcC)
+
 end SimpleGraph

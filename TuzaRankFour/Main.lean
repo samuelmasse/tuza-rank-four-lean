@@ -17,6 +17,7 @@ import TuzaRankFour.ComponentTransfer
 import TuzaRankFour.InternalResidual
 import TuzaRankFour.GlobalDischarge
 import TuzaRankFour.RankFourOrderBound
+import TuzaRankFour.FiniteEncoding
 
 /-!
 # Tuza's conjecture for packing number at most four

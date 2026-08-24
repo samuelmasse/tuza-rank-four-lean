@@ -1,4 +1,5 @@
 import TuzaRankFour.DischargeClassification
+import Mathlib.Combinatorics.Hall.Basic
 
 /-!
 # Crown-side foundations for the twelve-vertex discharge
@@ -193,5 +194,57 @@ theorem mem_spannedLabelledEdges_iff
     refine ⟨G.mem_labelledPackingEdges_of_spans_outside hS ?_ hcSpans,
       ⟨c, hcC, hcSpans⟩⟩
     exact mem_outsidePackingVertices_iff.mp (hCOutside hcC)
+
+/-- Labelled-edge neighbours of a finite family of selected vertices, in the
+finite subtype formulation used by Hall's theorem. -/
+noncomputable def labelledSpannerNeighbors (G : SimpleGraph V)
+    (S : Finset (Finset V)) (I : Finset V)
+    (A : Finset {c : V // c ∈ I}) :
+    Finset {e : Finset V // e ∈ G.labelledPackingEdges S} := by
+  classical
+  exact Finset.univ.filter fun e ↦
+    ∃ c ∈ A, G.Spans c.1 e.1
+
+@[simp]
+theorem mem_labelledSpannerNeighbors_iff
+    (G : SimpleGraph V) {S : Finset (Finset V)} {I : Finset V}
+    {A : Finset {c : V // c ∈ I}}
+    {e : {f : Finset V // f ∈ G.labelledPackingEdges S}} :
+    e ∈ G.labelledSpannerNeighbors S I A ↔
+      ∃ c ∈ A, G.Spans c.1 e.1 := by
+  classical
+  simp [labelledSpannerNeighbors]
+
+/-- Hall's exact dichotomy for the spanner relation: either all selected
+vertices can be injected into labelled edges they span, or some finite
+subfamily has fewer labelled-edge neighbours than vertices. -/
+theorem exists_injective_spanner_or_deficient_subfamily
+    (G : SimpleGraph V) (S : Finset (Finset V)) (I : Finset V) :
+    (∃ f : {c : V // c ∈ I} →
+        {e : Finset V // e ∈ G.labelledPackingEdges S},
+      Function.Injective f ∧ ∀ c, G.Spans c.1 (f c).1) ∨
+    (∃ A : Finset {c : V // c ∈ I},
+      (G.labelledSpannerNeighbors S I A).card < A.card) := by
+  classical
+  let r : {c : V // c ∈ I} →
+      {e : Finset V // e ∈ G.labelledPackingEdges S} → Prop :=
+    fun c e ↦ G.Spans c.1 e.1
+  have hHall := Fintype.all_card_le_filter_rel_iff_exists_injective r
+  by_cases hCondition :
+      ∀ A : Finset {c : V // c ∈ I},
+        A.card ≤ (G.labelledSpannerNeighbors S I A).card
+  · left
+    have hRelation :
+        ∀ A : Finset {c : V // c ∈ I},
+          A.card ≤
+            ({e | ∃ c ∈ A, r c e} :
+              Finset {e : Finset V // e ∈ G.labelledPackingEdges S}).card := by
+      intro A
+      simpa [labelledSpannerNeighbors, r] using hCondition A
+    obtain ⟨f, hfInjective, hfSpans⟩ := hHall.mp hRelation
+    exact ⟨f, hfInjective, hfSpans⟩
+  · right
+    push Not at hCondition
+    exact hCondition
 
 end SimpleGraph

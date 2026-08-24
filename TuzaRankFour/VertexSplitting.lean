@@ -624,6 +624,7 @@ theorem splitLinkComponentHom_surjective (G : SimpleGraph V)
   refine Sigma.ext (by rfl) ?_
   exact heq_of_eq hb.symm
 
+omit [Fintype V] [DecidableEq V] in
 /-- A single simultaneous canonical split makes every vertex link
 preconnected. -/
 theorem isSplitNormal_splitGraph (G : SimpleGraph V) :
@@ -631,5 +632,73 @@ theorem isSplitNormal_splitGraph (G : SimpleGraph V) :
   intro a
   exact a.2.connected_toSimpleGraph.preconnected.map
     (G.splitLinkComponentHom a) (G.splitLinkComponentHom_surjective a)
+
+/-- Splitting the triangle support creates no edge outside a triangle. -/
+theorem triangleSupport_splitGraph_triangleSupport (G : SimpleGraph V) :
+    G.triangleSupport.splitGraph.triangleSupport =
+      G.triangleSupport.splitGraph := by
+  classical
+  apply le_antisymm
+  · exact G.triangleSupport.splitGraph.triangleSupport_le
+  · intro a b hab
+    let H := G.triangleSupport
+    change H.splitGraph.Adj a b at hab
+    have habData := hab
+    obtain ⟨habH, haComponent, hbComponent⟩ := habData
+    obtain ⟨t, htG, hat, hbt, habNe⟩ := habH
+    have htH : t ∈ H.triangles := by
+      simpa [H] using htG
+    obtain ⟨q, hq, hproject⟩ := H.exists_split_triangle_project_eq htH
+    have haProject : a.1 ∈ H.projectSplitVertexSet q := by
+      rw [hproject]
+      exact hat
+    obtain ⟨a', ha'q, ha'fst⟩ := Finset.mem_image.mp haProject
+    have hbProject : b.1 ∈ H.projectSplitVertexSet q := by
+      rw [hproject]
+      exact hbt
+    obtain ⟨b', hb'q, hb'fst⟩ := Finset.mem_image.mp hbProject
+    have hqClique : H.splitGraph.IsNClique 3 q := by
+      simpa [triangles] using hq
+    have ha'b'Ne : a' ≠ b' := by
+      intro h
+      exact habNe (ha'fst.symm.trans ((congrArg Sigma.fst h).trans hb'fst))
+    have ha'b' : H.splitGraph.Adj a' b' :=
+      hqClique.isClique ha'q hb'q ha'b'Ne
+    have haa' : a = a' := H.eq_of_splitGraph_adj_of_fst_eq hab ha'b'
+      ha'fst.symm hb'fst.symm
+    have hbb' : b = b' := H.eq_of_splitGraph_adj_of_fst_eq
+      (H.splitGraph.symm.symm _ _ hab)
+      (H.splitGraph.symm.symm _ _ ha'b') hb'fst.symm ha'fst.symm
+    refine ⟨q, hq, ?_, ?_, ?_⟩
+    · simpa [haa'] using ha'q
+    · simpa [hbb'] using hb'q
+    · exact fun h ↦ habNe (congrArg Sigma.fst h)
+
+omit [Fintype V] [DecidableEq V] in
+/-- Every vertex created by splitting has a neighbor. -/
+theorem exists_splitGraph_adj (G : SimpleGraph V) (a : G.SplitVertex) :
+    ∃ b, G.splitGraph.Adj a b := by
+  obtain ⟨x, hx⟩ := a.2.nonempty_supp
+  let b := G.splitEndpoint (G.symm.symm _ _ x.2)
+  have ha : G.splitEndpoint x.2 = a := by
+    rcases a with ⟨v, c⟩
+    exact Sigma.ext rfl (heq_of_eq hx)
+  refine ⟨b, ?_⟩
+  rw [← ha]
+  exact G.splitGraph_adj_splitEndpoints x.2
+
+/-- Consequently every vertex of the split triangle support lies in a
+triangle. -/
+theorem mem_triangleSupportVertices_splitGraph_triangleSupport
+    (G : SimpleGraph V) (a : G.triangleSupport.SplitVertex) :
+    a ∈ G.triangleSupport.splitGraph.triangleSupportVertices := by
+  classical
+  let H := G.triangleSupport.splitGraph
+  obtain ⟨b, hab⟩ := G.triangleSupport.exists_splitGraph_adj a
+  have habSupport : H.triangleSupport.Adj a b := by
+    rw [G.triangleSupport_splitGraph_triangleSupport]
+    exact hab
+  obtain ⟨t, ht, hat, hbt, habNe⟩ := habSupport
+  exact H.mem_triangleSupportVertices_iff.mpr ⟨t, ht, hat⟩
 
 end SimpleGraph

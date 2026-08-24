@@ -1,0 +1,81 @@
+{
+  "schema": "tuza-checkpoint-lrat-performance-v1",
+  "date": "2026-08-24",
+  "purpose": "Select a memory-safe ordinary-proof-term import for all 66 frozen LRAT refutations.",
+  "mathematical_scope": {
+    "cases": 66,
+    "certificate_format": "RUP-only binary LRAT",
+    "acceptance": "Each segment is reconstructed by Mathlib's proof-producing LRAT step builder; the last declaration has type Sat.Fmla.proof formula [].",
+    "coverage_check": "For every case, the concatenation of the binary segment files must be byte-for-byte identical to the frozen source LRAT binary."
+  },
+  "machine": {
+    "os": "Windows",
+    "cpu": "AMD Ryzen 9 9950X 16-Core Processor",
+    "physical_cores": 16,
+    "logical_processors": 32,
+    "physical_memory_gib": 61.6
+  },
+  "toolchain": {
+    "lean": "4.32.0",
+    "lean_commit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+    "mathlib": "v4.32.0",
+    "repository_baseline": "6e28f55117806fc2c2fdba3c7a7b4453adccbdeb",
+    "checkpoint_importer_sha256": "4ea0e48c0f8c26aa1d639e471e98308d4f56b5b9465ede2afe60e9ec0d16269f",
+    "segment_generator_sha256": "9c8ee65283d28e2f8f3ea74dc6f7edce16aa0fe698812f9b88fddb04ee572d6c"
+  },
+  "representative_case": {
+    "name": "order12-skeleton15",
+    "cnf_sha256": "c5a5fe4d4660e3485811d105dddcbe025425aa368792dbb11206fe6feefe4a",
+    "source_binary_bytes": 47360196,
+    "source_additions": 245476,
+    "promoted_segment_binary_sha256": "169eb731d7d1933e6eb9f7a8f71c023ed004c30eee2eca4044608c6eb31d04de",
+    "promoted_segment_text_limit_bytes": 1000000,
+    "promoted_segment_count": 97,
+    "fresh_segment_wall_seconds": [26.0, 16.8],
+    "sampled_peak_working_set_gib": 3.56
+  },
+  "calibrations": [
+    {
+      "variant": "single Mathlib LRAT proof term",
+      "result": "rejected",
+      "observation": "The largest direct and cube-leaf imports retained 14-22 GiB and continued growing; the route was not safe at full scale."
+    },
+    {
+      "variant": "verified streaming checker with decide +kernel",
+      "case": "order10-skeleton06",
+      "result": "rejected",
+      "observation": "The 3.45 MB text trace remained unfinished after 750 seconds, making the 96 MB hard trace impractical despite a roughly 2.1 GiB working set."
+    },
+    {
+      "variant": "in-module proof checkpoints every 1000 additions",
+      "case": "order10-skeleton06",
+      "result": "rejected",
+      "observation": "Named checkpoints in one module still retained prior declaration values; working memory reached 17.0 GiB after about 60 seconds."
+    },
+    {
+      "variant": "one Lean module per 1000 additions",
+      "case": "order10-skeleton06",
+      "result": "correct but superseded",
+      "observation": "All 15 modules built successfully and the final theorem depended only on propext. Binary slices totaled exactly 1,657,867 bytes, matching the source binary."
+    },
+    {
+      "variant": "one Lean module per at most 1,000,000 text bytes and 10,000 additions",
+      "result": "promoted",
+      "observation": "This retains exact binary coverage, bounds measured memory, reduces the full campaign to 572 proof segments, and keeps all certificate source below the Palomar repository-size limit."
+    }
+  ],
+  "full_campaign_projection": {
+    "cases": 66,
+    "segments": 572,
+    "binary_certificate_mib": 250.98,
+    "restart_metadata_mib": 14.7,
+    "observed_clean_aggregate_wall_minutes": "approximately 93",
+    "sampled_peak_aggregate_lean_working_set_gib": 20.86,
+    "parallelism_policy": "Use at most four independent case chains concurrently and keep whole-machine physical-memory use below 54 GiB."
+  },
+  "verification": {
+    "negative_fixture": "Malformed or missing clause identifiers are rejected by buildProofStep and checkpoint cardinality checks.",
+    "translation_check": "Every manifest records both the frozen source-binary hash and the concatenated segment hash; generation aborts unless they agree exactly.",
+    "kernel_fixture": "All 66 final refutations compiled in the clean four-lane build, and every #print axioms report was exactly [propext]."
+  }
+}

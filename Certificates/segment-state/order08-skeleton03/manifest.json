@@ -1,0 +1,35 @@
+{
+  "schema": "tuza-checkpoint-lrat-segments-v1",
+  "case": "order08-skeleton03",
+  "source": "Certificates/lrat/order08-skeleton03.lrat",
+  "source_sha256": "c7c5bc83d78e04009c5d02cf3956c25e92e40f2e1c41c4b5d35e68f74a919fa3",
+  "binary_source": "Certificates/lratb/order08-skeleton03.lratb",
+  "binary_source_sha256": "6f6e523dded303ea3f23f319544235fffa1a5a6270ad022ac4ccb90b5acc07c5",
+  "binary_source_bytes": 64689,
+  "concatenated_binary_sha256": "6f6e523dded303ea3f23f319544235fffa1a5a6270ad022ac4ccb90b5acc07c5",
+  "concatenated_binary_bytes": 64689,
+  "cnf": "Certificates/cnf/order08-skeleton03.cnf",
+  "cnf_sha256": "be8b4aa672006c50b8de295478e9e8ffc9c739c0441c5d20cff2151b5e6aaca3",
+  "additions_per_segment": 10000,
+  "max_text_bytes": 1000000,
+  "segment_count": 1,
+  "segments": [
+    {
+      "index": 0,
+      "additions": 1016,
+      "actions": 1844,
+      "ids_before": 0,
+      "initial_ids": 467,
+      "text_file": "Certificates/segments-text/order08-skeleton03/segment0000.lrat",
+      "text_sha256": "67e884dc4b4f8e4713b0267390b9600919eb6cbab4c0c0511679129e23417243",
+      "binary_file": "Certificates/segments/order08-skeleton03/segment0000.lratb",
+      "binary_sha256": "6f6e523dded303ea3f23f319544235fffa1a5a6270ad022ac4ccb90b5acc07c5",
+      "binary_bytes": 64689,
+      "ids_file": null,
+      "ids_sha256": null,
+      "initial_ids_file": "Certificates/segment-state/order08-skeleton03/segment0000.initial.ids",
+      "initial_ids_sha256": "7d2394b736e0672a45ba309062216082325b7d247e9cf0f959fc0728dba45b96",
+      "final": true
+    }
+  ]
+}

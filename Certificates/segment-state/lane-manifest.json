@@ -1,0 +1,101 @@
+{
+  "schema": "tuza-certificate-build-lanes-v1",
+  "lane_count": 4,
+  "assignment_rule": "descending binary size, greedily assigned to the lightest lane",
+  "lanes": [
+    {
+      "index": 0,
+      "binary_bytes": 65795138,
+      "segments": 141,
+      "cases": [
+        "order12-skeleton15",
+        "order11-skeleton13",
+        "order11-skeleton04",
+        "order11-skeleton03",
+        "order10-skeleton12",
+        "order10-skeleton13",
+        "order10-skeleton05",
+        "order09-skeleton06",
+        "order09-skeleton07",
+        "order09-skeleton04",
+        "order09-skeleton01",
+        "order08-skeleton01"
+      ]
+    },
+    {
+      "index": 1,
+      "binary_bytes": 65796743,
+      "segments": 144,
+      "cases": [
+        "order12-skeleton14",
+        "order11-skeleton14",
+        "order12-skeleton06",
+        "order12-skeleton05",
+        "order12-skeleton10",
+        "order11-skeleton08",
+        "order11-skeleton07",
+        "order11-skeleton10",
+        "order11-skeleton02",
+        "order10-skeleton08",
+        "order10-skeleton10",
+        "order12-skeleton00",
+        "order09-skeleton08",
+        "order09-skeleton03",
+        "order09-skeleton10",
+        "order08-skeleton02"
+      ]
+    },
+    {
+      "index": 2,
+      "binary_bytes": 65789125,
+      "segments": 143,
+      "cases": [
+        "order12-skeleton12",
+        "order12-skeleton13",
+        "order12-skeleton07",
+        "order12-skeleton03",
+        "order11-skeleton11",
+        "order11-skeleton06",
+        "order12-skeleton02",
+        "order11-skeleton05",
+        "order10-skeleton06",
+        "order10-skeleton07",
+        "order10-skeleton03",
+        "order10-skeleton02",
+        "order09-skeleton05",
+        "order11-skeleton00",
+        "order09-skeleton00",
+        "order08-skeleton04",
+        "order08-skeleton05",
+        "order07-skeleton02",
+        "order07-skeleton01",
+        "order07-skeleton00"
+      ]
+    },
+    {
+      "index": 3,
+      "binary_bytes": 65788396,
+      "segments": 144,
+      "cases": [
+        "order12-skeleton11",
+        "order12-skeleton08",
+        "order12-skeleton04",
+        "order12-skeleton09",
+        "order11-skeleton12",
+        "order12-skeleton01",
+        "order11-skeleton09",
+        "order10-skeleton11",
+        "order11-skeleton01",
+        "order10-skeleton04",
+        "order10-skeleton09",
+        "order10-skeleton01",
+        "order09-skeleton09",
+        "order09-skeleton02",
+        "order10-skeleton00",
+        "order08-skeleton03",
+        "order08-skeleton00",
+        "order06-skeleton00"
+      ]
+    }
+  ]
+}

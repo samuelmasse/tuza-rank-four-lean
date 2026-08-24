@@ -16,6 +16,7 @@ class SegmentRecord(TypedDict):
     additions: int
     actions: int
     ids_before: int
+    initial_ids: int
     text_file: str
     text_sha256: str
     binary_file: str
@@ -23,6 +24,8 @@ class SegmentRecord(TypedDict):
     binary_bytes: int
     ids_file: str | None
     ids_sha256: str | None
+    initial_ids_file: str
+    initial_ids_sha256: str
     final: bool
 
 
@@ -61,8 +64,10 @@ def write_module(
     namespace_name: str,
     declaration_name: str,
     formula_name: str,
-    cnf_relative: str,
+    initial_bundle_name: str,
     proof_relative: str,
+    initial_ids_relative: str,
+    initial_clause_count: int,
     prior_name: str | None,
     ids_relative: str | None,
 ) -> None:
@@ -75,9 +80,11 @@ def write_module(
     if prior_name is None:
         lines.extend(
             [
-                f"lrat_initial_segment_binary {declaration_name}",
+                f"lrat_initial_segment_from_bundle_binary {declaration_name}",
                 f"  {formula_name}",
-                f'  (include_str "{cnf_relative}")',
+                f"  {initial_bundle_name}",
+                f'  (include_str "{initial_ids_relative}")',
+                f"  {initial_clause_count}",
                 f'  "{proof_relative}"',
             ]
         )
@@ -85,11 +92,13 @@ def write_module(
         assert ids_relative is not None
         lines.extend(
             [
-                f"lrat_segment_binary {declaration_name}",
+                f"lrat_segment_from_bundle_binary {declaration_name}",
                 f"  {formula_name}",
+                f"  {initial_bundle_name}",
+                f'  (include_str "{initial_ids_relative}")',
+                f"  {initial_clause_count}",
                 f"  {prior_name}",
                 f'  (include_str "{ids_relative}")',
-                f'  (include_str "{cnf_relative}")',
                 f'  "{proof_relative}"',
             ]
         )
@@ -101,15 +110,22 @@ def segment_trace(
     repository: Path,
     case_name: str,
     additions_per_segment: int,
+    max_text_bytes: int,
     lake_command: str | None,
 ) -> None:
     if additions_per_segment <= 0:
         raise ValueError("additions per segment must be positive")
+    if max_text_bytes <= 0:
+        raise ValueError("maximum text bytes must be positive")
     source = repository / "Certificates" / "lrat" / f"{case_name}.lrat"
     binary_source = repository / "Certificates" / "lratb" / f"{case_name}.lratb"
     cnf = repository / "Certificates" / "cnf" / f"{case_name}.cnf"
     if not source.is_file() or not binary_source.is_file() or not cnf.is_file():
         raise FileNotFoundError(f"missing source for {case_name}")
+    cnf_header = cnf.open(encoding="ascii").readline().split()
+    if len(cnf_header) != 4 or cnf_header[:2] != ["p", "cnf"]:
+        raise ValueError(f"malformed DIMACS header in {cnf}")
+    initial_clause_count = int(cnf_header[3])
 
     case_lean = lean_case_name(case_name)
     namespace_name = f"TuzaRankFour.Certificates.Segmented.{case_lean}"
@@ -119,9 +135,18 @@ def segment_trace(
     state_root = repository / "Certificates" / "segment-state" / case_name
     for directory in (module_root, text_root, binary_root, state_root):
         directory.mkdir(parents=True, exist_ok=True)
+    for pattern, directory in (
+        ("Segment*.lean", module_root),
+        ("segment*.lrat", text_root),
+        ("segment*.lratb", binary_root),
+        ("segment*.ids", state_root),
+    ):
+        for generated_file in directory.glob(pattern):
+            generated_file.unlink()
 
     module_prefix = f"TuzaRankFour.Certificates.Segmented.{case_lean}"
     formula_name = f"{namespace_name}.formula"
+    initial_bundle_name = f"{namespace_name}.initialClauses"
     relative_root = "../../../../"
     cnf_relative = f"{relative_root}Certificates/cnf/{case_name}.cnf"
 
@@ -136,6 +161,10 @@ def segment_trace(
                 "dimacs_formula_binary formula",
                 f'  (include_str "{cnf_relative}")',
                 "",
+                "dimacs_initial_clause_bundle initialClauses",
+                "  formula",
+                f'  (include_str "{cnf_relative}")',
+                "",
                 f"end {namespace_name}",
                 "",
             ]
@@ -145,10 +174,12 @@ def segment_trace(
     )
 
     live: set[int] = set()
-    segments: list[tuple[list[str], list[int], int, bool]] = []
+    segments: list[tuple[list[str], list[int], list[int], int, bool]] = []
     lines: list[str] = []
     ids_before = sorted(live)
     additions = 0
+    text_bytes = 0
+    initial_ids: set[int] = set()
     saw_refutation = False
     with source.open(encoding="ascii") as stream:
         for raw_line in stream:
@@ -156,28 +187,51 @@ def segment_trace(
             if not stripped:
                 continue
             fields = stripped.split()
-            lines.append(stripped + "\n")
+            normalized_line = stripped + "\n"
+            lines.append(normalized_line)
+            text_bytes += len(normalized_line.encode("ascii"))
             final = is_empty_addition(fields)
             if not is_deletion(fields):
                 additions += 1
+                first_zero = fields.index("0", 1)
+                for hint in fields[first_zero + 1 : -1]:
+                    hint_id = abs(int(hint))
+                    if hint_id <= initial_clause_count:
+                        initial_ids.add(hint_id)
             update_live_derived(fields, live)
-            if final or additions == additions_per_segment:
-                segments.append((lines, ids_before, additions, final))
+            if final or (
+                additions > 0
+                and (
+                    additions == additions_per_segment
+                    or text_bytes >= max_text_bytes
+                )
+            ):
+                segments.append(
+                    (lines, ids_before, sorted(initial_ids), additions, final)
+                )
                 lines = []
                 ids_before = sorted(live)
                 additions = 0
+                text_bytes = 0
+                initial_ids = set()
                 if final:
                     saw_refutation = True
                     break
     if lines:
-        segments.append((lines, ids_before, additions, False))
-    if not saw_refutation or not segments[-1][3]:
+        segments.append((lines, ids_before, sorted(initial_ids), additions, False))
+    if not saw_refutation or not segments[-1][4]:
         raise ValueError(f"{source} does not end in an empty-clause addition")
 
     pending_records: list[tuple[SegmentRecord, Path]] = []
     previous_module = f"{module_prefix}.Base"
     previous_declaration: str | None = None
-    for index, (segment_lines, prior_ids, segment_additions, final) in enumerate(segments):
+    for index, (
+        segment_lines,
+        prior_ids,
+        segment_initial_ids,
+        segment_additions,
+        final,
+    ) in enumerate(segments):
         stem = f"Segment{index:04d}"
         text_path = text_root / f"segment{index:04d}.lrat"
         text_path.write_text("".join(segment_lines), encoding="ascii", newline="\n")
@@ -187,6 +241,10 @@ def segment_trace(
             ids_path = state_root / f"segment{index:04d}.ids"
             ids_path.write_text(" ".join(map(str, prior_ids)) + "\n", encoding="ascii")
             ids_sha = sha256_file(ids_path)
+        initial_ids_path = state_root / f"segment{index:04d}.initial.ids"
+        initial_ids_path.write_text(
+            " ".join(map(str, segment_initial_ids)) + "\n", encoding="ascii"
+        )
         declaration = "refutation" if final else f"checkpoint{index:04d}"
         proof_relative = (
             f"{relative_root}Certificates/segments/{case_name}/segment{index:04d}.lratb"
@@ -197,14 +255,20 @@ def segment_trace(
                 f"{relative_root}Certificates/segment-state/{case_name}/"
                 f"segment{index:04d}.ids"
             )
+        initial_ids_relative = (
+            f"{relative_root}Certificates/segment-state/{case_name}/"
+            f"segment{index:04d}.initial.ids"
+        )
         write_module(
             module_root / f"{stem}.lean",
             previous_module,
             namespace_name,
             declaration,
             formula_name,
-            cnf_relative,
+            initial_bundle_name,
             proof_relative,
+            initial_ids_relative,
+            initial_clause_count,
             previous_declaration,
             ids_relative,
         )
@@ -215,6 +279,7 @@ def segment_trace(
                 "additions": segment_additions,
                 "actions": len(segment_lines),
                 "ids_before": len(prior_ids),
+                "initial_ids": len(segment_initial_ids),
                 "text_file": text_path.relative_to(repository).as_posix(),
                 "text_sha256": sha256_file(text_path),
                 "binary_file": binary_path.relative_to(repository).as_posix(),
@@ -222,6 +287,8 @@ def segment_trace(
                 "binary_bytes": 0,
                 "ids_file": None if ids_path is None else ids_path.relative_to(repository).as_posix(),
                 "ids_sha256": ids_sha,
+                "initial_ids_file": initial_ids_path.relative_to(repository).as_posix(),
+                "initial_ids_sha256": sha256_file(initial_ids_path),
                 "final": final,
             }, binary_path)
         )
@@ -283,6 +350,7 @@ def segment_trace(
         "cnf": cnf.relative_to(repository).as_posix(),
         "cnf_sha256": sha256_file(cnf),
         "additions_per_segment": additions_per_segment,
+        "max_text_bytes": max_text_bytes,
         "segment_count": len(records),
         "segments": records,
     }
@@ -296,7 +364,8 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("case")
     parser.add_argument("--repository", type=Path, default=Path.cwd())
-    parser.add_argument("--additions-per-segment", type=int, default=1000)
+    parser.add_argument("--additions-per-segment", type=int, default=10_000)
+    parser.add_argument("--max-text-bytes", type=int, default=1_000_000)
     parser.add_argument(
         "--lake",
         help="lake executable used to convert generated text segments to binary LRAT",
@@ -306,6 +375,7 @@ def main() -> None:
         arguments.repository.resolve(),
         arguments.case,
         arguments.additions_per_segment,
+        arguments.max_text_bytes,
         arguments.lake,
     )
 

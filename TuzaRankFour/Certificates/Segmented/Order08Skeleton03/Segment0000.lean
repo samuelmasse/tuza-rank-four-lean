@@ -1,0 +1,12 @@
+import TuzaRankFour.Certificates.Segmented.Order08Skeleton03.Base
+
+namespace TuzaRankFour.Certificates.Segmented.Order08Skeleton03
+
+lrat_initial_segment_from_bundle_binary refutation
+  TuzaRankFour.Certificates.Segmented.Order08Skeleton03.formula
+  TuzaRankFour.Certificates.Segmented.Order08Skeleton03.initialClauses
+  (include_str "../../../../Certificates/segment-state/order08-skeleton03/segment0000.initial.ids")
+  811
+  "../../../../Certificates/segments/order08-skeleton03/segment0000.lratb"
+
+end TuzaRankFour.Certificates.Segmented.Order08Skeleton03

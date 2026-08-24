@@ -1,1 +1,1 @@
-import TuzaRankFour.Certificates.Segmented.Order10Skeleton06.Segment0014
+import TuzaRankFour.Certificates.Segmented.Order10Skeleton06.Segment0003

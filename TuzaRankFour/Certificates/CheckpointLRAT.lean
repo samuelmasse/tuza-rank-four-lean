@@ -148,6 +148,36 @@ private partial def collectBundleClauses (ctx bundleType bundleProof : Expr) :
   let literals ← decodeClauseExpr clauseExpr
   return #[{ lits := literals, expr := clauseExpr, proof := bundleProof }]
 
+private partial def bundleClauseAt (ctx bundleType bundleProof : Expr)
+    (start stop index : Nat) : Except String Mathlib.Tactic.Sat.Clause := do
+  unless start ≤ index && index < stop do
+    throw "checkpoint bundle index is out of bounds"
+  match stop - start with
+  | 0 => throw "empty checkpoint bundle"
+  | 1 =>
+      unless bundleType.isAppOfArity ``Sat.Fmla.proof 2 do
+        throw "checkpoint leaf is not a formula-clause proof"
+      let formula := bundleType.appFn!.appArg!
+      unless formula == ctx do
+        throw "checkpoint formula does not match the requested base formula"
+      let clauseExpr := bundleType.appArg!
+      let literals ← decodeClauseExpr clauseExpr
+      return { lits := literals, expr := clauseExpr, proof := bundleProof }
+  | length =>
+      unless bundleType.isAppOfArity ``And 2 do
+        throw "checkpoint branch is not a conjunction"
+      let middle := start + length / 2
+      let leftType := bundleType.appFn!.appArg!
+      let rightType := bundleType.appArg!
+      if index < middle then
+        bundleClauseAt ctx leftType
+          (mkApp3 (Lean.mkConst ``And.left) leftType rightType bundleProof)
+          start middle index
+      else
+        bundleClauseAt ctx rightType
+          (mkApp3 (Lean.mkConst ``And.right) leftType rightType bundleProof)
+          middle stop index
+
 private def parseClauseIds (source : String) : Except String (Array Nat) := do
   let mut ids := #[]
   for field in source.split (·.isWhitespace) do
@@ -164,23 +194,12 @@ private inductive SegmentResult
       (derived : Std.HashSet Nat)
   | refutation (proof : Expr)
 
-private def buildSegmentProof (clauses : Array (Array Int))
-    (ctx expanded : Expr) (steps : Array Mathlib.Tactic.Sat.LRATStep)
-    (prior : Option (Array Nat × Expr)) : MetaM SegmentResult := do
-  let selfProof := mkApp (Lean.mkConst ``Sat.Fmla.subsumes_self) ctx
-  let mut db :=
-    (Mathlib.Tactic.Sat.buildClauses clauses ctx 0 clauses.size expanded
-      selfProof default).2
-  let mut derived : Std.HashSet Nat := {}
-  if let some (ids, priorProof) := prior then
-    let priorType ← Meta.inferType priorProof
-    let priorClauses ← IO.ofExcept (collectBundleClauses ctx priorType priorProof)
-    unless ids.size = priorClauses.size do
-      throwError "checkpoint id count does not match its clause bundle"
-    for index in [:ids.size] do
-      let id := ids[index]!
-      db := db.insert id priorClauses[index]!
-      derived := derived.insert id
+private def runSegment (ctx : Expr)
+    (steps : Array Mathlib.Tactic.Sat.LRATStep)
+    (initialDb : Std.HashMap Nat Mathlib.Tactic.Sat.Clause)
+    (initialDerived : Std.HashSet Nat) : MetaM SegmentResult := do
+  let mut db := initialDb
+  let mut derived := initialDerived
   for step in steps do
     match step with
     | .del ids =>
@@ -200,6 +219,70 @@ private def buildSegmentProof (clauses : Array (Array Int))
             }
             derived := derived.insert id
   return .checkpoint db derived
+
+private def buildSegmentProof (clauses : Array (Array Int))
+    (ctx expanded : Expr) (steps : Array Mathlib.Tactic.Sat.LRATStep)
+    (prior : Option (Array Nat × Expr)) : MetaM SegmentResult := do
+  let selfProof := mkApp (Lean.mkConst ``Sat.Fmla.subsumes_self) ctx
+  let mut db :=
+    (Mathlib.Tactic.Sat.buildClauses clauses ctx 0 clauses.size expanded
+      selfProof default).2
+  let mut derived : Std.HashSet Nat := {}
+  if let some (ids, priorProof) := prior then
+    let priorType ← Meta.inferType priorProof
+    let priorClauses ← IO.ofExcept (collectBundleClauses ctx priorType priorProof)
+    unless ids.size = priorClauses.size do
+      throwError "checkpoint id count does not match its clause bundle"
+    for index in [:ids.size] do
+      let id := ids[index]!
+      db := db.insert id priorClauses[index]!
+      derived := derived.insert id
+  runSegment ctx steps db derived
+
+private def buildSegmentProofFromBundles (ctx : Expr)
+    (steps : Array Mathlib.Tactic.Sat.LRATStep)
+    (initialProof : Expr) (prior : Option (Array Nat × Expr)) : MetaM SegmentResult := do
+  let initialType ← Meta.inferType initialProof
+  let initialClauses ← IO.ofExcept
+    (collectBundleClauses ctx initialType initialProof)
+  let mut db : Std.HashMap Nat Mathlib.Tactic.Sat.Clause := {}
+  for index in [:initialClauses.size] do
+    db := db.insert (index + 1) initialClauses[index]!
+  let mut derived : Std.HashSet Nat := {}
+  if let some (ids, priorProof) := prior then
+    let priorType ← Meta.inferType priorProof
+    let priorClauses ← IO.ofExcept (collectBundleClauses ctx priorType priorProof)
+    unless ids.size = priorClauses.size do
+      throwError "checkpoint id count does not match its clause bundle"
+    for index in [:ids.size] do
+      let id := ids[index]!
+      db := db.insert id priorClauses[index]!
+      derived := derived.insert id
+  runSegment ctx steps db derived
+
+private def buildSegmentProofFromSelectedBundles (ctx : Expr)
+    (steps : Array Mathlib.Tactic.Sat.LRATStep)
+    (initialProof : Expr) (initialCount : Nat) (initialIds : Array Nat)
+    (prior : Option (Array Nat × Expr)) : MetaM SegmentResult := do
+  let initialType ← Meta.inferType initialProof
+  let mut db : Std.HashMap Nat Mathlib.Tactic.Sat.Clause := {}
+  for id in initialIds do
+    if id = 0 || initialCount < id then
+      throwError "initial-clause id is out of bounds"
+    let clause ← IO.ofExcept
+      (bundleClauseAt ctx initialType initialProof 0 initialCount (id - 1))
+    db := db.insert id clause
+  let mut derived : Std.HashSet Nat := {}
+  if let some (ids, priorProof) := prior then
+    let priorType ← Meta.inferType priorProof
+    let priorClauses ← IO.ofExcept (collectBundleClauses ctx priorType priorProof)
+    unless ids.size = priorClauses.size do
+      throwError "checkpoint id count does not match its clause bundle"
+    for index in [:ids.size] do
+      let id := ids[index]!
+      db := db.insert id priorClauses[index]!
+      derived := derived.insert id
+  runSegment ctx steps db derived
 
 private def addSegmentDeclaration (name : Name) (ctx : Expr)
     (result : SegmentResult) : MetaM Unit := do
@@ -337,6 +420,86 @@ elab "lrat_segment_binary " n:ident ppSpace base:term:max ppSpace
     let expanded := Mathlib.Tactic.Sat.buildConj clauses 0 clauses.size
     let result ← buildSegmentProof clauses baseExpr expanded steps
       (some (clauseIds, priorExpr))
+    addSegmentDeclaration name baseExpr result
+
+/-- Package every original DIMACS clause as a named balanced theorem bundle.
+Segment modules can then reconstruct the initial LRAT database without
+reparsing and rebuilding the full CNF expression. -/
+elab "dimacs_initial_clause_bundle " n:ident ppSpace base:term:max ppSpace
+    cnf:term:max : command => do
+  let name := (← getCurrNamespace) ++ n.getId
+  liftTermElabM do
+    let cnf ← unsafe evalTerm String (Lean.mkConst ``String) cnf
+    let .success _ (_, clauses) :=
+        Mathlib.Tactic.Sat.Parser.parseDimacs ⟨_, cnf.startPos⟩
+      | throwError "parse CNF failed"
+    if clauses.isEmpty then
+      throwError "empty CNF"
+    let baseExpr ← elabTermEnsuringType base (Lean.mkConst ``Sat.Fmla)
+    let expanded := Mathlib.Tactic.Sat.buildConj clauses 0 clauses.size
+    let selfProof := mkApp (Lean.mkConst ``Sat.Fmla.subsumes_self) baseExpr
+    let db :=
+      (Mathlib.Tactic.Sat.buildClauses clauses baseExpr 0 clauses.size expanded
+        selfProof default).2
+    let mut entries := #[]
+    for id in [1:clauses.size + 1] do
+      entries := entries.push (id, db[id]!)
+    addDecl <| Declaration.thmDecl {
+      name
+      levelParams := []
+      type := bundleType baseExpr entries 0 entries.size
+      value := bundleValue baseExpr entries 0 entries.size
+    }
+
+/-- Check an initial LRAT segment from a named original-clause bundle. -/
+elab "lrat_initial_segment_from_bundle_binary " n:ident ppSpace
+    base:term:max ppSpace initial:term:max ppSpace initialIds:term:max ppSpace
+    initialCount:num ppSpace path:str : command => do
+  let name := (← getCurrNamespace) ++ n.getId
+  let sourcePath := System.FilePath.mk (← getFileName)
+  let some sourceDirectory := sourcePath.parent
+    | throwError "cannot compute source directory of `{sourcePath}`"
+  let proofText ← loadBinaryLRATText (sourceDirectory / path.getString)
+  liftTermElabM do
+    let initialIdSource ← unsafe evalTerm String (Lean.mkConst ``String) initialIds
+    let initialClauseIds ← IO.ofExcept (parseClauseIds initialIdSource)
+    let .success _ steps :=
+        Mathlib.Tactic.Sat.Parser.parseLRAT ⟨_, proofText.startPos⟩
+      | throwError "parse LRAT segment failed"
+    let baseExpr ← elabTermEnsuringType base (Lean.mkConst ``Sat.Fmla)
+    let initialExpr ← elabTerm initial none
+    synthesizeSyntheticMVarsNoPostponing
+    let initialExpr ← instantiateMVars initialExpr
+    let result ← buildSegmentProofFromSelectedBundles baseExpr steps initialExpr
+      initialCount.getNat initialClauseIds none
+    addSegmentDeclaration name baseExpr result
+
+/-- Check a later LRAT segment from named original- and derived-clause
+bundles. -/
+elab "lrat_segment_from_bundle_binary " n:ident ppSpace base:term:max ppSpace
+    initial:term:max ppSpace initialIds:term:max ppSpace initialCount:num ppSpace
+    prior:term:max ppSpace ids:term:max ppSpace path:str : command => do
+  let name := (← getCurrNamespace) ++ n.getId
+  let sourcePath := System.FilePath.mk (← getFileName)
+  let some sourceDirectory := sourcePath.parent
+    | throwError "cannot compute source directory of `{sourcePath}`"
+  let proofText ← loadBinaryLRATText (sourceDirectory / path.getString)
+  liftTermElabM do
+    let initialIdSource ← unsafe evalTerm String (Lean.mkConst ``String) initialIds
+    let initialClauseIds ← IO.ofExcept (parseClauseIds initialIdSource)
+    let idSource ← unsafe evalTerm String (Lean.mkConst ``String) ids
+    let clauseIds ← IO.ofExcept (parseClauseIds idSource)
+    let .success _ steps :=
+        Mathlib.Tactic.Sat.Parser.parseLRAT ⟨_, proofText.startPos⟩
+      | throwError "parse LRAT segment failed"
+    let baseExpr ← elabTermEnsuringType base (Lean.mkConst ``Sat.Fmla)
+    let initialExpr ← elabTerm initial none
+    let priorExpr ← elabTerm prior none
+    synthesizeSyntheticMVarsNoPostponing
+    let initialExpr ← instantiateMVars initialExpr
+    let priorExpr ← instantiateMVars priorExpr
+    let result ← buildSegmentProofFromSelectedBundles baseExpr steps initialExpr
+      initialCount.getNat initialClauseIds (some (clauseIds, priorExpr))
     addSegmentDeclaration name baseExpr result
 
 end TuzaRankFour.Certificates

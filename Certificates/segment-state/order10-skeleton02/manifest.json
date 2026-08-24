@@ -1,0 +1,52 @@
+{
+  "schema": "tuza-checkpoint-lrat-segments-v1",
+  "case": "order10-skeleton02",
+  "source": "Certificates/lrat/order10-skeleton02.lrat",
+  "source_sha256": "fba57e8ece10bff12c578d4637d80a5b6d8490c87532f0fa771f963f6fc1e702",
+  "binary_source": "Certificates/lratb/order10-skeleton02.lratb",
+  "binary_source_sha256": "5b4b54513b72c1eae7f0db6f2e4dc446e30620e9f11b4eb3bd1095951a7e8a62",
+  "binary_source_bytes": 694846,
+  "concatenated_binary_sha256": "5b4b54513b72c1eae7f0db6f2e4dc446e30620e9f11b4eb3bd1095951a7e8a62",
+  "concatenated_binary_bytes": 694846,
+  "cnf": "Certificates/cnf/order10-skeleton02.cnf",
+  "cnf_sha256": "f0b19beff2c0cf62eecfc4dbe0feb3cd659eb0c8c78f01f3190718a2353d074a",
+  "additions_per_segment": 10000,
+  "max_text_bytes": 1000000,
+  "segment_count": 2,
+  "segments": [
+    {
+      "index": 0,
+      "additions": 5492,
+      "actions": 9962,
+      "ids_before": 0,
+      "initial_ids": 2415,
+      "text_file": "Certificates/segments-text/order10-skeleton02/segment0000.lrat",
+      "text_sha256": "4d19ab3ed18e675881c870ebe0d4ff8063e154b18e64101415765b0c9c18422b",
+      "binary_file": "Certificates/segments/order10-skeleton02/segment0000.lratb",
+      "binary_sha256": "d10f83e32bb4a515637e88e3c10e6127cb552b31744a22b32549f28b4e340957",
+      "binary_bytes": 462278,
+      "ids_file": null,
+      "ids_sha256": null,
+      "initial_ids_file": "Certificates/segment-state/order10-skeleton02/segment0000.initial.ids",
+      "initial_ids_sha256": "f9a49f92325748d1accf7e86c8b7cdb4357251969e685b95dee38bb27ecea22a",
+      "final": false
+    },
+    {
+      "index": 1,
+      "additions": 2270,
+      "actions": 3938,
+      "ids_before": 1708,
+      "initial_ids": 98,
+      "text_file": "Certificates/segments-text/order10-skeleton02/segment0001.lrat",
+      "text_sha256": "975afabe6faa6ace4f469f3fc6babdbd34317afda6545cdd95b5eb2a60ec9f27",
+      "binary_file": "Certificates/segments/order10-skeleton02/segment0001.lratb",
+      "binary_sha256": "679c75225151f3d0ccd669742d125e6886d31a97712fef5041b80cacf04d052b",
+      "binary_bytes": 232568,
+      "ids_file": "Certificates/segment-state/order10-skeleton02/segment0001.ids",
+      "ids_sha256": "a130fef579d602a5302f4fc78b43f853dd72fedff9a0f0c45350923146499dad",
+      "initial_ids_file": "Certificates/segment-state/order10-skeleton02/segment0001.initial.ids",
+      "initial_ids_sha256": "c5960349cdb7fc4a18f9fc5375acbbe3e5dfe5b1713b3d7f320d8395359d89a2",
+      "final": true
+    }
+  ]
+}

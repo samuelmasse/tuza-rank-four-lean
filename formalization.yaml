@@ -74,9 +74,10 @@ status:
     Hall deficiency is reduced to a minimal deficient core, matched back, and
     packaged as the exact nonempty fat-head crown structure. The residual
     zero-vertex domain is proved independent. Component transfer and the two
-    residual-zero spanner statements remain, as do 65 certificate imports,
-    the semantic graph-to-certificate translation, and the final rank-four
-    theorem. The stronger K4-free nu=4, tau<=7 statement is intentionally
+    residual-zero spanner statements remain. Twenty-two of 66 finite cases
+    have kernel-checked imports; the other 44 need partitioned imports. The
+    semantic graph-to-certificate translation and final rank-four theorem also
+    remain. The stronger K4-free nu=4, tau<=7 statement is intentionally
     outside scope.
   sorry_count: 1
   sorry_in_definitions: 0

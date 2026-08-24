@@ -10,12 +10,13 @@ refutes the original formula together with the unit clauses on its path.
 `Sat.Fmla.proof_empty_of_split` then removes the units two children at a time,
 leaving a proof for the original formula.
 
-`Order10Skeleton06Adaptive` is the current end-to-end reference case.  Its 18
-binary LRAT leaves have all been imported and recombined as
-`Order10Skeleton06Adaptive.refutation`.  The other 65 cases and the semantic
-bridge from the graph statement to these formulas remain to be integrated;
-the main theorem must not be described as Lean-verified before that work is
-complete.
+`DirectSmall` imports all 21 order-six through order-nine cases.  The larger
+`Order10Skeleton06Adaptive` reference case is split into 18 binary LRAT leaves
+and recombined as `Order10Skeleton06Adaptive.refutation`.  Thus 22 of the 66
+cases are kernel-checked.  The other 44 cases need partitioned imports, and the
+semantic bridge from the graph statement to these formulas remains to be
+integrated; the main theorem must not be described as Lean-verified before
+that work is complete.
 
 The importer deliberately avoids `native_decide`, `Lean.ofReduceBool`, and
 unchecked external proof declarations.  The reference theorem has only the

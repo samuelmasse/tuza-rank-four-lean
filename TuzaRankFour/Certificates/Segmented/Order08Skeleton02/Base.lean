@@ -1,5 +1,5 @@
 import TuzaRankFour.Certificates.CheckpointLRAT
-import TuzaRankFour.Certificates.Segmented.Order09Skeleton10.All
+import TuzaRankFour.Certificates.Segmented.Order08Skeleton01.All
 
 namespace TuzaRankFour.Certificates.Segmented.Order08Skeleton02
 

@@ -11,16 +11,20 @@ fi
 # Resolve every deletion target and accept only this fixed allowlist.
 targets=(
   /usr/local/lib/android
+  /usr/local/.ghcup
   /usr/share/dotnet
+  /usr/share/swift
+  /usr/share/miniconda
   /opt/ghc
   /usr/local/share/boost
+  /usr/local/share/vcpkg
   /opt/hostedtoolcache
 )
 
 for target in "${targets[@]}"; do
   resolved=$(realpath -m -- "$target")
   case "$resolved" in
-    /usr/local/lib/android|/usr/share/dotnet|/opt/ghc|/usr/local/share/boost|/opt/hostedtoolcache)
+    /usr/local/lib/android|/usr/local/.ghcup|/usr/share/dotnet|/usr/share/swift|/usr/share/miniconda|/opt/ghc|/usr/local/share/boost|/usr/local/share/vcpkg|/opt/hostedtoolcache)
       ;;
     *)
       echo "error: refusing unexpected cleanup target $resolved" >&2
@@ -31,6 +35,10 @@ for target in "${targets[@]}"; do
     sudo rm -rf --one-file-system -- "$resolved"
   fi
 done
+
+if command -v docker >/dev/null 2>&1; then
+  sudo docker system prune --all --force --volumes
+fi
 
 sudo apt-get clean
 df -h /

@@ -1,4 +1,4 @@
-"""Assign segmented certificate cases to deterministic memory-safe build lanes."""
+"""Assign certificate cases to a deterministic low-memory build chain."""
 
 from __future__ import annotations
 
@@ -92,7 +92,7 @@ def write_aggregate_modules(repository: Path, lanes: list[LaneRecord]) -> None:
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--repository", type=Path, default=Path.cwd())
-    parser.add_argument("--lanes", type=int, default=4)
+    parser.add_argument("--lanes", type=int, default=1)
     arguments = parser.parse_args()
     if arguments.lanes <= 0:
         raise ValueError("lane count must be positive")

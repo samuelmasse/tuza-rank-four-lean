@@ -1,6 +1,7 @@
 name = "TuzaRankFour"
 version = "0.1.0"
 defaultTargets = ["TuzaRankFour", "Challenge", "Solution"]
+weakLeanArgs = ["-j", "1"]
 
 [[require]]
 name = "mathlib"

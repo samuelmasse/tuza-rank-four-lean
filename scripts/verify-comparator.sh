@@ -83,6 +83,7 @@ GOBIN="$bin_dir" go install "github.com/zouuup/landrun/cmd/landrun@$landrun_comm
 
 cd "$repository_root"
 lake exe cache get
+python3 "$repository_root/scripts/prebuild_solution.py"
 PALOMAR_LANDRUN_BIN="$bin_dir/landrun" \
 COMPARATOR_LEAN4EXPORT="$lean4export_dir/.lake/build/bin/lean4export" \
 COMPARATOR_NANODA="$nanoda_dir/target/release/nanoda_bin" \

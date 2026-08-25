@@ -1,1 +1,4 @@
+import TuzaRankFour.Certificates.Segmented.Order08Skeleton01.All
+import TuzaRankFour.Certificates.Segmented.Order08Skeleton02.All
+import TuzaRankFour.Certificates.Segmented.Order07Skeleton00.All
 import TuzaRankFour.Certificates.Segmented.Order06Skeleton00.All

@@ -10,15 +10,15 @@ refutes the original formula together with the unit clauses on its path.
 `Sat.Fmla.proof_empty_of_split` then removes the units two children at a time,
 leaving a proof for the original formula.
 
-`DirectSmall` imports all 21 order-six through order-nine cases.  The larger
-`Order10Skeleton06Adaptive` reference case is split into 18 binary LRAT leaves
-and recombined as `Order10Skeleton06Adaptive.refutation`.  Thus 22 of the 66
-cases are kernel-checked.  The other 44 cases need partitioned imports, and the
-semantic bridge from the graph statement to these formulas remains to be
-integrated; the main theorem must not be described as Lean-verified before
-that work is complete.
+`DirectSmall` imports all 21 order-six through order-nine cases.  Every larger
+case is divided into binary LRAT segments and recombined by repeated Boolean
+case splitting.  Across the 66 cases, Lean checks 572 segments and derives one
+refutation theorem for each final formula.  The semantic layer independently
+reconstructs all packing and covering witnesses, checks the resulting clauses
+against the exact formulas, and connects the 66 refutations to the finite
+graph endpoint used by the main theorem.
 
 The importer deliberately avoids `native_decide`, `Lean.ofReduceBool`, and
-unchecked external proof declarations.  The reference theorem has only the
+unchecked external proof declarations.  The advertised theorem has only the
 standard axioms permitted by Palomar: propositional extensionality, quotient
 soundness, and classical choice.

@@ -134,6 +134,8 @@ jobs:
           persist-credentials: false
       - name: Reclaim ephemeral runner space for certificate replay
         run: ./scripts/reclaim-runner-disk.sh
+      - name: Provision bounded swap for proof-producing Lean processes
+        run: ./scripts/provision-runner-swap.sh
       - uses: leanprover/lean-action@38fbc41a8c28c4cbaec22d7f7de508ec2e7c0dd9
         with:
           build: false
@@ -143,4 +145,10 @@ jobs:
           go-version: "1.24.0"
           cache: false
       - name: Run pinned Comparator toolchain
-        run: ./scripts/verify-comparator.sh
+        env:
+          TUZA_RESOURCE_LOG_INTERVAL_SECONDS: "60"
+        run: |
+          ./scripts/monitor-runner-resources.sh &
+          monitor_pid=$!
+          trap 'kill "$monitor_pid" 2>/dev/null || true' EXIT
+          ./scripts/verify-comparator.sh

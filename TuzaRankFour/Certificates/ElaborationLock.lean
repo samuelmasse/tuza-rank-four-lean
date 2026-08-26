@@ -18,10 +18,12 @@ namespace TuzaRankFour.Certificates
 def withCertificateElaborationLock
     [Monad m] [MonadFinally m] [MonadLiftT IO m] (act : m α) : m α := do
   let projectDirectory ← IO.Process.getCurrentDir
-  let lakeDirectory := projectDirectory / ".lake"
-  IO.FS.createDirAll lakeDirectory
+  -- Comparator's Landrun sandbox exposes `.lake/build` as the project's
+  -- writable build area; the `.lake` root itself may be read-only.
+  let lakeBuildDirectory := projectDirectory / ".lake" / "build"
+  IO.FS.createDirAll lakeBuildDirectory
   let handle ← IO.FS.Handle.mk
-    (lakeDirectory / "tuza-certificate-elaboration.lock") .append
+    (lakeBuildDirectory / "tuza-certificate-elaboration.lock") .append
   handle.lock
   try
     act

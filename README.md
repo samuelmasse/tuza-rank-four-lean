@@ -74,7 +74,10 @@ semantic/LRAT case without replaying the 66-case certificate corpus:
     lake exe cache get
     lake build
     lake build +TuzaRankFour.Analytic
-    lake build +TuzaRankFour.Certificates.Semantic.Order06Skeleton00
+    lake build +TuzaRankFour.Certificates.Semantic.Order12Skeleton11
+
+The representative case is a root of one generated certificate lane. Using a
+later case would also replay every earlier case in that lane.
 
 A clean release build is deliberately substantial: it replays every proof
 certificate, takes longer than GitHub's six-hour hosted-job limit, and produces

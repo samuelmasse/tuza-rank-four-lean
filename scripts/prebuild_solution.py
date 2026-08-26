@@ -162,7 +162,6 @@ def semantic_cases(
     for case_name in case_names:
         prefix = f"TuzaRankFour.Certificates.Semantic.{case_name}"
         run_build(repository, f"{prefix}Data", dry_run)
-        run_build(repository, f"{prefix}Validity", dry_run)
         run_build(repository, prefix, dry_run)
 
 

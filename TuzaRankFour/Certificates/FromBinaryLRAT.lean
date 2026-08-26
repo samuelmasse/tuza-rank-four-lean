@@ -1,5 +1,6 @@
 import Mathlib.Tactic.Sat.FromLRAT
 import Std.Tactic.BVDecide.LRAT.Parser
+import TuzaRankFour.Certificates.ElaborationLock
 
 /-!
 # Binary LRAT import
@@ -37,7 +38,8 @@ private def appendDimacsClauses (cnf extra : String) : Except String String := d
   let newHeader := s!"p cnf {variables} {declared + additions.length}"
   return String.intercalate "\n" (newHeader :: body) ++ "\n" ++ extra
 
-elab "lrat_proof_binary " n:ident ppSpace cnf:term:max ppSpace path:str : command => do
+elab "lrat_proof_binary " n:ident ppSpace cnf:term:max ppSpace path:str : command =>
+    withCertificateElaborationLock do
   let name := (← getCurrNamespace) ++ n.getId
   let srcPath := System.FilePath.mk (← getFileName)
   let some srcDir := srcPath.parent
@@ -49,7 +51,8 @@ elab "lrat_proof_binary " n:ident ppSpace cnf:term:max ppSpace path:str : comman
     Mathlib.Tactic.Sat.fromLRAT cnf lrat name
 
 /-- Name a DIMACS formula so that several cube refutations can share it. -/
-elab "dimacs_formula_binary " n:ident ppSpace cnf:term:max : command => do
+elab "dimacs_formula_binary " n:ident ppSpace cnf:term:max : command =>
+    withCertificateElaborationLock do
   let name := (← getCurrNamespace) ++ n.getId
   liftTermElabM do
     let cnf ← unsafe evalTerm String (mkConst ``String) cnf
@@ -70,7 +73,7 @@ elab "dimacs_formula_binary " n:ident ppSpace cnf:term:max : command => do
 /-- Import a binary LRAT refutation as a proof of the empty clause from a
 previously named DIMACS formula. -/
 elab "lrat_core_proof_binary " n:ident ppSpace base:term:max ppSpace
-    cnf:term:max ppSpace path:str : command => do
+    cnf:term:max ppSpace path:str : command => withCertificateElaborationLock do
   let name := (← getCurrNamespace) ++ n.getId
   let srcPath := System.FilePath.mk (← getFileName)
   let some srcDir := srcPath.parent
@@ -102,7 +105,8 @@ elab "lrat_core_proof_binary " n:ident ppSpace base:term:max ppSpace
 of unit clauses.  This is the leaf theorem used by an exhaustive decision-tree
 partition. -/
 elab "lrat_cube_core_proof_binary " n:ident ppSpace base:term:max ppSpace
-    cnf:term:max ppSpace extra:term:max ppSpace path:str : command => do
+    cnf:term:max ppSpace extra:term:max ppSpace path:str : command =>
+    withCertificateElaborationLock do
   let name := (← getCurrNamespace) ++ n.getId
   let srcPath := System.FilePath.mk (← getFileName)
   let some srcDir := srcPath.parent

@@ -115,7 +115,7 @@ jobs:
         run: lake build +TuzaRankFour.Analytic
       - name: Check representative semantic reconstruction
         run: |
-          lake build +TuzaRankFour.Certificates.Semantic.Order06Skeleton00Validity
+          lake build +TuzaRankFour.Certificates.Semantic.Order06Skeleton00Data
           lake build +TuzaRankFour.Certificates.Semantic.Order06Skeleton00Formula00
       - name: Replay a dependency-root LRAT segment
         run: lake build +TuzaRankFour.Certificates.Segmented.Order12Skeleton11.Segment0000

@@ -1,5 +1,4 @@
-import TuzaRankFour.Certificates.Semantic.Order10Skeleton06Validity
-import TuzaRankFour.Certificates.Semantic.Order10Skeleton06Formula01
+import TuzaRankFour.Certificates.Semantic.Order10Skeleton06Formula07
 import TuzaRankFour.Certificates.Segmented.Order10Skeleton06.All
 
 namespace TuzaRankFour.Certificates.Semantic.Order10Skeleton06

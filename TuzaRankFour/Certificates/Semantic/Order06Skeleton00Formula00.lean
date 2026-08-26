@@ -10,6 +10,7 @@ open TuzaRankFour.SemanticEncoding
 deriving instance DecidableEq for Sat.Literal
 deriving instance DecidableEq for Sat.Clause
 
+certificate_locked {
 theorem cutChunk0_valid : cutsValidBool 6 cutChunk0 = true := by
   decide
 
@@ -18,5 +19,7 @@ theorem formulaChunk0_eq :
       ((baseFormula 6 markedPacking).drop 0).take 105 ++
         cutFormula 6 cutChunk0 := by
   decide
+
+}
 
 end TuzaRankFour.Certificates.Semantic.Order06Skeleton00

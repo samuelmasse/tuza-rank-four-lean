@@ -1,4 +1,5 @@
 import TuzaRankFour.SemanticEncoding
+import TuzaRankFour.Certificates.ElaborationLock
 
 /-!
 # Compact semantic-witness import
@@ -115,8 +116,12 @@ private def addDefinition (name : Name) (type value : Expr) : MetaM Unit :=
     safety := .safe
   }
 
-/-- Import a compact witness stream as two kernel-visible definitions. -/
-elab "semantic_cut_bundle_binary " markedName:ident ppSpace cutsName:ident ppSpace
+/-- Import the four marked triangles from a compact witness stream.
+
+The cut records are exposed only through the bounded slices below.  Storing a
+second monolithic copy made hosted verification retain the same witness data
+twice, while the proof uses and validates every slice independently. -/
+elab "semantic_marked_packing_binary " markedName:ident ppSpace
     orderSyntax:num ppSpace skeletonSyntax:num ppSpace path:str : command => do
   let sourcePath := System.FilePath.mk (← getFileName)
   let some sourceDirectory := sourcePath.parent
@@ -134,14 +139,9 @@ elab "semantic_cut_bundle_binary " markedName:ident ppSpace cutsName:ident ppSpa
     throwError "semantic-witness stream must contain exactly four marked triangles"
   let currentNamespace ← getCurrNamespace
   let markedDecl := currentNamespace ++ markedName.getId
-  let cutsDecl := currentNamespace ++ cutsName.getId
   let listNat := mkApp (mkConst ``List [Level.zero]) (mkConst ``Nat)
-  let cutType := mkConst ``TuzaRankFour.SemanticEncoding.Cut
-  let listCut := mkApp (mkConst ``List [Level.zero]) cutType
   liftTermElabM do
     addDefinition markedDecl listNat (mkNatListExpr bundle.marked)
-    addDefinition cutsDecl listCut
-      (mkListExpr cutType (bundle.cuts.map mkCutExpr))
 
 private partial def collectFormulaChunks (clauses : Array (Array Int))
     (maximumSize start stop : Nat) : Array Expr :=

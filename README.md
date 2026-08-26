@@ -74,7 +74,7 @@ check, and one LRAT segment without replaying the 66-case certificate corpus:
     lake exe cache get
     lake build
     lake build +TuzaRankFour.Analytic
-    lake build +TuzaRankFour.Certificates.Semantic.Order06Skeleton00Validity
+    lake build +TuzaRankFour.Certificates.Semantic.Order06Skeleton00Data
     lake build +TuzaRankFour.Certificates.Semantic.Order06Skeleton00Formula00
     lake build +TuzaRankFour.Certificates.Segmented.Order12Skeleton11.Segment0000
 

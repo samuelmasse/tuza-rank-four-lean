@@ -2,7 +2,8 @@ import TuzaRankFour.Certificates.SemanticCutBinary
 
 namespace TuzaRankFour.Certificates.Semantic.Order09Skeleton09
 
-semantic_cut_bundle_binary markedPacking cuts 9 9
+certificate_locked {
+semantic_marked_packing_binary markedPacking 9 9
   "../../../Certificates/semantic-cuts/order09-skeleton09.cutb"
 
 dimacs_formula_chunks formulaChunk 512
@@ -10,5 +11,6 @@ dimacs_formula_chunks formulaChunk 512
 
 semantic_cut_slices_binary cutChunk 9 9 385 512
   "../../../Certificates/semantic-cuts/order09-skeleton09.cutb"
+}
 
 end TuzaRankFour.Certificates.Semantic.Order09Skeleton09

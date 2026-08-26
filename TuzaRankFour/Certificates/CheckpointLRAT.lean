@@ -338,7 +338,8 @@ private def buildCheckpointedProof
 /-- Import a binary LRAT proof as a checkpointed ordinary proof term for the
 empty clause of an already named DIMACS formula. -/
 elab "checkpoint_lrat_core_proof_binary " n:ident ppSpace base:term:max ppSpace
-    cnf:term:max ppSpace path:str ppSpace frequency:num : command => do
+    cnf:term:max ppSpace path:str ppSpace frequency:num : command =>
+    withCertificateElaborationLock do
   let name := (← getCurrNamespace) ++ n.getId
   let sourcePath := System.FilePath.mk (← getFileName)
   let some sourceDirectory := sourcePath.parent
@@ -370,7 +371,7 @@ elab "checkpoint_lrat_core_proof_binary " n:ident ppSpace base:term:max ppSpace
 the declaration is a refutation; otherwise it is the balanced live-clause
 checkpoint consumed by the next segment module. -/
 elab "lrat_initial_segment_binary " n:ident ppSpace base:term:max ppSpace
-    cnf:term:max ppSpace path:str : command => do
+    cnf:term:max ppSpace path:str : command => withCertificateElaborationLock do
   let name := (← getCurrNamespace) ++ n.getId
   let sourcePath := System.FilePath.mk (← getFileName)
   let some sourceDirectory := sourcePath.parent
@@ -395,7 +396,7 @@ elab "lrat_initial_segment_binary " n:ident ppSpace base:term:max ppSpace
 its sorted list of LRAT clause identifiers. -/
 elab "lrat_segment_binary " n:ident ppSpace base:term:max ppSpace
     prior:term:max ppSpace ids:term:max ppSpace cnf:term:max ppSpace
-    path:str : command => do
+    path:str : command => withCertificateElaborationLock do
   let name := (← getCurrNamespace) ++ n.getId
   let sourcePath := System.FilePath.mk (← getFileName)
   let some sourceDirectory := sourcePath.parent
@@ -426,7 +427,7 @@ elab "lrat_segment_binary " n:ident ppSpace base:term:max ppSpace
 Segment modules can then reconstruct the initial LRAT database without
 reparsing and rebuilding the full CNF expression. -/
 elab "dimacs_initial_clause_bundle " n:ident ppSpace base:term:max ppSpace
-    cnf:term:max : command => do
+    cnf:term:max : command => withCertificateElaborationLock do
   let name := (← getCurrNamespace) ++ n.getId
   liftTermElabM do
     let cnf ← unsafe evalTerm String (Lean.mkConst ``String) cnf
@@ -454,7 +455,7 @@ elab "dimacs_initial_clause_bundle " n:ident ppSpace base:term:max ppSpace
 /-- Check an initial LRAT segment from a named original-clause bundle. -/
 elab "lrat_initial_segment_from_bundle_binary " n:ident ppSpace
     base:term:max ppSpace initial:term:max ppSpace initialIds:term:max ppSpace
-    initialCount:num ppSpace path:str : command => do
+    initialCount:num ppSpace path:str : command => withCertificateElaborationLock do
   let name := (← getCurrNamespace) ++ n.getId
   let sourcePath := System.FilePath.mk (← getFileName)
   let some sourceDirectory := sourcePath.parent
@@ -478,7 +479,8 @@ elab "lrat_initial_segment_from_bundle_binary " n:ident ppSpace
 bundles. -/
 elab "lrat_segment_from_bundle_binary " n:ident ppSpace base:term:max ppSpace
     initial:term:max ppSpace initialIds:term:max ppSpace initialCount:num ppSpace
-    prior:term:max ppSpace ids:term:max ppSpace path:str : command => do
+    prior:term:max ppSpace ids:term:max ppSpace path:str : command =>
+    withCertificateElaborationLock do
   let name := (← getCurrNamespace) ++ n.getId
   let sourcePath := System.FilePath.mk (← getFileName)
   let some sourceDirectory := sourcePath.parent

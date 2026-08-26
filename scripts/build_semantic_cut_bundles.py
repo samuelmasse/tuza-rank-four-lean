@@ -265,7 +265,8 @@ def write_lean_modules(lean_root: Path, case: dict[str, object], maximum_size: i
 
 namespace {namespace}
 
-semantic_cut_bundle_binary markedPacking cuts {order} {skeleton}
+certificate_locked {{
+semantic_marked_packing_binary markedPacking {order} {skeleton}
   \"../../../Certificates/semantic-cuts/{stem}.cutb\"
 
 dimacs_formula_chunks formulaChunk {maximum_size}
@@ -273,27 +274,15 @@ dimacs_formula_chunks formulaChunk {maximum_size}
 
 semantic_cut_slices_binary cutChunk {order} {skeleton} {base_count} {maximum_size}
   \"../../../Certificates/semantic-cuts/{stem}.cutb\"
+}}
 
 end {namespace}
 """
     (lean_root / f"{module}Data.lean").write_text(data_source, encoding="utf-8", newline="\n")
-    validity_source = f"""import TuzaRankFour.Certificates.Semantic.{module}Data
-
-namespace {namespace}
-
-set_option maxHeartbeats 0
-set_option maxRecDepth 1000000
-
-open TuzaRankFour.SemanticEncoding
-
-theorem cuts_valid : cutsValidBool {order} cuts = true := by decide
-
-end {namespace}
-"""
-    (lean_root / f"{module}Validity.lean").write_text(
-        validity_source, encoding="utf-8", newline="\n"
-    )
-    formula_group_size = 8
+    validity_path = lean_root / f"{module}Validity.lean"
+    if validity_path.exists():
+        validity_path.unlink()
+    formula_group_size = 2
     group_count = (len(leaves) + formula_group_size - 1) // formula_group_size
     for group in range(group_count):
         first = group * formula_group_size
@@ -322,6 +311,7 @@ end {namespace}
                     "",
                 ]
             )
+        group_lines.append("certificate_locked {")
         for index in range(first, stop_index):
             start, stop = leaves[index]
             base_start = min(start, base_count)
@@ -343,12 +333,11 @@ end {namespace}
                     "",
                 ]
             )
-        group_lines.extend([f"end {namespace}", ""])
+        group_lines.extend(["}", "", f"end {namespace}", ""])
         (lean_root / f"{module}Formula{group:02d}.lean").write_text(
             "\n".join(group_lines), encoding="utf-8", newline="\n"
         )
     lines = [
-        f"import TuzaRankFour.Certificates.Semantic.{module}Validity",
         f"import TuzaRankFour.Certificates.Semantic.{module}Formula{group_count - 1:02d}",
         f"import TuzaRankFour.Certificates.Segmented.{module}.All",
         "",

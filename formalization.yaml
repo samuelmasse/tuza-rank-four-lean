@@ -21,12 +21,13 @@ sources:
   - title: "Tuza's Conjecture for Graphs with at Most Four Edge-Disjoint Triangles"
     authors:
       - "Samuel Masse"
-    id: "sha256:00e91f28a80c21814e72f98f8cab37e68fb11e53f7c03705304a898da09adc9f"
+    id: "sha256:71e6ea7fc66c8577d923f544d8944766f7559607758e3749911a4583a54b0994"
     type: "original-proof"
     relationship: "other"
     note: >-
-      Publication-form manuscript dated 2026-08-24. The formalization targets
-      its main theorem and excludes the separate stronger K4-free statement.
+      SHA-256 of paper/main.tex in the release candidate. The formalization
+      targets its main theorem and excludes the separate stronger K4-free
+      statement.
   - title: "A conjecture on triangles of graphs"
     authors:
       - "Zsolt Tuza"

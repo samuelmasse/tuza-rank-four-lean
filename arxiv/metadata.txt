@@ -1,0 +1,24 @@
+Title: Tuza's Conjecture for Graphs with at Most Four Edge-Disjoint Triangles
+
+Authors: Samuel Masse
+
+Abstract:
+For a finite simple graph $G$, let $\nu(G)$ be the maximum number of pairwise
+edge-disjoint triangles and let $\tau(G)$ be the minimum number of edges meeting
+every triangle. We prove that $\tau(G) \leq 2\nu(G)$ whenever $\nu(G) \leq 4$. The
+cases $\nu(G) \leq 3$ were proved by Parker. For $\nu(G) = 4$, a discharging
+reduction based on the method of Sheng and Xiao shows that a counterexample
+would have triangle support on at most twelve vertices. Marking a maximum
+four-packing leaves 66 finite order-type cases. We encode these cases as SAT
+instances and certify each resulting formula by an LRAT refutation. A Lean
+formalization reconstructs the semantic clauses, checks the exact formulas
+and all 66 refutations, and derives the stated graph theorem.
+
+Comments: 11 pages, 2 tables. Lean formalization and checked certificates:
+https://github.com/samuelmasse/tuza-rank-four-lean
+
+Primary category: math.CO
+MSC-class: 05C70
+Report-no:
+Journal-ref:
+DOI:

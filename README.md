@@ -97,6 +97,16 @@ steps so GitHub does not kill a monolithic six-hour step.
 TuzaRankFour/Audit.lean prints the axiom set for both the advertised theorem
 and the carrier-independent finite endpoint.
 
+## arXiv and Palomar release
+
+Build the deterministic arXiv source archive with:
+
+    python3 scripts/build-arxiv-package.py
+
+The archive contains only the top-level LaTeX source and bibliography needed
+by arXiv. Copy-ready submission metadata and the Palomar/arXiv release gates
+are recorded in `arxiv/metadata.txt` and `docs/submission-readiness.md`.
+
 ## Authorship
 
 Samuel Masse is the author and responsible maintainer. ChatGPT 5.6 Sol
@@ -106,15 +116,16 @@ responsible for the mathematical claims and released artifact.
 
 ## Publication and Palomar status
 
-The repository remains private while the manuscript and artifact undergo
-independent review. A targeted primary-source search found no exact statement
-of the rank-four theorem, but absence of a match is not a novelty verdict.
-Neither the paper nor this repository should claim priority before a
-specialist literature review.
+The repository remains private until the full release workflow passes. It is
+being prepared for coordinated public release through arXiv and the Palomar
+Registry. A targeted primary-source search found no exact statement of the
+rank-four theorem, but absence of a match is not a novelty verdict. Neither
+the paper nor this repository should claim priority before a specialist
+literature review.
 
 Palomar requires a completed proof at a fixed commit in a public GitHub
-repository. No submission or public release is authorized yet. The submission
-portal is <https://submit.palomar-registry.org/>.
+repository. No Palomar registration or arXiv submission has yet been made. The
+submission portal is <https://submit.palomar-registry.org/>.
 
 The repository is licensed under Apache-2.0. Cited papers and dependencies
 retain their own licences.

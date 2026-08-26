@@ -71,6 +71,12 @@ declaration SimpleGraph.tuza_rank_four.
 | Producer software | SAT generation, Python witness generation, DRAT production, DRAT-to-LRAT conversion | Not trusted; only the checked outputs enter the theorem |
 | Independent statement comparison | Palomar Challenge/Solution configuration and axiom audit | Local axiom audit passes; Comparator and NanoDa replay remain to be run from a clean Linux environment |
 
+Routine CI intentionally stops at the complete analytic endpoint and one
+representative semantic/LRAT case. The full 66-case replay is the separately
+dispatched `Full release verification` workflow on a high-memory self-hosted
+Linux runner. A green routine-CI badge is therefore not, by itself, release
+evidence.
+
 The finite layer contains 331,430 semantic records: 231,947 five-packing cuts
 and 99,483 cover cuts. The original DRAT traces contain 570,595,138 bytes. The
 checked proof source uses 572 binary LRAT segments occupying 250.98 MiB.

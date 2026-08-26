@@ -1,24 +1,5 @@
-import TuzaRankFour.Parker
-import TuzaRankFour.Reduction
-import TuzaRankFour.K4Reduction
-import TuzaRankFour.CrownReduction
-import TuzaRankFour.RankFourReduction
-import TuzaRankFour.PackingSaturation
-import TuzaRankFour.VertexSplitting
-import TuzaRankFour.KernelReduction
-import TuzaRankFour.Discharge
-import TuzaRankFour.ComponentBound
-import TuzaRankFour.DischargeClassification
-import TuzaRankFour.CrownExtraction
-import TuzaRankFour.ResidualIndependence
-import TuzaRankFour.Exchange
-import TuzaRankFour.TransferLedger
-import TuzaRankFour.ComponentTransfer
-import TuzaRankFour.InternalResidual
-import TuzaRankFour.GlobalDischarge
-import TuzaRankFour.RankFourOrderBound
-import TuzaRankFour.FiniteEncoding
-import TuzaRankFour.FiniteEndpoint
+import TuzaRankFour.Analytic
+import TuzaRankFour.Finite
 
 /-!
 # Tuza's conjecture for packing number at most four

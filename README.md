@@ -49,8 +49,10 @@ axiom.
 - Challenge.lean is the short, Mathlib-only statement of record. Its deliberate
   theorem hole is allowed by the Palomar Challenge/Solution format.
 - Solution.lean supplies the proof of the compared theorem.
-- TuzaRankFour/ contains the analytic proof, finite classification, semantic
-  encoding, case dispatch, and axiom audit.
+- TuzaRankFour/Analytic.lean is the lightweight proof boundary through the
+  twelve-vertex reduction. TuzaRankFour/Finite.lean is the heavy boundary that
+  imports the exhaustive classification and certificates; Main.lean composes
+  the two layers.
 - Certificates/ contains the frozen CNFs, compact semantic witnesses, binary
   LRAT segments, and manifests.
 - paper/ contains the article source; the rendered article is placed in
@@ -64,12 +66,20 @@ axiom.
 
 ## Verification
 
-The project pins Lean 4.32.0 and Mathlib 4.32.0. A clean build is deliberately
-substantial because it replays every proof certificate; the resulting local
-Lake directory occupies about 36 GiB.
+The project pins Lean 4.32.0 and Mathlib 4.32.0. The ordinary contributor loop
+builds the challenge, the complete analytic layer, and one representative
+semantic/LRAT case without replaying the 66-case certificate corpus:
 
     lake update
     lake exe cache get
+    lake build
+    lake build +TuzaRankFour.Analytic
+    lake build +TuzaRankFour.Certificates.Semantic.Order06Skeleton00
+
+A clean release build is deliberately substantial: it replays every proof
+certificate, takes longer than GitHub's six-hour hosted-job limit, and produces
+about 36 GiB of Lake artifacts.
+
     lake build Solution
     lake env lean TuzaRankFour/Audit.lean
     ruby scripts/validate-formalization.rb
@@ -77,6 +87,12 @@ Lake directory occupies about 36 GiB.
 On Linux, the independent statement comparison and NanoDa replay are:
 
     ./scripts/verify-comparator.sh
+
+The manually dispatched `Full release verification` workflow runs that replay
+on a Linux self-hosted runner labelled `tuza-release`. The runner must have at
+least 48 GiB of RAM, 80 GiB of free workspace storage, and Cargo installed.
+The workflow splits the four LRAT lanes and four semantic shards into separate
+steps so GitHub does not kill a monolithic six-hour step.
 
 TuzaRankFour/Audit.lean prints the axiom set for both the advertised theorem
 and the carrier-independent finite endpoint.

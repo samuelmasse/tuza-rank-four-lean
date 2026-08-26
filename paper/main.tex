@@ -598,12 +598,15 @@ calculations.  The Lean development~\cite{Lean4,Mathlib} reconstructs every
 serialized witness,
 validates all 331,430 semantic clauses, checks their exact agreement with the
 final DIMACS formulas, and discharges each of the 66 formulas by a
-kernel-checked LRAT refutation.  An independent executable verifier performs
-the same witness reconstruction and formula comparison, and the original
-DRAT traces are checked separately with \texttt{drat-trim}.
+kernel-checked LRAT refutation.  During certificate production the original
+DRAT traces were also checked with \texttt{drat-trim}; this producer-side check
+is not part of the theorem's trust boundary.
 
-A separate coverage checker reconstructs every expected marked type at each
-order and verifies that the resulting 66 cases occur exactly once.
+Completeness is not delegated to a separate coverage script.  The Lean
+development classifies the marked packing, dispatches every supported graph to
+one of the 66 scoped refutation theorems, and checks the semantic reconstruction
+inside each scope.  The release build additionally rejects its build manifest
+unless it contains 66 distinct case identities.
 
 Table~\ref{tab:campaign} records the complete computation.  Here ``models''
 means decoded assignments that produced a semantic cut; it does not denote

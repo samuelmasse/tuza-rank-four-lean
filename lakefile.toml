@@ -1,6 +1,9 @@
 name = "TuzaRankFour"
 version = "0.1.0"
-defaultTargets = ["TuzaRankFour", "Challenge", "Solution"]
+# A bare `lake build` is the quick contributor check.  The complete theorem
+# replay is intentionally explicit because its checked certificates produce
+# tens of GiB of build artifacts and take longer than a hosted CI job permits.
+defaultTargets = ["Challenge"]
 weakLeanArgs = ["-j", "1"]
 
 [[require]]

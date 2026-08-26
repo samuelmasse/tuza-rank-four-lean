@@ -1,0 +1,60 @@
+name: Full release verification
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: full-release-verification-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  comparator:
+    name: Replay all certificates, Comparator, and NanoDa
+    runs-on: [self-hosted, linux, x64, tuza-release]
+    timeout-minutes: 1440
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Check release-runner capacity
+        shell: bash
+        run: bash scripts/check-release-runner.sh
+      - uses: leanprover/lean-action@38fbc41a8c28c4cbaec22d7f7de508ec2e7c0dd9
+        with:
+          build: false
+          use-github-cache: false
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e
+        with:
+          go-version: "1.24.0"
+          cache: false
+      - name: Build the pinned comparison toolchain
+        run: bash scripts/with-resource-monitor.sh ./scripts/verify-comparator.sh --prepare
+      - name: Replay certificate lane 0
+        run: bash scripts/with-resource-monitor.sh python3 scripts/prebuild_solution.py --phase certificate-lane --lane 0
+      - name: Replay certificate lane 1
+        run: bash scripts/with-resource-monitor.sh python3 scripts/prebuild_solution.py --phase certificate-lane --lane 1
+      - name: Replay certificate lane 2
+        run: bash scripts/with-resource-monitor.sh python3 scripts/prebuild_solution.py --phase certificate-lane --lane 2
+      - name: Replay certificate lane 3
+        run: bash scripts/with-resource-monitor.sh python3 scripts/prebuild_solution.py --phase certificate-lane --lane 3
+      - name: Join certificate lanes
+        run: python3 scripts/prebuild_solution.py --phase certificate-aggregate
+      - name: Check semantic cases (shard 1 of 4)
+        run: bash scripts/with-resource-monitor.sh python3 scripts/prebuild_solution.py --phase semantic-shard --shard 0/4
+      - name: Check semantic cases (shard 2 of 4)
+        run: bash scripts/with-resource-monitor.sh python3 scripts/prebuild_solution.py --phase semantic-shard --shard 1/4
+      - name: Check semantic cases (shard 3 of 4)
+        run: bash scripts/with-resource-monitor.sh python3 scripts/prebuild_solution.py --phase semantic-shard --shard 2/4
+      - name: Check semantic cases (shard 4 of 4)
+        run: bash scripts/with-resource-monitor.sh python3 scripts/prebuild_solution.py --phase semantic-shard --shard 3/4
+      - name: Join semantic cases
+        run: python3 scripts/prebuild_solution.py --phase semantic-aggregate
+      - name: Build and audit the advertised theorem
+        run: |
+          python3 scripts/prebuild_solution.py --phase solution
+          lake env lean TuzaRankFour/Audit.lean
+      - name: Compare the statement and replay it with NanoDa
+        run: bash scripts/with-resource-monitor.sh ./scripts/verify-comparator.sh --compare

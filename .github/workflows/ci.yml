@@ -97,6 +97,25 @@ jobs:
           build-args: "Challenge"
           use-github-cache: false
 
+  proof-smoke:
+    name: Check analytic proof and one finite certificate
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: leanprover/lean-action@38fbc41a8c28c4cbaec22d7f7de508ec2e7c0dd9
+        with:
+          build: false
+          use-github-cache: false
+      - name: Restore Mathlib build artifacts
+        run: lake exe cache get
+      - name: Build the analytic endpoint
+        run: lake build +TuzaRankFour.Analytic
+      - name: Replay a representative semantic and LRAT case
+        run: lake build +TuzaRankFour.Certificates.Semantic.Order06Skeleton00
+
   docs:
     name: Build API documentation
     runs-on: ubuntu-latest
@@ -123,32 +142,3 @@ jobs:
           name: api-documentation
           path: docbuild/.lake/build/doc
           if-no-files-found: error
-
-  comparator:
-    name: Check statement against solution
-    runs-on: ubuntu-latest
-    timeout-minutes: 360
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-        with:
-          persist-credentials: false
-      - name: Reclaim ephemeral runner space for certificate replay
-        run: ./scripts/reclaim-runner-disk.sh
-      - name: Provision bounded swap for proof-producing Lean processes
-        run: ./scripts/provision-runner-swap.sh
-      - uses: leanprover/lean-action@38fbc41a8c28c4cbaec22d7f7de508ec2e7c0dd9
-        with:
-          build: false
-          use-github-cache: false
-      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e
-        with:
-          go-version: "1.24.0"
-          cache: false
-      - name: Run pinned Comparator toolchain
-        env:
-          TUZA_RESOURCE_LOG_INTERVAL_SECONDS: "60"
-        run: |
-          ./scripts/monitor-runner-resources.sh &
-          monitor_pid=$!
-          trap 'kill "$monitor_pid" 2>/dev/null || true' EXIT
-          ./scripts/verify-comparator.sh

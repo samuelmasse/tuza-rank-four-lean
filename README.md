@@ -67,17 +67,19 @@ axiom.
 ## Verification
 
 The project pins Lean 4.32.0 and Mathlib 4.32.0. The ordinary contributor loop
-builds the challenge, the complete analytic layer, and one representative
-semantic/LRAT case without replaying the 66-case certificate corpus:
+builds the challenge, the complete analytic layer, one semantic reconstruction
+check, and one LRAT segment without replaying the 66-case certificate corpus:
 
     lake update
     lake exe cache get
     lake build
     lake build +TuzaRankFour.Analytic
-    lake build +TuzaRankFour.Certificates.Semantic.Order12Skeleton11
+    lake build +TuzaRankFour.Certificates.Semantic.Order06Skeleton00Validity
+    lake build +TuzaRankFour.Certificates.Semantic.Order06Skeleton00Formula00
+    lake build +TuzaRankFour.Certificates.Segmented.Order12Skeleton11.Segment0000
 
-The representative case is a root of one generated certificate lane. Using a
-later case would also replay every earlier case in that lane.
+The LRAT fragment starts at a root of one generated certificate lane. Building
+a complete later case would also replay every earlier case in that lane.
 
 A clean release build is deliberately substantial: it replays every proof
 certificate, takes longer than GitHub's six-hour hosted-job limit, and produces

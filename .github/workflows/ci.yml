@@ -113,8 +113,12 @@ jobs:
         run: lake exe cache get
       - name: Build the analytic endpoint
         run: lake build +TuzaRankFour.Analytic
-      - name: Replay a dependency-root semantic and LRAT case
-        run: lake build +TuzaRankFour.Certificates.Semantic.Order12Skeleton11
+      - name: Check representative semantic reconstruction
+        run: |
+          lake build +TuzaRankFour.Certificates.Semantic.Order06Skeleton00Validity
+          lake build +TuzaRankFour.Certificates.Semantic.Order06Skeleton00Formula00
+      - name: Replay a dependency-root LRAT segment
+        run: lake build +TuzaRankFour.Certificates.Segmented.Order12Skeleton11.Segment0000
 
   docs:
     name: Build API documentation

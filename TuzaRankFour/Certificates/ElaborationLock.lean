@@ -5,7 +5,7 @@ import Lean
 
 Generated certificate modules are individually modest enough for hosted
 verification, but Lake can elaborate many independent modules concurrently.
-This cross-process lock pool keeps at most two memory-heavy certificate
+This cross-process lock pool keeps at most three memory-heavy certificate
 commands or decision procedures active at a time.  It affects build scheduling
 only: the resulting declarations remain ordinary kernel-checked proof terms.
 -/
@@ -22,7 +22,7 @@ private partial def acquireCertificateElaborationSlot
   IO.sleep 25
   acquireCertificateElaborationSlot handles
 
-/-- Run a memory-heavy elaboration action in a two-worker, project-wide pool. -/
+/-- Run a memory-heavy elaboration action in a three-worker, project-wide pool. -/
 def withCertificateElaborationLock
     [Monad m] [MonadFinally m] [MonadLiftT IO m] (act : m α) : m α := do
   let projectDirectory ← IO.Process.getCurrentDir
@@ -30,7 +30,7 @@ def withCertificateElaborationLock
   -- writable build area; the `.lake` root itself may be read-only.
   let lakeBuildDirectory := projectDirectory / ".lake" / "build"
   IO.FS.createDirAll lakeBuildDirectory
-  let handles ← #[0, 1].mapM fun slot => IO.FS.Handle.mk
+  let handles ← #[0, 1, 2].mapM fun slot => IO.FS.Handle.mk
     (lakeBuildDirectory / s!"tuza-certificate-elaboration-{slot}.lock") .append
   let handle ← acquireCertificateElaborationSlot handles
   try

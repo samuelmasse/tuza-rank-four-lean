@@ -22,7 +22,7 @@ jobs:
       - name: Check release-runner capacity
         shell: bash
         run: bash scripts/check-release-runner.sh
-      - uses: leanprover/lean-action@38fbc41a8c28c4cbaec22d7f7de508ec2e7c0dd9
+      - uses: leanprover/lean-action@fe408643ea7367d8c0404a8be3975bb145f5fb64
         with:
           build: false
           use-github-cache: false
